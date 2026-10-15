@@ -351,12 +351,12 @@ def plan_page(
 
 
 @router.post("/get_soil_by_city")
-async def legacy_soil(request: Request, user: User = Depends(get_visitor)):
+async def legacy_soil(request: Request, user: User = Depends(get_visitor), db: Session = Depends(get_db)):
     if not user:
         return JSONResponse({"success": False, "message": "Please sign in."}, status_code=401)
     body = await request.json()
     try:
-        data = await lookup.soil_for_city((body.get("city") or "").strip())
+        data = await lookup.soil_for_city((body.get("city") or "").strip(), db)
     except lookup.LookupError as exc:
         return JSONResponse({"success": False, "message": str(exc)}, status_code=502)
     return JSONResponse({"success": True, **data})

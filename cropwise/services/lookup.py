@@ -12,7 +12,9 @@ honest source is a soil test (see docs/MODEL_CARD.md).
 from __future__ import annotations
 
 import asyncio
+import json
 import math
+import pathlib
 
 import httpx
 
@@ -21,11 +23,27 @@ SOILGRIDS_URL = "https://rest.isric.org/soilgrids/v2.0/properties/query"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 # Generous, because SoilGrids is often slow — but nothing that renders a page may wait on it.
 # Pages render from local data and fetch these readings afterwards.
-TIMEOUT = httpx.Timeout(12.0, connect=6.0)
+TIMEOUT = httpx.Timeout(8.0, connect=5.0)
 # SoilGrids can take half a minute. A serverless function that waits that long is killed and the
 # farmer sees a 500, so the whole lookup is bounded and cached instead.
-SOIL_BUDGET_SECONDS = 22.0
+# Vercel's gateway cuts a request off at about 25 seconds, and a cold start spends several
+# seconds importing scikit-learn before this code runs. Twelve seconds leaves room for both,
+# so a slow upstream produces a clear message instead of a 500.
+SOIL_BUDGET_SECONDS = 12.0
 _SOIL_CACHE: dict[str, dict] = {}
+PREFETCHED = pathlib.Path(__file__).resolve().parents[2] / "data" / "soil_cache.json"
+
+
+def _prefetched() -> dict:
+    """Readings collected by scripts/prefetch_soil.py and committed with the code.
+
+    They are real SoilGrids values, not estimates: fetching them here rather than at request
+    time is what keeps auto-detect instant for the towns most farmers will type.
+    """
+    try:
+        return json.loads(PREFETCHED.read_text())
+    except (OSError, ValueError):
+        return {}
 
 
 class LookupError(Exception):
@@ -73,11 +91,25 @@ async def _query_soilgrids(lat: float, lon: float) -> dict:
     }
 
 
-async def soil_for_city(city: str) -> dict:
-    """Cached wrapper: the same town is only looked up once per process."""
+async def soil_for_city(city: str, db=None) -> dict:
+    """Soil for a town, from the database if anyone has asked before, otherwise from SoilGrids."""
     key = city.strip().lower()
     if key in _SOIL_CACHE:
         return _SOIL_CACHE[key]
+
+    shipped = _prefetched().get(key)
+    if shipped:
+        _SOIL_CACHE[key] = shipped
+        return shipped
+
+    if db is not None:
+        from ..database import SoilReading
+
+        row = db.query(SoilReading).filter(SoilReading.place == key).one_or_none()
+        if row:
+            cached = json.loads(row.payload)
+            _SOIL_CACHE[key] = cached
+            return cached
     try:
         result = await asyncio.wait_for(_soil_for_city(city), timeout=SOIL_BUDGET_SECONDS)
     except asyncio.TimeoutError as exc:
@@ -86,6 +118,14 @@ async def soil_for_city(city: str) -> dict:
             "minute, or type your Soil Health Card values in by hand."
         ) from exc
     _SOIL_CACHE[key] = result
+    if db is not None:
+        from ..database import SoilReading
+
+        try:
+            db.add(SoilReading(place=key, payload=json.dumps(result)))
+            db.commit()
+        except Exception:
+            db.rollback()  # a duplicate from a parallel request is harmless
     return result
 
 
@@ -100,43 +140,30 @@ async def _soil_for_city(city: str) -> dict:
     place = await geocode(city)
     lat, lon = place["latitude"], place["longitude"]
 
-    # Ask the town centre and a ring around it at the same time. SoilGrids masks built-up land,
-    # so the centre is often empty; waiting to find that out before starting the ring doubled the
-    # time a farmer sat looking at a spinner.
-    def ring(radius_km: float, points: int = 4) -> list[tuple[float, float]]:
-        out = []
-        for i in range(points):
-            angle = math.radians(i * (360 / points))
-            out.append(
-                (
-                    lat + (radius_km / 111.0) * math.cos(angle),
-                    lon + (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle),
-                )
-            )
-        return out
+    # ISRIC rate-limits SoilGrids to roughly five calls a minute, so the ring is walked one
+    # point at a time and stops as soon as something answers. Firing them in parallel looked
+    # faster and in fact tripped the limit, which is why most towns returned nothing.
+    def ring_point(radius_km: float, bearing_degrees: float) -> tuple[float, float]:
+        angle = math.radians(bearing_degrees)
+        return (
+            lat + (radius_km / 111.0) * math.cos(angle),
+            lon + (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle),
+        )
 
     attempts: list[tuple[float, tuple[float, float]]] = [(0.0, (lat, lon))]
-    attempts += [(10.0, point) for point in ring(10.0)]
-    results = await asyncio.gather(
-        *(_query_soilgrids(a, b) for _, (a, b) in attempts), return_exceptions=True
-    )
+    attempts += [(10.0, ring_point(10.0, b)) for b in (0, 120, 240)]
+    attempts += [(25.0, ring_point(25.0, 60))]
 
     layers: dict = {}
     sampled_km = 0.0
-    for (distance, _point), found in zip(attempts, results):
-        if isinstance(found, dict) and any(v is not None for v in found.values()):
+    for distance, (plat, plon) in attempts:
+        try:
+            found = await _query_soilgrids(plat, plon)
+        except LookupError:
+            continue
+        if any(v is not None for v in found.values()):
             layers, sampled_km = found, distance
             break
-
-    if not layers:
-        # Nothing within 10 km: one wider ring before giving up.
-        wider = await asyncio.gather(
-            *(_query_soilgrids(a, b) for a, b in ring(25.0)), return_exceptions=True
-        )
-        for found in wider:
-            if isinstance(found, dict) and any(v is not None for v in found.values()):
-                layers, sampled_km = found, 25.0
-                break
 
     if not layers or all(v is None for v in layers.values()):
         raise LookupError(

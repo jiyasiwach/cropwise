@@ -114,8 +114,12 @@ $('detect').addEventListener('click', async () => {
       : '<span class="chip">Read for ' + data.city + '</span> ISRIC SoilGrids, 0–5 cm.';
     toast('Soil read for ' + data.city);
   } catch (error) {
-    $('status').textContent = error.message;
-    toast(error.message, 'bad');
+    // SoilGrids is frequently slow or down. Never leave the farmer at a dead end: switch the
+    // form to manual entry and say plainly what happened.
+    $('status').innerHTML = '<span class="chip chip-warn">Soil service unavailable</span> ' +
+      error.message + ' You can type the values in below — a Soil Health Card has all of them.';
+    enableManual();
+    toast('Soil service is down — type the values in', 'bad');
   } finally {
     clearInterval(ticker);
     button.disabled = false;
@@ -124,14 +128,19 @@ $('detect').addEventListener('click', async () => {
 });
 
 // If the service is unavailable, the farmer must still be able to continue by hand.
-document.getElementById('manual').addEventListener('click', () => {
-  ['nitrogenVal', 'phVal', 'clayVal', 'socVal'].forEach((id) => {
-    $(id).readOnly = false;
-    $(id).placeholder = 'type a value';
-  });
+function enableManual() {
+  [['nitrogenVal', 'e.g. 1.4'], ['phVal', 'e.g. 6.5'], ['clayVal', 'e.g. 28'], ['socVal', 'e.g. 14']]
+    .forEach(([id, hint]) => {
+      $(id).readOnly = false;
+      $(id).placeholder = hint;
+    });
   $('hiddenCity').value = $('cityInput').value.trim() || 'my field';
   $('next').disabled = false;
-  $('status').textContent = 'Typing your own values. Use your Soil Health Card if you have one.';
+}
+
+document.getElementById('manual').addEventListener('click', () => {
+  enableManual();
+  $('status').textContent = 'Typing your own values. A Soil Health Card lists all four.';
   $('nitrogenVal').focus();
 });
 

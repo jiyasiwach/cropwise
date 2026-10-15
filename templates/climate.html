@@ -62,12 +62,18 @@
 {% block scripts %}
 <script>
 const $ = (id) => document.getElementById(id);
-const CITY = {{ (locked_city or '')|tojson }};
+const CITY = {{ (locked_city or '')|tojson }} || 'my field';
 
 $('detect').addEventListener('click', async () => {
   const button = $('detect');
   button.disabled = true;
   button.innerHTML = '<span class="spinner"></span>Reading the weather…';
+  if (!CITY || CITY === 'my field') {
+    $('status').textContent = 'No town was carried over, so type the three values in yourself.';
+    button.disabled = false;
+    button.innerHTML = '⚡ Auto detect';
+    return;
+  }
   $('status').textContent = 'Asking Open-Meteo about ' + CITY + '…';
   try {
     const response = await fetch('/get_weather_by_city', {

@@ -33,9 +33,11 @@ def me(user: User = Depends(get_visitor)) -> UserOut:
 
 
 @router.get("/soil", response_model=SoilOut)
-async def soil(city: str, _: User = Depends(get_visitor)) -> SoilOut:
+async def soil(
+    city: str, _: User = Depends(get_visitor), db: Session = Depends(get_db)
+) -> SoilOut:
     try:
-        return SoilOut(**await lookup.soil_for_city(city))
+        return SoilOut(**await lookup.soil_for_city(city, db))
     except lookup.LookupError as exc:
         raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
 

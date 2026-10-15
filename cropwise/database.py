@@ -117,6 +117,22 @@ class MandiPrice(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
+class SoilReading(Base):
+    """Soil for a town, kept so the slow upstream is asked once rather than once per visitor.
+
+    A memory cache is useless on serverless: each cold start begins empty. This table is the
+    difference between a 13-second wait and an instant answer for the second person to type
+    the same town.
+    """
+
+    __tablename__ = "soil_readings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    place: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    payload: Mapped[str] = mapped_column(Text, nullable=False)  # the JSON we would have returned
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
 

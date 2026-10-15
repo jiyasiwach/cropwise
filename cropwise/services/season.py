@@ -112,7 +112,7 @@ async def _build_snapshot(db: Session, city: str = DEFAULT_CITY) -> dict:
     }
 
     try:
-        soil = await lookup.soil_for_city(city)
+        soil = await lookup.soil_for_city(city, db)
         weather = await lookup.weather_for_city(city)
         result["soil"] = soil
         result["weather"] = weather

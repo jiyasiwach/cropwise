@@ -1,0 +1,62 @@
+{
+ "aurangabad": {
+  "city": "Aurangabad",
+  "clay": 49.0,
+  "country": "India",
+  "latitude": 19.87757,
+  "longitude": 75.34226,
+  "missing": [],
+  "nitrogen": 1.39,
+  "organic_carbon": 10.9,
+  "ph": 7.2,
+  "phosphorus": null,
+  "potassium": null,
+  "sample_note": "No soil is mapped under Aurangabad itself (SoilGrids masks built-up land), so these readings come from farmland about 25 km away.",
+  "sampled_offset_km": 25.0
+ },
+ "belgaum": {
+  "city": "Belgaum Airport",
+  "clay": 29.2,
+  "country": "India",
+  "latitude": 15.85929,
+  "longitude": 74.61829,
+  "missing": [],
+  "nitrogen": 1.7,
+  "organic_carbon": 22.0,
+  "ph": 6.4,
+  "phosphorus": null,
+  "potassium": null,
+  "sample_note": "No soil is mapped under Belgaum Airport itself (SoilGrids masks built-up land), so these readings come from farmland about 25 km away.",
+  "sampled_offset_km": 25.0
+ },
+ "tiruchirappalli": {
+  "city": "Tiruchirappalli",
+  "clay": 31.9,
+  "country": "India",
+  "latitude": 10.8155,
+  "longitude": 78.69651,
+  "missing": [],
+  "nitrogen": 1.98,
+  "organic_carbon": 24.4,
+  "ph": 7.3,
+  "phosphorus": null,
+  "potassium": null,
+  "sample_note": "No soil is mapped under Tiruchirappalli itself (SoilGrids masks built-up land), so these readings come from farmland about 25 km away.",
+  "sampled_offset_km": 25.0
+ },
+ "udaipur": {
+  "city": "Udaipur",
+  "clay": 32.8,
+  "country": "India",
+  "latitude": 24.58584,
+  "longitude": 73.71346,
+  "missing": [],
+  "nitrogen": 1.59,
+  "organic_carbon": 13.2,
+  "ph": 7.3,
+  "phosphorus": null,
+  "potassium": null,
+  "sample_note": "No soil is mapped under Udaipur itself (SoilGrids masks built-up land), so these readings come from farmland about 10 km away.",
+  "sampled_offset_km": 10.0
+ }
+}
