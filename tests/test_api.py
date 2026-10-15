@@ -29,26 +29,18 @@ with TestClient(main.app) as client:
     spec = client.get("/openapi.json").json()
     check("OpenAPI documents the API", "/api/v1/predict" in spec["paths"])
 
-    # --- everything private is private ---
-    for path in ["/api/v1/me", "/api/v1/soil?city=Hyderabad", "/api/v1/history"]:
-        check(f"401 for {path}", client.get(path).status_code == 401, client.get(path).status_code)
-    check("401 for POST /api/v1/predict", client.post("/api/v1/predict", json={}).status_code in (401, 422))
-    for path in ["/dashboard", "/soil", "/history", "/profile", "/settings"]:
-        r = client.get(path, follow_redirects=False)
-        check(f"page {path} redirects when signed out", r.status_code == 303, r.status_code)
+    # --- no sign-in: every page opens straight away ---
+    for path in ["/", "/dashboard", "/soil", "/history", "/profile", "/settings", "/assistant"]:
+        r = client.get(path)
+        check(f"{path} opens without a login", r.status_code == 200, r.status_code)
+    check("the landing page offers a way in", "Start with my location" in client.get("/").text)
+    check("no login form remains", "password" not in client.get("/").text.lower())
 
-    # --- accounts ---
-    r = client.post("/api/v1/auth/signup", json={"name": "Jiya", "email": "j@x.com", "password": "farming123"})
-    check("signup creates an account", r.status_code == 201, r.text[:120])
-    check("session cookie is httpOnly", "httponly" in r.headers.get("set-cookie", "").lower())
-    r = client.post("/api/v1/auth/signup", json={"name": "x", "email": "j@x.com", "password": "farming123"})
-    check("duplicate signup refused", r.status_code == 409, r.status_code)
-    r = client.post("/api/v1/auth/signup", json={"name": "x", "email": "bad", "password": "farming123"})
-    check("invalid email refused", r.status_code == 422, r.status_code)
-    r = client.post("/api/v1/auth/signup", json={"name": "x", "email": "s@x.com", "password": "short"})
-    check("short password refused", r.status_code == 422, r.status_code)
-
-    check("me works when signed in", client.get("/api/v1/me").json()["email"] == "j@x.com")
+    # --- no accounts: a browser is identified by a cookie ---
+    me = client.get("/api/v1/me").json()
+    check("every visitor gets a workspace", me["id"] > 0, me)
+    check("no personal data is collected", me["email"].endswith("@visitor.cropwise.local"), me["email"])
+    check("the visitor cookie is set", "cropwise_visitor" in client.cookies, dict(client.cookies))
 
     # --- prediction ---
     body = {
@@ -82,37 +74,23 @@ with TestClient(main.app) as client:
                                       "city": "Hyderabad"})
     check("wizard result page renders", "rice" in r.text.lower() and "suits this crop" in r.text, r.status_code)
 
-    # --- one user cannot see another's data ---
-    client.post("/api/v1/auth/logout")
-    client.post("/api/v1/auth/signup", json={"name": "Other", "email": "o@x.com", "password": "farming123"})
-    check("new account sees an empty history", client.get("/api/v1/history").json() == [])
 
-    # --- demo sign-in (DEMO_MODE) ---
-    client.post("/api/v1/auth/logout")
-    r = client.post("/login", data={"email": "brand.new@example.com", "password": "1234"},
-                    follow_redirects=False)
-    check("demo password signs anyone in", r.headers.get("location") == "/dashboard", r.headers.get("location"))
-    check("demo sign-in creates the account", client.get("/dashboard").status_code == 200)
-    client.cookies.clear()
-    r = client.post("/login", data={"email": "brand.new@example.com", "password": "wrong"},
-                    follow_redirects=False)
-    check("a wrong password is still refused", "error" in r.headers.get("location", ""), r.headers.get("location"))
-    client.cookies.clear()
-    check("the login page says demo mode is on", "Demo mode" in client.get("/").text)
+    # --- one browser's history is not another's ---
+    from fastapi.testclient import TestClient as _TC
 
-    import cropwise.routers.pages as pages_module
-    os.environ["DEMO_MODE"] = "0"
-    try:
-        # A fresh address: "brand.new" now genuinely has 1234 as its password, because the
-        # demo sign-in created the account with it.
-        r = client.post("/login", data={"email": "never.seen@example.com", "password": "1234"},
-                        follow_redirects=False)
-        check("DEMO_MODE=0 turns the demo password off", "error" in r.headers.get("location", ""),
-              r.headers.get("location"))
-        check("the banner disappears with it", "Demo mode" not in client.get("/").text)
-    finally:
-        os.environ["DEMO_MODE"] = "1"
-    assert pages_module.demo_mode() is True
+    other = _TC(main.app)
+    check("a second browser starts empty", other.get("/api/v1/history").json() == [])
+
+    # --- profit ---
+    money = client.get("/api/v1/profit?crop=rice&state=Telangana&acres=2").json()
+    check("profit returns revenue, costs and a bottom line",
+          {"revenue", "costs", "profit"} <= money.keys(), money.keys())
+    check("profit scales with the land",
+          client.get("/api/v1/profit?crop=rice&acres=4").json()["revenue"] > money["revenue"])
+    check("profit says what it assumed", len(money["assumptions"]) >= 3)
+    ranked = client.get("/api/v1/profit/compare?crops=rice,maize,chickpea&acres=2").json()["results"]
+    check("profit comparison is sorted by profit",
+          [r["profit"] for r in ranked] == sorted([r["profit"] for r in ranked], reverse=True))
 
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)

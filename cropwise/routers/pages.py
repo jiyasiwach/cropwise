@@ -22,27 +22,16 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from ..database import Prediction, User, get_db
-from ..security import COOKIE_NAME, current_user_optional, hash_password, set_session_cookie, verify_password
-from ..services import cropplan, lookup
+from ..visitor import COOKIE_NAME, get_visitor
+from ..services import cropplan, lookup, season
 from ..services.predictor import recommend
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 templates = Jinja2Templates(directory=str(ROOT / "templates"))
 
-def demo_mode() -> bool:
-    """A deliberately weak sign-in for showing the app: any email, one shared password.
-
-    It is loud about itself — the login page says so in a banner — and one environment variable
-    turns it off. It must be off before any real farmer data goes in.
-    """
-    return os.environ.get("DEMO_MODE", "1") == "1"
-
-
-DEMO_PASSWORD = os.environ.get("DEMO_PASSWORD", "1234")
-
 ROUTES = {
     "login": "/",
-    "signup": "/signup",
+    "landing": "/",
     "dashboard": "/dashboard",
     "soil": "/soil",
     "climate": "/climate",
@@ -74,69 +63,30 @@ def signed_in(response: RedirectResponse, email: str) -> RedirectResponse:
     return response
 
 
-def require(user: User | None, path: str = "/") -> RedirectResponse | None:
-    return None if user else RedirectResponse(path, status_code=303)
-
-
-# ---- sign in / sign up ----------------------------------------------------
+# ---- entry ---------------------------------------------------------------
 
 
 @router.get("/", response_class=HTMLResponse)
-def login_page(request: Request, error: str | None = None, user: User | None = Depends(current_user_optional)):
-    if user:
-        return RedirectResponse("/dashboard", status_code=303)
-    return render(request, "login.html", error=error, signup=False, demo_mode=demo_mode())
+def landing(request: Request):
+    """The front door.
 
-
-@router.post("/login")
-def login_submit(email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    email = email.strip().lower()
-    row = db.query(User).filter(User.email == email).one_or_none()
-
-    if demo_mode() and password == DEMO_PASSWORD:
-        if not row:
-            # First time in demo mode: make the account rather than bouncing the visitor.
-            row = User(
-                email=email,
-                password_hash=hash_password(DEMO_PASSWORD),
-                name=email.split("@")[0].replace(".", " ").title(),
-            )
-            db.add(row)
-            db.commit()
-        return signed_in(RedirectResponse("/dashboard", status_code=303), row.email)
-
-    if not row or not verify_password(password, row.password_hash):
-        return RedirectResponse("/?error=Those+details+did+not+match+an+account.", status_code=303)
-    return signed_in(RedirectResponse("/dashboard", status_code=303), row.email)
-
-
-@router.get("/signup", response_class=HTMLResponse)
-def signup_page(request: Request, error: str | None = None):
-    return render(request, "signup.html", error=error, signup=True, demo_mode=demo_mode())
-
-
-@router.post("/signup")
-def signup_submit(
-    name: str = Form(""),
-    email: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    email = email.strip().lower()
-    if len(password) < 8:
-        return RedirectResponse("/signup?error=Use+a+password+of+at+least+8+characters.", status_code=303)
-    if db.query(User).filter(User.email == email).one_or_none():
-        return RedirectResponse("/signup?error=That+email+already+has+an+account.", status_code=303)
-    db.add(User(email=email, password_hash=hash_password(password), name=name.strip() or email.split("@")[0]))
-    db.commit()
-    return signed_in(RedirectResponse("/dashboard", status_code=303), email)
+    Rendered entirely from the local crop calendar so it appears at once; the live soil, weather
+    and prices are fetched by the browser from /api/v1/season and swapped in when they arrive.
+    """
+    return render(
+        request,
+        "landing.html",
+        active_page="landing",
+        city=season.DEFAULT_CITY,
+        month=date.today().strftime("%B"),
+        sowable=season.sowable_now()[:3],
+    )
 
 
 @router.get("/logout")
 def logout_page():
-    response = RedirectResponse("/", status_code=303)
-    response.delete_cookie(COOKIE_NAME, path="/")
-    return response
+    """Kept so old links do not 404. There is nothing to sign out of."""
+    return RedirectResponse("/", status_code=303)
 
 
 # ---- the app --------------------------------------------------------------
@@ -145,44 +95,43 @@ def logout_page():
 @router.get("/dashboard", response_class=HTMLResponse)
 def dashboard(
     request: Request,
-    user: User | None = Depends(current_user_optional),
+    city: str = season.DEFAULT_CITY,
+    user: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ):
-    gate = require(user)
-    if gate:
-        return gate
+    """The app's home. Local data renders immediately; live conditions arrive over the API."""
     total = db.query(Prediction).filter(Prediction.user_id == user.id).count()
-    latest = (
+    recent = (
         db.query(Prediction)
         .filter(Prediction.user_id == user.id)
         .order_by(desc(Prediction.created_at))
-        .first()
+        .limit(3)
+        .all()
     )
-    name = (user.name or user.email.split("@")[0]).split()[0].title()
     return render(
         request,
         "dashboard.html",
         active_page="dashboard",
-        name=name,
-        initial=name[0].upper(),
-        total=total,
+        city=city,
         today_long=date.today().strftime("%A, %d %B %Y"),
-        last=(
+        total=total,
+        sowable=season.sowable_now(),
+        icon=season.icon,
+        recent=[
             {
-                "crop": latest.crop,
-                "confidence": latest.confidence,
-                "city": latest.city,
-                "when": latest.created_at.strftime("%d %b, %I:%M %p"),
+                "crop": r.crop,
+                "confidence": r.confidence,
+                "city": r.city or "—",
+                "when": r.created_at.strftime("%d %b"),
             }
-            if latest
-            else None
-        ),
+            for r in recent
+        ],
     )
 
 
 @router.get("/soil", response_class=HTMLResponse)
-def soil_page(request: Request, user: User | None = Depends(current_user_optional)):
-    return require(user) or render(request, "soil.html", active_page="soil")
+def soil_page(request: Request, user: User = Depends(get_visitor)):
+    return render(request, "soil.html", active_page="soil")
 
 
 @router.post("/climate", response_class=HTMLResponse)
@@ -195,12 +144,9 @@ def climate_page(
     ph: float = Form(6.5),
     clay: float = Form(25.0),
     organic_carbon: float = Form(12.0),
-    user: User | None = Depends(current_user_optional),
+    user: User = Depends(get_visitor),
 ):
     """Step 2 of the wizard. The soil readings travel on in hidden fields."""
-    gate = require(user)
-    if gate:
-        return gate
     return render(
         request,
         "climate.html",
@@ -230,12 +176,9 @@ def predict_page(
     ph: float = Form(6.5),
     clay: float = Form(25.0),
     organic_carbon: float = Form(12.0),
-    user: User | None = Depends(current_user_optional),
+    user: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ):
-    gate = require(user)
-    if gate:
-        return gate
 
     readings = {
         "nitrogen": nitrogen,
@@ -287,10 +230,7 @@ def predict_page(
 
 
 @router.get("/history", response_class=HTMLResponse)
-def history_page(request: Request, user: User | None = Depends(current_user_optional), db: Session = Depends(get_db)):
-    gate = require(user)
-    if gate:
-        return gate
+def history_page(request: Request, user: User = Depends(get_visitor), db: Session = Depends(get_db)):
     rows = (
         db.query(Prediction)
         .filter(Prediction.user_id == user.id)
@@ -318,10 +258,7 @@ def history_page(request: Request, user: User | None = Depends(current_user_opti
 
 
 @router.get("/profile", response_class=HTMLResponse)
-def profile_page(request: Request, user: User | None = Depends(current_user_optional), db: Session = Depends(get_db)):
-    gate = require(user)
-    if gate:
-        return gate
+def profile_page(request: Request, user: User = Depends(get_visitor), db: Session = Depends(get_db)):
     total = db.query(Prediction).filter(Prediction.user_id == user.id).count()
     last = (
         db.query(Prediction)
@@ -342,16 +279,13 @@ def profile_page(request: Request, user: User | None = Depends(current_user_opti
 
 
 @router.get("/settings", response_class=HTMLResponse)
-def settings_page(request: Request, user: User | None = Depends(current_user_optional)):
-    return require(user) or render(request, "settings.html", email=user.email, active_page="settings")
+def settings_page(request: Request, user: User = Depends(get_visitor)):
+    return render(request, "settings.html", email=user.email, active_page="settings")
 
 
 @router.get("/eval", response_class=HTMLResponse)
-def eval_page(request: Request, user: User | None = Depends(current_user_optional)):
+def eval_page(request: Request, user: User = Depends(get_visitor)):
     """The evaluation numbers, read from the file `make eval` writes."""
-    gate = require(user)
-    if gate:
-        return gate
     path = pathlib.Path(__file__).resolve().parents[2] / "docs" / "eval.json"
     if not path.exists():
         return render(request, "plan_missing.html", crop="evaluation results", crops=["run make eval"])
@@ -361,9 +295,9 @@ def eval_page(request: Request, user: User | None = Depends(current_user_optiona
 
 
 @router.get("/assistant", response_class=HTMLResponse)
-def assistant_page(request: Request, user: User | None = Depends(current_user_optional)):
+def assistant_page(request: Request, user: User = Depends(get_visitor)):
     """KrishiMitra, full page. The floating button on other pages links here."""
-    return require(user) or render(request, "assistant.html", active_page="assistant")
+    return render(request, "assistant.html", active_page="assistant")
 
 
 @router.get("/plan/{crop}", response_class=HTMLResponse)
@@ -375,12 +309,9 @@ def plan_page(
     state: str = "Telangana",
     latitude: float = 17.385,
     longitude: float = 78.4867,
-    user: User | None = Depends(current_user_optional),
+    user: User = Depends(get_visitor),
 ):
     """The plan for one crop: timeline, fertiliser, shops, prices and where to sell."""
-    gate = require(user)
-    if gate:
-        return gate
     try:
         timeline = cropplan.sowing_window(crop)
         fertiliser = cropplan.fertiliser_plan(crop, acres=acres)
@@ -420,7 +351,7 @@ def plan_page(
 
 
 @router.post("/get_soil_by_city")
-async def legacy_soil(request: Request, user: User | None = Depends(current_user_optional)):
+async def legacy_soil(request: Request, user: User = Depends(get_visitor)):
     if not user:
         return JSONResponse({"success": False, "message": "Please sign in."}, status_code=401)
     body = await request.json()
@@ -432,7 +363,7 @@ async def legacy_soil(request: Request, user: User | None = Depends(current_user
 
 
 @router.post("/get_weather_by_city")
-async def legacy_weather(request: Request, user: User | None = Depends(current_user_optional)):
+async def legacy_weather(request: Request, user: User = Depends(get_visitor)):
     if not user:
         return JSONResponse({"success": False, "message": "Please sign in."}, status_code=401)
     body = await request.json()

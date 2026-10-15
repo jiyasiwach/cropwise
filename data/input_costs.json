@@ -1,0 +1,21 @@
+{
+  "_about": "Rough all-India input costs used by the profit estimate. These move with the market and vary by state; they are averages for an order-of-magnitude answer, not quotations.",
+  "_sources": [
+    "Fertiliser: subsidised retail prices commonly quoted for urea (45 kg bag), DAP (50 kg bag) and MOP (50 kg bag)",
+    "Seed and labour: Commission for Agricultural Costs and Prices cost-of-cultivation ranges"
+  ],
+  "_status": "needs_verification",
+  "fertiliser_per_kg": { "urea": 5.9, "dap": 27.0, "mop": 17.5 },
+  "seed_per_acre": {
+    "_default": 2000,
+    "rice": 1600, "maize": 2400, "cotton": 3200, "chickpea": 3000, "lentil": 2600,
+    "mungbean": 2400, "blackgram": 2400, "pigeonpeas": 1800, "jute": 1200,
+    "banana": 22000, "papaya": 9000, "watermelon": 4500, "muskmelon": 4500
+  },
+  "labour_per_acre": {
+    "_default": 9000,
+    "rice": 14000, "cotton": 16000, "banana": 20000, "grapes": 28000, "coffee": 18000,
+    "chickpea": 7000, "lentil": 6500, "mungbean": 6500, "maize": 8500
+  },
+  "other_per_acre": 3000
+}

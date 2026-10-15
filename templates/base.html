@@ -32,7 +32,7 @@
     <div class="nav-group">You</div>
     <a class="menu-item {% if active_page == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}"><span class="ic">👤</span> <span data-i18n="profile">Profile</span></a>
     <a class="menu-item {% if active_page == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}"><span class="ic">⚙</span> <span data-i18n="settings">Settings</span></a>
-    <a class="menu-item" href="{{ url_for('logout') }}"><span class="ic">↪</span> Sign out</a>
+    <a class="menu-item" href="/"><span class="ic">↪</span> About CropWise</a>
 
     <div class="spacer"></div>
     <div class="help-box">

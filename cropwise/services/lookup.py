@@ -11,6 +11,7 @@ honest source is a soil test (see docs/MODEL_CARD.md).
 
 from __future__ import annotations
 
+import asyncio
 import math
 
 import httpx
@@ -18,7 +19,9 @@ import httpx
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 SOILGRIDS_URL = "https://rest.isric.org/soilgrids/v2.0/properties/query"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
-TIMEOUT = httpx.Timeout(30.0, connect=10.0)
+# Generous, because SoilGrids is often slow — but nothing that renders a page may wait on it.
+# Pages render from local data and fetch these readings afterwards.
+TIMEOUT = httpx.Timeout(25.0, connect=8.0)
 
 
 class LookupError(Exception):
@@ -80,14 +83,23 @@ async def soil_for_city(city: str) -> dict:
     layers = await _query_soilgrids(lat, lon)
     sampled_km = 0.0
     if all(v is None for v in layers.values()):
-        # Eight points on a ring, then a wider one: enough to clear a city's built-up area.
+        # Points on a ring around the town, asked all at once rather than one after another:
+        # sequentially this took half a minute, which is longer than a serverless function lives.
         for radius_km in (10.0, 25.0):
-            for bearing in range(0, 360, 45):
+            offsets = []
+            for bearing in range(0, 360, 90):
                 angle = math.radians(bearing)
-                d_lat = (radius_km / 111.0) * math.cos(angle)
-                d_lon = (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle)
-                nearby = await _query_soilgrids(lat + d_lat, lon + d_lon)
-                if any(v is not None for v in nearby.values()):
+                offsets.append(
+                    (
+                        lat + (radius_km / 111.0) * math.cos(angle),
+                        lon + (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle),
+                    )
+                )
+            results = await asyncio.gather(
+                *(_query_soilgrids(a, b) for a, b in offsets), return_exceptions=True
+            )
+            for nearby in results:
+                if isinstance(nearby, dict) and any(v is not None for v in nearby.values()):
                     layers, sampled_km = nearby, radius_km
                     break
             if sampled_km:

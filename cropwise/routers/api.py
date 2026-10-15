@@ -12,61 +12,20 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from ..database import Prediction, User, get_db
-from ..schemas import (
-    HistoryItem,
-    LoginIn,
-    PredictIn,
-    PredictOut,
-    SignupIn,
-    SoilOut,
-    UserOut,
-    WeatherOut,
-)
-from ..security import COOKIE_NAME, current_user, hash_password, set_session_cookie, verify_password
-from ..services import cropplan, lookup, mandi, market, stores
+from ..schemas import HistoryItem, PredictIn, PredictOut, SoilOut, UserOut, WeatherOut
+from ..visitor import get_visitor
+from ..services import cropplan, lookup, mandi, market, profit, season, stores
 from ..services.predictor import recommend
 
 router = APIRouter(prefix="/api/v1")
 
 
-# ---- accounts -------------------------------------------------------------
-
-
-@router.post("/auth/signup", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def signup(body: SignupIn, response: Response, db: Session = Depends(get_db)) -> UserOut:
-    email = body.email.lower()
-    if db.query(User).filter(User.email == email).one_or_none():
-        raise HTTPException(status.HTTP_409_CONFLICT, "That email already has an account.")
-    user = User(
-        email=email,
-        password_hash=hash_password(body.password),
-        name=body.name.strip() or email.split("@")[0],
-        state=body.state,
-    )
-    db.add(user)
-    db.commit()
-    set_session_cookie(response, email)
-    return UserOut(id=user.id, email=user.email, name=user.name, state=user.state)
-
-
-@router.post("/auth/login", response_model=UserOut)
-def login(body: LoginIn, response: Response, db: Session = Depends(get_db)) -> UserOut:
-    user = db.query(User).filter(User.email == body.email.lower()).one_or_none()
-    # One message for both failures, so the endpoint cannot be used to discover who has an account.
-    if not user or not verify_password(body.password, user.password_hash):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Those details did not match an account.")
-    set_session_cookie(response, user.email)
-    return UserOut(id=user.id, email=user.email, name=user.name, state=user.state)
-
-
-@router.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
-def logout(response: Response) -> Response:
-    response.delete_cookie(COOKIE_NAME, path="/")
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+# ---- who am I ------------------------------------------------------------
 
 
 @router.get("/me", response_model=UserOut)
-def me(user: User = Depends(current_user)) -> UserOut:
+def me(user: User = Depends(get_visitor)) -> UserOut:
+    """There is no sign-in: this is the workspace tied to this browser."""
     return UserOut(id=user.id, email=user.email, name=user.name, state=user.state)
 
 
@@ -74,7 +33,7 @@ def me(user: User = Depends(current_user)) -> UserOut:
 
 
 @router.get("/soil", response_model=SoilOut)
-async def soil(city: str, _: User = Depends(current_user)) -> SoilOut:
+async def soil(city: str, _: User = Depends(get_visitor)) -> SoilOut:
     try:
         return SoilOut(**await lookup.soil_for_city(city))
     except lookup.LookupError as exc:
@@ -82,7 +41,7 @@ async def soil(city: str, _: User = Depends(current_user)) -> SoilOut:
 
 
 @router.get("/weather", response_model=WeatherOut)
-async def weather(city: str, days: int = 30, _: User = Depends(current_user)) -> WeatherOut:
+async def weather(city: str, days: int = 30, _: User = Depends(get_visitor)) -> WeatherOut:
     try:
         return WeatherOut(**await lookup.weather_for_city(city, days))
     except lookup.LookupError as exc:
@@ -94,7 +53,7 @@ async def weather(city: str, days: int = 30, _: User = Depends(current_user)) ->
 
 @router.post("/predict", response_model=PredictOut)
 def predict(
-    body: PredictIn, user: User = Depends(current_user), db: Session = Depends(get_db)
+    body: PredictIn, user: User = Depends(get_visitor), db: Session = Depends(get_db)
 ) -> PredictOut:
     """Top three crops. Uses the lab model only when a soil test supplied N, P and K."""
     has_lab = None not in (body.lab_nitrogen, body.lab_phosphorus, body.lab_potassium)
@@ -159,7 +118,7 @@ def predict(
 
 @router.get("/history", response_model=list[HistoryItem])
 def history(
-    limit: int = 50, user: User = Depends(current_user), db: Session = Depends(get_db)
+    limit: int = 50, user: User = Depends(get_visitor), db: Session = Depends(get_db)
 ) -> list[HistoryItem]:
     rows = (
         db.query(Prediction)
@@ -191,7 +150,7 @@ def crop_plan(
     soil_phosphorus: float | None = None,
     soil_potassium: float | None = None,
     soil_nitrogen: float | None = None,
-    _: User = Depends(current_user),
+    _: User = Depends(get_visitor),
 ) -> dict:
     """When to sow, when to harvest, and what fertiliser to buy for this much land."""
     try:
@@ -212,7 +171,7 @@ async def nearby_stores(
     latitude: float,
     longitude: float,
     radius_km: float = 15,
-    _: User = Depends(current_user),
+    _: User = Depends(get_visitor),
 ) -> dict:
     """Agri-input shops near a point, from OpenStreetMap."""
     return await stores.find_stores(latitude, longitude, radius_km)
@@ -225,7 +184,7 @@ async def mandi_prices(
     days: int = 30,
     latitude: float | None = None,
     longitude: float | None = None,
-    _: User = Depends(current_user),
+    _: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ) -> dict:
     """Daily mandi prices and a trend. Cached; labelled MOCK when no data.gov.in key is set."""
@@ -239,8 +198,50 @@ async def best_market(
     latitude: float,
     longitude: float,
     quintals: float = 10.0,
-    _: User = Depends(current_user),
+    _: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ) -> dict:
     """Markets ranked by what the farmer actually keeps, after transport."""
     return await market.best_markets(db, crop, state, latitude, longitude, quintals)
+
+
+@router.get("/profit")
+async def profit_estimate(
+    crop: str,
+    state: str = "Telangana",
+    acres: float = 1.0,
+    _: User = Depends(get_visitor),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Expected yield, revenue, costs and profit for one crop on this much land."""
+    try:
+        return await profit.estimate(db, crop.lower(), state, acres)
+    except cropplan.UnknownCrop as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+
+
+@router.get("/profit/compare")
+async def profit_compare(
+    crops: str,
+    state: str = "Telangana",
+    acres: float = 1.0,
+    _: User = Depends(get_visitor),
+    db: Session = Depends(get_db),
+) -> dict:
+    """The same sum for several crops (comma separated), best profit first."""
+    names = [c.strip().lower() for c in crops.split(",") if c.strip()][:5]
+    return {"acres": acres, "state": state, "results": await profit.compare(db, names, state, acres)}
+
+
+@router.get("/season")
+async def season_snapshot(
+    city: str = season.DEFAULT_CITY,
+    _: User = Depends(get_visitor),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Live conditions and what suits them, for the landing page and the dashboard.
+
+    Cached for fifteen minutes. Pages fetch this after they have rendered, so a slow soil
+    service delays one card rather than the whole page.
+    """
+    return await season.snapshot(db, city)

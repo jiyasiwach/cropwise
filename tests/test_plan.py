@@ -61,8 +61,7 @@ check("DAP's own nitrogen is deducted from the urea",
 
 # --- the API and the page ---
 with TestClient(main.app) as client:
-    check("plan API needs a sign-in", client.get("/api/v1/plan/rice").status_code == 401)
-    client.post("/api/v1/auth/signup", json={"name": "T", "email": "t@x.com", "password": "farming123"})
+    check("plan API opens without a sign-in", client.get("/api/v1/plan/rice").status_code == 200)
 
     plan = client.get("/api/v1/plan/rice?acres=2").json()
     check("plan API returns a timeline and a fertiliser plan", {"timeline", "fertiliser"} <= plan.keys(), plan.keys())

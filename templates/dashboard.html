@@ -4,79 +4,165 @@
 {% block body %}
 <div class="topbar">
   <div class="greeting">
-    <h1>Namaste{% if name %}, {{ name }}{% endif %}</h1>
-    <div class="date">{{ today_long }}</div>
+    <h1>Today on your farm</h1>
+    <div class="date">{{ today_long }} · <span id="placeName">{{ city }}</span></div>
   </div>
-  <a class="btn btn-amber" href="{{ url_for('soil') }}">Start an analysis</a>
-  <span class="avatar">{{ initial }}</span>
+  <form method="get" action="/dashboard" style="display:flex;gap:8px;align-items:center">
+    <input type="text" name="city" value="{{ city }}" aria-label="Change town" style="min-height:44px;max-width:180px">
+    <button class="btn btn-ghost btn-sm" type="submit" data-busy-label="Reading…">Change town</button>
+  </form>
+  <a class="btn btn-amber" href="{{ url_for('soil') }}">Full analysis</a>
 </div>
 
-{% if last %}
-<section class="card reveal hoverable" style="margin-bottom:18px">
-  <div class="row" style="align-items:center">
-    <div style="flex:2 1 320px">
-      <h2>Your last recommendation</h2>
-      <p class="muted">{{ last.city or 'your location' }} · {{ last.when }}</p>
-      <p style="margin-top:12px;font-size:24px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;text-transform:capitalize">
-        {{ last.crop }} <span class="chip" style="vertical-align:middle">{{ last.confidence }}% match</span>
-      </p>
-    </div>
-    <div style="flex:1 1 220px;display:flex;gap:10px;flex-wrap:wrap">
-      <a class="btn" href="/plan/{{ last.crop }}">Open the plan</a>
-      <a class="btn btn-ghost" href="{{ url_for('history') }}">All history</a>
-    </div>
-  </div>
-</section>
-{% endif %}
-
-<div class="kpis reveal" style="margin-bottom:18px">
-  <div class="kpi"><span class="n" data-count="{{ total }}">0</span><span class="l">Analyses you have run</span></div>
-  <div class="kpi"><span class="n">22</span><span class="l">Crops the model knows</span></div>
-  <div class="kpi"><span class="n">97<small style="font-size:16px">%</small></span><span class="l">Accuracy from a city estimate</span></div>
-  <div class="kpi"><span class="n">6</span><span class="l">Languages</span></div>
-</div>
-
-<div class="grid">
-  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('soil') }}">
-    <h3>🧪 Check your soil</h3>
-    <p>Type a town. We read nitrogen, pH, clay and organic carbon from ISRIC SoilGrids, and tell
-       you how far away the reading was taken.</p>
-    <p style="margin-top:14px"><span class="chip">Step 1</span></p>
-  </a>
-
-  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('soil') }}">
-    <h3>🌦 Add the weather</h3>
-    <p>Mean temperature, humidity and rainfall over the last 30 days, from Open-Meteo. No typing
-       numbers you do not have.</p>
-    <p style="margin-top:14px"><span class="chip">Step 2</span></p>
-  </a>
-
-  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('history') }}">
-    <h3>🌾 Get three crops</h3>
-    <p>Each with a confidence, the reasons behind it, and a full plan: sowing window, fertiliser,
-       shops and which mandi pays most.</p>
-    <p style="margin-top:14px"><span class="chip">Step 3</span></p>
-  </a>
-
+<div class="grid" style="margin-bottom:18px">
   <section class="card col-8 reveal">
-    <h2>What this app will not do</h2>
-    <p>It will not invent a number to fill a gap. Three examples you can check:</p>
-    <ul class="stack" style="margin:12px 0 0;padding-left:18px">
-      <li><strong>Phosphorus and potassium are left blank</strong> unless you upload a soil test —
-        no map publishes them, and the earlier version of this app guessed them.</li>
-      <li><strong>Soil under a town is reported as sampled from nearby farmland</strong>, with the
-        distance, because satellites do not map built-up land.</li>
-      <li><strong>Mandi prices are labelled MOCK</strong> until a data.gov.in key is set.</li>
-    </ul>
-    <p style="margin-top:14px"><a class="btn btn-ghost btn-sm" href="/eval">See the measured numbers</a></p>
+    <h2>Conditions right now</h2>
+    <p class="muted small" id="conditionsNote">Reading the soil and the weather for {{ city }}…</p>
+    <div class="kpis" style="margin-top:14px" id="conditions">
+      {% for label in ['°C average', '% humidity', 'mm rain, 30 days', 'g/kg nitrogen', 'pH', '% clay'] %}
+      <div class="kpi"><span class="skeleton" style="display:block;width:70px;height:26px"></span>
+        <span class="l">{{ label }}</span></div>
+      {% endfor %}
+    </div>
   </section>
 
   <section class="card col-4 reveal">
-    <h2>Ask in your language</h2>
-    <p>KrishiMitra answers from a cited knowledge base, in six languages, by voice or text. If it
-       does not know, it says so and gives you the Kisan Call Centre.</p>
-    <p style="margin-top:14px"><a class="btn btn-amber" href="/assistant">Open KrishiMitra</a></p>
-    <p class="small muted" style="margin-top:10px">Tip: press Ctrl + K anywhere.</p>
+    <h2>Sow this month</h2>
+    <p class="muted small">Windows open right now, soonest deadline first.</p>
+    {% if sowable %}
+    <div class="stack" style="margin-top:12px">
+      {% for c in sowable %}
+      <a class="card-link" href="/plan/{{ c.crop }}?city={{ city }}"
+         style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:{{ c.tint }}">
+        <span style="font-size:22px">{{ c.icon }}</span>
+        <span style="flex:1">
+          <strong style="text-transform:capitalize">{{ c.crop }}</strong>
+          <span class="small muted" style="display:block">{{ c.season }} · {{ c.days_left }} days left to sow</span>
+        </span>
+        <span aria-hidden="true">→</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted" style="margin-top:12px">No sowing window is open this month for the 22 crops in
+      the calendar. Open a crop plan to see when the next one starts.</p>
+    {% endif %}
   </section>
 </div>
+
+<div class="grid">
+  <section class="card col-8 reveal">
+    <h2>What suits <span id="placeName2">{{ city }}</span> today</h2>
+    <p class="muted small">Run on the live readings above. Tap one for the full plan.</p>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:14px" id="suited">
+      {% for i in [1, 2, 3] %}
+      <div class="card" style="padding:16px">
+        <span class="skeleton" style="display:block;width:38px;height:30px"></span>
+        <span class="skeleton" style="display:block;width:80%;height:18px;margin-top:12px"></span>
+        <span class="skeleton" style="display:block;width:50%;height:14px;margin-top:8px"></span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="card col-4 reveal">
+    <h2>Mandi prices</h2>
+    <p class="muted small" id="priceNote">Loading…</p>
+    <table style="margin-top:10px"><tbody id="priceRows">
+      <tr><td colspan="2"><span class="skeleton" style="display:block;height:16px"></span></td></tr>
+    </tbody></table>
+    <p style="margin-top:12px"><a class="btn btn-ghost btn-sm" id="sellLink" href="/plan/rice?city={{ city }}">Where to sell →</a></p>
+  </section>
+
+  <section class="card col-4 reveal">
+    <h2>Your history</h2>
+    {% if recent %}
+      <div class="stack" style="margin-top:10px">
+        {% for r in recent %}
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:20px">{{ icon(r.crop) }}</span>
+          <span style="flex:1"><strong style="text-transform:capitalize">{{ r.crop }}</strong>
+            <span class="small muted" style="display:block">{{ r.city }} · {{ r.when }}</span></span>
+          <span class="chip">{{ r.confidence }}%</span>
+        </div>
+        {% endfor %}
+      </div>
+      <p style="margin-top:14px"><a class="btn btn-ghost btn-sm" href="{{ url_for('history') }}">All {{ total }} →</a></p>
+    {% else %}
+      <p class="muted" style="margin-top:8px">Nothing yet. Run an analysis for your own field and it
+        is saved here — no account needed, it stays in this browser.</p>
+      <p style="margin-top:12px"><a class="btn btn-sm" href="{{ url_for('soil') }}">Run one now</a></p>
+    {% endif %}
+  </section>
+
+  <section class="card col-8 reveal">
+    <h2>Ask anything, in your language</h2>
+    <p class="muted">KrishiMitra answers from a cited knowledge base — crops, fertiliser, schemes,
+      insurance — by voice or text, in six languages. If it does not know, it says so and gives you
+      the Kisan Call Centre.</p>
+    <div class="row" style="margin-top:14px">
+      <a class="btn btn-amber" href="/assistant">Open KrishiMitra</a>
+      <a class="btn btn-ghost" href="/eval">See how well it works</a>
+    </div>
+    <p class="small muted" style="margin-top:10px">Press Ctrl + K from anywhere.</p>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// The page is useful immediately; these fill in once the soil and weather services answer.
+(async () => {
+  const rupees = (n) => '₹' + Number(n).toLocaleString('en-IN');
+  try {
+    const d = await fetch('/api/v1/season?city={{ city }}').then((r) => r.json());
+
+    if (d.soil && d.weather) {
+      const cells = [
+        [d.weather.temperature, '°C average'], [d.weather.humidity, '% humidity'],
+        [d.weather.rainfall, 'mm rain, 30 days'], [d.soil.nitrogen, 'g/kg nitrogen'],
+        [d.soil.ph, 'pH'], [d.soil.clay, '% clay'],
+      ];
+      document.getElementById('conditions').innerHTML = cells.map(
+        ([n, l]) => `<div class="kpi"><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
+      document.getElementById('conditionsNote').textContent =
+        'Soil from ISRIC SoilGrids' +
+        (d.soil.sampled_offset_km ? `, sampled ${Math.round(d.soil.sampled_offset_km)} km from the town centre` : '') +
+        '. Weather from Open-Meteo, last 30 days.';
+    } else {
+      document.getElementById('conditionsNote').textContent =
+        'The soil service did not answer just now. The sowing windows beside this still apply.';
+      document.getElementById('conditions').innerHTML = '';
+    }
+
+    if (d.crops && d.crops.length) {
+      document.getElementById('suited').innerHTML = d.crops.map((c) => `
+        <a class="card-link card hoverable" href="/plan/${c.crop}?city=${encodeURIComponent(d.city)}"
+           style="background:${c.tint};border:0;padding:16px">
+          <div style="font-size:30px">${c.icon}</div>
+          <h3 style="margin-top:8px;text-transform:capitalize">${c.crop}</h3>
+          <div class="small muted">${c.window}</div>
+          <div style="margin-top:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px">
+            ${c.confidence != null ? c.confidence + '%' : 'in season'}</div>
+          ${c.reasons && c.reasons.length ? `<div class="small muted" style="margin-top:6px">${c.reasons[0].text}</div>` : ''}
+        </a>`).join('');
+      document.getElementById('sellLink').href = `/plan/${d.crops[0].crop}?city=${encodeURIComponent(d.city)}`;
+    }
+
+    if (d.prices && d.prices.length) {
+      document.getElementById('priceRows').innerHTML = d.prices.map((p) => `
+        <tr><td style="text-transform:capitalize">${p.crop}</td>
+            <td style="text-align:right"><strong>${rupees(p.modal)}</strong><span class="small muted">/qtl</span></td></tr>`).join('');
+      document.getElementById('priceNote').innerHTML = d.prices_live
+        ? 'Agmarknet, via data.gov.in'
+        : '<span class="chip chip-warn">MOCK</span> placeholders until a free data.gov.in key is set';
+    }
+  } catch (error) {
+    document.getElementById('conditionsNote').textContent = 'Could not reach the soil service just now.';
+    document.getElementById('conditions').innerHTML = '';
+    document.getElementById('priceNote').textContent = 'Prices unavailable right now.';
+    document.getElementById('priceRows').innerHTML = '';
+  }
+})();
+</script>
 {% endblock %}

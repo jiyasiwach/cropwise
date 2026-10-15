@@ -77,6 +77,7 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     <button class="tab" role="tab" aria-selected="false" data-panel="shops">Shops near me</button>
     <button class="tab" role="tab" aria-selected="false" data-panel="prices">Mandi prices</button>
     <button class="tab" role="tab" aria-selected="false" data-panel="market">Best market</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="profit">Profit</button>
   </div>
 
   <section class="panel card" id="panel-timeline">
@@ -139,6 +140,18 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     <h2>Mandi prices</h2>
     <p class="src" id="pricesNote">Loading prices…</p>
     <div id="pricesBody"></div>
+  </section>
+
+  <section class="panel card" id="panel-profit" hidden>
+    <h2>What you might earn</h2>
+    <div class="row" style="align-items:flex-end;gap:12px;margin:12px 0">
+      <label style="flex:0 0 160px">Your land (acres)
+        <input type="number" id="acres" value="1" min="0.25" step="0.25"
+               style="width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);padding:0 12px">
+      </label>
+      <button class="btn" id="calc" style="min-height:44px;padding:0 16px">Work it out</button>
+    </div>
+    <div id="profitBody" class="src">Enter your acreage and press the button.</div>
   </section>
 
   <section class="panel card" id="panel-market" hidden>
@@ -209,6 +222,30 @@ async function loadPrices() {
     <p class="src">Modal price over the last ${d.trend.length} days (${d.unit}).</p>
     <table><thead><tr><th>Market</th><th>Min</th><th>Max</th><th>Modal</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+
+document.getElementById('calc').addEventListener('click', async () => {
+  const acres = Number(document.getElementById('acres').value) || 1;
+  const body = document.getElementById('profitBody');
+  body.innerHTML = 'Working it out…';
+  const r = await fetch(`/api/v1/profit?crop=${CROP}&state=${encodeURIComponent(STATE)}&acres=${acres}`);
+  if (!r.ok) { body.textContent = 'No yield figure is recorded for this crop.'; return; }
+  const d = await r.json();
+  const c = d.costs;
+  body.innerHTML = `
+    ${d.is_mock_price ? '<p><span class="pill pill-mock">MOCK PRICE</span> ' + d.price_source + '</p>' : ''}
+    <div class="row">
+      <div class="kpi"><span class="big">${rupees(d.revenue)}</span><span class="lbl">Revenue · ${d.yield_quintals} qtl at ${rupees(d.price_per_quintal)}/qtl</span></div>
+      <div class="kpi"><span class="big">${rupees(c.total)}</span><span class="lbl">Costs</span></div>
+      <div class="kpi" style="background:var(--soft-amber)"><span class="big">${rupees(d.profit)}</span><span class="lbl">Profit on ${d.acres} acre(s) · ${rupees(d.profit_per_acre)}/acre</span></div>
+    </div>
+    <table style="margin-top:14px"><thead><tr><th>Cost</th><th>Amount</th></tr></thead><tbody>
+      <tr><td>Seed</td><td>${rupees(c.seed)}</td></tr>
+      <tr><td>Fertiliser</td><td>${rupees(c.fertiliser)}</td></tr>
+      <tr><td>Labour</td><td>${rupees(c.labour)}</td></tr>
+      <tr><td>Other</td><td>${rupees(c.other)}</td></tr>
+    </tbody></table>
+    <ul class="src" style="margin-top:12px">${d.assumptions.map(a => '<li>' + a + '</li>').join('')}</ul>`;
+});
 
 async function loadMarket() {
   if (marketLoaded) return; marketLoaded = true;

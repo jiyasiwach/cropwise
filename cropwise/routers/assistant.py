@@ -15,7 +15,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from ..database import User, get_db
-from ..security import current_user
+from ..visitor import get_visitor
 from ..services import agent
 
 router = APIRouter(prefix="/api/v1/assistant")
@@ -24,7 +24,7 @@ router = APIRouter(prefix="/api/v1/assistant")
 @router.post("")
 async def ask(
     request: Request,
-    user: User = Depends(current_user),
+    user: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ) -> dict:
     """Ask once, get the whole answer. Used by the evaluation harness and any non-browser client."""
@@ -49,7 +49,7 @@ async def ask(
 @router.post("/stream")
 async def ask_streaming(
     request: Request,
-    user: User = Depends(current_user),
+    user: User = Depends(get_visitor),
     db: Session = Depends(get_db),
 ) -> StreamingResponse:
     """The same answer, streamed as server-sent events.

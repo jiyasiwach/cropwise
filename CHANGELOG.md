@@ -98,3 +98,21 @@
 
 ### Fixed
 - Static files were missing from the deployment, so production rendered unstyled.
+
+## No sign-in, live dashboard, profit estimate (16 Oct 2026)
+
+### Removed
+- Accounts, login, signup and demo mode. A cookie-based visitor id keeps each browser's history
+  separate; no personal data is collected.
+
+### Added
+- A landing page: hero, how it works, eight features, mandi price band, helplines.
+- `GET /api/v1/season` — live soil, weather, suited crops and prices for a city, cached 15 minutes.
+- `GET /api/v1/profit` and `/api/v1/profit/compare`, plus a Profit tab on the crop plan.
+- `data/input_costs.json` — seed, fertiliser and labour costs behind the profit estimate.
+- A dashboard that is useful before you do anything: live conditions, what to sow this month,
+  today's prices, and your own history.
+
+### Fixed
+- The landing page took 28 s on a cold cache. Pages now render in ~0.15 s and fill in live data
+  afterwards; the soil sampling ring queries its points concurrently (~28 s → ~8 s).

@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from cropwise import __version__
 from cropwise.database import init_db
+from cropwise.visitor import COOKIE_MAX_AGE, COOKIE_NAME, _new_id
 from cropwise.routers import api, assistant, pages
 
 app = FastAPI(
@@ -41,6 +42,26 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(api.router)
 app.include_router(assistant.router)
 app.include_router(pages.router)
+
+
+@app.middleware("http")
+async def ensure_visitor(request, call_next):
+    """Give every browser a stable id. There is no sign-in, so this is what keeps one person's
+    history separate from another's. It carries no personal data — just a random string."""
+    visitor_id = request.cookies.get(COOKIE_NAME)
+    is_new = visitor_id is None
+    request.state.visitor_id = visitor_id or _new_id()
+    response = await call_next(request)
+    if is_new:
+        response.set_cookie(
+            COOKIE_NAME,
+            request.state.visitor_id,
+            max_age=COOKIE_MAX_AGE,
+            httponly=True,
+            samesite="lax",
+            path="/",
+        )
+    return response
 
 
 @app.on_event("startup")

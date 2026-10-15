@@ -2,24 +2,15 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
-
-
-class SignupIn(BaseModel):
-    name: str = Field(min_length=1, max_length=120)
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=200)
-    state: str | None = Field(default=None, max_length=80)
-
-
-class LoginIn(BaseModel):
-    email: EmailStr
-    password: str
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserOut(BaseModel):
+    """Who the API thinks is calling. There are no accounts: this is the browser's workspace,
+    identified by a random id, so the address is internal and never a real mailbox."""
+
     id: int
-    email: EmailStr
+    email: str
     name: str | None
     state: str | None
 

@@ -91,8 +91,8 @@ check("every advertised tool has a handler",
 
 # --- the HTTP layer ---
 with TestClient(main.app) as client:
-    check("assistant API needs a sign-in", client.post("/api/v1/assistant", json={"question": "hi"}).status_code == 401)
-    client.post("/api/v1/auth/signup", json={"name": "T", "email": "t@example.com", "password": "farming123"})
+    check("assistant API opens without a sign-in",
+          client.post("/api/v1/assistant", json={"question": "when to sow rice"}).status_code == 200)
 
     body = client.post("/api/v1/assistant", json={"question": "how much urea does rice need"}).json()
     check("assistant endpoint answers", body["answer"] and body["citations"], body)

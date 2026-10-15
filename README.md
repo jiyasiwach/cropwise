@@ -21,7 +21,7 @@ make run                 # http://127.0.0.1:8000  — API docs at /docs
 ## Tests
 
 ```bash
-make test                # 97 checks: models, API, auth, pages, crop plan and the assistant
+make test                # 98 checks: models, API, auth, pages, crop plan and the assistant
 make eval                # retrieval, guardrail and answer metrics -> docs/EVAL.md
 ```
 
@@ -29,7 +29,7 @@ make eval                # retrieval, guardrail and answer metrics -> docs/EVAL.
 
 | Step | What happens |
 |---|---|
-| Sign up / log in | Accounts in SQLite, passwords hashed with PBKDF2-SHA256 |
+| Open it | No sign-in. A cookie keeps your history separate; nothing personal is stored |
 | Soil | City → Open-Meteo geocoding → ISRIC SoilGrids (nitrogen, pH, clay, organic carbon at 0–5 cm) |
 | Climate | Open-Meteo forecast over 1 / 15 / 30 days (mean temperature, humidity, rainfall) |
 | Predict | RandomForest → top 3 crops, each with SHAP reasons and a confidence, saved to your history |
@@ -73,7 +73,8 @@ accumulation window in the dataset is undocumented, so our 30-day mapping is a b
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /api/v1/auth/signup` · `login` · `logout` | Accounts; the session is a JWT in an httpOnly cookie |
+| `GET /api/v1/season?city=` | Live conditions, suited crops and prices (cached 15 min) |
+| `GET /api/v1/profit?crop=&acres=` | Yield, revenue, costs and profit per acre |
 | `GET /api/v1/soil?city=` | Nitrogen, pH, clay, organic carbon from ISRIC SoilGrids |
 | `GET /api/v1/weather?city=&days=` | Mean temperature, humidity, accumulated rainfall |
 | `POST /api/v1/predict` | Top three crops with reasons; uses the lab model when a soil test is supplied |
