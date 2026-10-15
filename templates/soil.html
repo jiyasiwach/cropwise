@@ -23,6 +23,7 @@
     </div>
     <div class="field" style="flex:0 0 auto;display:flex;align-items:flex-end">
       <button type="button" class="btn btn-amber" id="detect" data-busy-label="Reading…">⚡ Auto detect</button>
+      <button type="button" class="btn btn-ghost" id="manual" style="margin-left:8px">Type values myself</button>
     </div>
   </div>
 
@@ -77,13 +78,26 @@ $('detect').addEventListener('click', async () => {
   ['nitrogenVal', 'phVal', 'clayVal', 'socVal'].forEach((id) => { $(id).value = ''; });
   $('status').textContent = 'Looking up ' + city + '…';
 
+  // The soil service is often slow, so say what is happening rather than freezing the button.
+  const waiting = ['Looking up ' + city + '…', 'Reading the soil…', 'Still reading — SoilGrids is slow today…',
+                   'Almost there…'];
+  let step = 0;
+  const ticker = setInterval(() => {
+    step = Math.min(step + 1, waiting.length - 1);
+    $('status').textContent = waiting[step];
+  }, 4000);
+
   try {
     const response = await fetch('/get_soil_by_city', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city }),
     });
-    const data = await response.json();
+    // A gateway timeout or a crash returns HTML, not JSON; say something useful either way.
+    const data = await response.json().catch(() => ({
+      success: false,
+      message: 'The soil service did not answer in time. Try again, or type your values in below.',
+    }));
     if (!data.success) throw new Error(data.message || 'Could not read the soil there.');
 
     $('hiddenCity').value = data.city;
@@ -103,9 +117,22 @@ $('detect').addEventListener('click', async () => {
     $('status').textContent = error.message;
     toast(error.message, 'bad');
   } finally {
+    clearInterval(ticker);
     button.disabled = false;
     button.innerHTML = '⚡ Auto detect';
   }
+});
+
+// If the service is unavailable, the farmer must still be able to continue by hand.
+document.getElementById('manual').addEventListener('click', () => {
+  ['nitrogenVal', 'phVal', 'clayVal', 'socVal'].forEach((id) => {
+    $(id).readOnly = false;
+    $(id).placeholder = 'type a value';
+  });
+  $('hiddenCity').value = $('cityInput').value.trim() || 'my field';
+  $('next').disabled = false;
+  $('status').textContent = 'Typing your own values. Use your Soil Health Card if you have one.';
+  $('nitrogenVal').focus();
 });
 
 $('cityInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('detect').click(); } });

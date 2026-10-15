@@ -21,7 +21,11 @@ SOILGRIDS_URL = "https://rest.isric.org/soilgrids/v2.0/properties/query"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 # Generous, because SoilGrids is often slow — but nothing that renders a page may wait on it.
 # Pages render from local data and fetch these readings afterwards.
-TIMEOUT = httpx.Timeout(25.0, connect=8.0)
+TIMEOUT = httpx.Timeout(12.0, connect=6.0)
+# SoilGrids can take half a minute. A serverless function that waits that long is killed and the
+# farmer sees a 500, so the whole lookup is bounded and cached instead.
+SOIL_BUDGET_SECONDS = 22.0
+_SOIL_CACHE: dict[str, dict] = {}
 
 
 class LookupError(Exception):
@@ -70,6 +74,22 @@ async def _query_soilgrids(lat: float, lon: float) -> dict:
 
 
 async def soil_for_city(city: str) -> dict:
+    """Cached wrapper: the same town is only looked up once per process."""
+    key = city.strip().lower()
+    if key in _SOIL_CACHE:
+        return _SOIL_CACHE[key]
+    try:
+        result = await asyncio.wait_for(_soil_for_city(city), timeout=SOIL_BUDGET_SECONDS)
+    except asyncio.TimeoutError as exc:
+        raise LookupError(
+            "The soil service (ISRIC SoilGrids) is taking too long right now. Try again in a "
+            "minute, or type your Soil Health Card values in by hand."
+        ) from exc
+    _SOIL_CACHE[key] = result
+    return result
+
+
+async def _soil_for_city(city: str) -> dict:
     """Soil properties near a city.
 
     SoilGrids masks built-up land and water, so a city-centre coordinate often has no data at
@@ -80,29 +100,42 @@ async def soil_for_city(city: str) -> dict:
     place = await geocode(city)
     lat, lon = place["latitude"], place["longitude"]
 
-    layers = await _query_soilgrids(lat, lon)
-    sampled_km = 0.0
-    if all(v is None for v in layers.values()):
-        # Points on a ring around the town, asked all at once rather than one after another:
-        # sequentially this took half a minute, which is longer than a serverless function lives.
-        for radius_km in (10.0, 25.0):
-            offsets = []
-            for bearing in range(0, 360, 90):
-                angle = math.radians(bearing)
-                offsets.append(
-                    (
-                        lat + (radius_km / 111.0) * math.cos(angle),
-                        lon + (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle),
-                    )
+    # Ask the town centre and a ring around it at the same time. SoilGrids masks built-up land,
+    # so the centre is often empty; waiting to find that out before starting the ring doubled the
+    # time a farmer sat looking at a spinner.
+    def ring(radius_km: float, points: int = 4) -> list[tuple[float, float]]:
+        out = []
+        for i in range(points):
+            angle = math.radians(i * (360 / points))
+            out.append(
+                (
+                    lat + (radius_km / 111.0) * math.cos(angle),
+                    lon + (radius_km / (111.0 * max(0.2, math.cos(math.radians(lat))))) * math.sin(angle),
                 )
-            results = await asyncio.gather(
-                *(_query_soilgrids(a, b) for a, b in offsets), return_exceptions=True
             )
-            for nearby in results:
-                if isinstance(nearby, dict) and any(v is not None for v in nearby.values()):
-                    layers, sampled_km = nearby, radius_km
-                    break
-            if sampled_km:
+        return out
+
+    attempts: list[tuple[float, tuple[float, float]]] = [(0.0, (lat, lon))]
+    attempts += [(10.0, point) for point in ring(10.0)]
+    results = await asyncio.gather(
+        *(_query_soilgrids(a, b) for _, (a, b) in attempts), return_exceptions=True
+    )
+
+    layers: dict = {}
+    sampled_km = 0.0
+    for (distance, _point), found in zip(attempts, results):
+        if isinstance(found, dict) and any(v is not None for v in found.values()):
+            layers, sampled_km = found, distance
+            break
+
+    if not layers:
+        # Nothing within 10 km: one wider ring before giving up.
+        wider = await asyncio.gather(
+            *(_query_soilgrids(a, b) for a, b in ring(25.0)), return_exceptions=True
+        )
+        for found in wider:
+            if isinstance(found, dict) and any(v is not None for v in found.values()):
+                layers, sampled_km = found, 25.0
                 break
 
     if not layers or all(v is None for v in layers.values()):

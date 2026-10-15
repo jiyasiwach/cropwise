@@ -75,7 +75,10 @@ $('detect').addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: CITY, range: Number($('range').value) }),
     });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({
+      success: false,
+      message: 'The weather service did not answer in time. Try again, or type the values in.',
+    }));
     if (!data.success) throw new Error(data.message || 'Could not read the weather.');
     $('temperature').value = data.temperature;
     $('humidity_input').value = data.humidity;
@@ -92,7 +95,7 @@ $('detect').addEventListener('click', async () => {
   }
 });
 
-// The farmer came here to get an answer, not to press another button.
+// The farmer came here for an answer, not to press another button.
 document.addEventListener('DOMContentLoaded', () => { if (CITY) $('detect').click(); });
 </script>
 {% endblock %}

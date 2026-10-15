@@ -5,9 +5,25 @@
       "src": "main.py",
       "use": "@vercel/python",
       "config": {
-        "includeFiles": ["static/**", "templates/**", "models/**", "data/**", "docs/eval.json"]
+        "includeFiles": [
+          "static/**",
+          "templates/**",
+          "models/**",
+          "data/**",
+          "docs/eval.json"
+        ]
       }
     }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "main.py" }]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "functions": {
+    "main.py": {
+      "maxDuration": 60
+    }
+  }
 }
