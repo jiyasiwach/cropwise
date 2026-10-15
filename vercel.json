@@ -1,29 +1,10 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "main.py",
-      "use": "@vercel/python",
-      "config": {
-        "includeFiles": [
-          "static/**",
-          "templates/**",
-          "models/**",
-          "data/**",
-          "docs/eval.json"
-        ]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "main.py"
-    }
-  ],
   "functions": {
-    "main.py": {
-      "maxDuration": 60
+    "api/index.py": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "{static,templates,models,data}/**"
     }
-  }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
 }

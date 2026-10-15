@@ -116,3 +116,18 @@
 ### Fixed
 - The landing page took 28 s on a cold cache. Pages now render in ~0.15 s and fill in live data
   afterwards; the soil sampling ring queries its points concurrently (~28 s → ~8 s).
+
+## Auto-detect fixed (16 Oct 2026)
+
+### Fixed
+- Deployments had been failing silently: `functions` cannot be combined with `builds` in
+  `vercel.json`. Moved to `api/index.py` + `rewrites`, so pushes actually reach production.
+- A `ReadTimeout` from SoilGrids escaped as a 500 after 26 s; it now returns a readable 502.
+- The sampling ring ran in parallel and tripped ISRIC's ~5 calls/minute limit, which is why most
+  towns returned nothing. It is now sequential and stops at the first answer.
+- The soil step no longer dead-ends when the service is down: it switches to manual entry.
+
+### Added
+- `data/soil_cache.json` plus `scripts/prefetch_soil.py` — real readings, collected when the
+  service is healthy, so common towns answer in under a second.
+- `/healthz` reports the soil cache path, whether it exists, and the knowledge-base size.

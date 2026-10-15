@@ -71,4 +71,15 @@ def startup() -> None:
 
 @app.get("/healthz", include_in_schema=False)
 def healthz() -> dict:
-    return {"ok": True, "version": __version__}
+    """Also reports what the running instance can actually see on disk, because a file that is
+    present in the repository is not necessarily present in a deployment bundle."""
+    from cropwise.services import lookup, rag
+
+    return {
+        "ok": True,
+        "version": __version__,
+        "soil_cache_towns": len(lookup._prefetched()),
+        "soil_cache_path": str(lookup.PREFETCHED),
+        "soil_cache_exists": lookup.PREFETCHED.exists(),
+        "knowledge_base_chunks": len(rag.load_chunks()),
+    }
