@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "builds": [{ "src": "main.py", "use": "@vercel/python" }],
-  "routes": [
-    { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/(.*)", "dest": "main.py" }
-  ]
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": ["static/**", "templates/**", "models/**", "data/**", "docs/eval.json"]
+      }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "main.py" }]
 }
