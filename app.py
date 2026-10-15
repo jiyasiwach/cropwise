@@ -9,8 +9,6 @@ import re
 import sqlite3
 from datetime import datetime
 from functools import wraps
-import pickle
-import joblib
 import numpy as np
 import pandas as pd
 import requests
@@ -78,10 +76,7 @@ def init_db():
 
 init_db()
 
-model=pickle.load(open("model.pkl","rb"))
-features=pickle.load(open("features.pkl","rb"))
-p_model=joblib.load("p_model.pkl")
-k_model=joblib.load("k_model.pkl")
+from predictor import recommend  # the two honest models, their reasons and the outlier check
 
 @app.route('/')
 def login():
@@ -384,43 +379,30 @@ def get_weather_by_city():
             x for x in daily.get("precipitation_sum",[])
             if x is not None
         ]
-        temp=round(float(np.mean(temps)),2) if temps else 25.0
-        rainfall=round(max(float(np.sum(rain))*3,50),2) if rain else 50.0
+        temp = round(float(np.mean(temps)), 2) if temps else 25.0
+        # Accumulated rainfall over the window the farmer chose, scaled to the 30-day basis the
+        # training data uses, and nothing else. The old code multiplied by 3 with a floor of 50 mm
+        # to force Open-Meteo totals into the dataset's range; that was invented. See docs/DECISIONS.md.
+        days_counted = max(1, len(rain))
+        rainfall = round(float(np.sum(rain)) * (30.0 / days_counted), 2) if rain else 0.0
         humidity=weather.get("current",{}).get(
             "relative_humidity_2m",
             70.0
         )
-        nitrogen=float(session.get('nitrogen',1.4))
-        ph=float(session.get('ph',6.5))
-        clay=float(session.get('clay',25.0))
-        organic_carbon=float(session.get('organic_carbon',12.0))
-        pk_input=[[
-            nitrogen,
-            ph,
-            clay,
-            organic_carbon,
-            temp,
-            humidity,
-            rainfall
-        ]]
-        predicted_p=round(float(p_model.predict(pk_input)[0]),2)
-        predicted_k=round(float(k_model.predict(pk_input)[0]),2)
-        session['P']=predicted_p
-        session['K']=predicted_k
         session['temperature']=temp
         session['humidity']=humidity
         session['rainfall']=rainfall
-        print("\nP:",predicted_p)
-        print("K:",predicted_k)
         return jsonify({
             "success":True,
             "city":c.get("name",""),
             "country":c.get("country",""),
             "temperature":temp,
             "humidity":humidity,
-            "rainfall":rainfall,
-            "phosphorus":predicted_p,
-            "potassium":predicted_k
+            "rainfall": rainfall,
+            # Phosphorus and potassium are not published by SoilGrids and are no longer guessed.
+            "phosphorus": None,
+            "potassium": None,
+            "nutrient_note": "Phosphorus and potassium need a soil test. Upload your Soil Health Card to use them."
         })
     except Exception as e:
         return jsonify({
@@ -428,81 +410,77 @@ def get_weather_by_city():
             "message":str(e)
         }),500
 
-@app.route('/predict',methods=['POST'])
+@app.route('/predict', methods=['POST'])
 @login_required
 def predict():
-    record={
-        'P':float(session.get('P',40)),
-        'K':float(session.get('K',35)),
-        'nitrogen':float(session.get('nitrogen',1.4)),
-        'ph':float(session.get('ph',6.5)),
-        'clay':float(session.get('clay',25.0)),
-        'organic_carbon':float(session.get('organic_carbon',12.0)),
-        'temperature':float(request.form['temperature']),
-        'humidity':float(request.form['humidity']),
-        'rainfall':float(request.form['rainfall'])
+    """Top three crops for this session's readings, with reasons and an unusual-readings flag."""
+    readings = {
+        'nitrogen': float(session.get('nitrogen', 1.4)),
+        'ph': float(session.get('ph', 6.5)),
+        'clay': float(session.get('clay', 25.0)),
+        'organic_carbon': float(session.get('organic_carbon', 12.0)),
+        'temperature': float(request.form['temperature']),
+        'humidity': float(request.form['humidity']),
+        'rainfall': float(request.form['rainfall']),
     }
-    input_df=pd.DataFrame([record])[features]
-    probs=model.predict_proba(input_df)[0]
-    classes=model.classes_
-    idx=probs.argsort()[-3:][::-1]
-    print("\nINPUT TO MODEL:")
-    print(input_df)
-    print("\nPREDICTIONS:")
-    for i in idx:
-        print(classes[i],round(probs[i]*100,2))
-    top3=[
-        (classes[i],round(probs[i]*100,2))
-        for i in idx
-    ]
+    # The lab model only runs when a soil test supplied real P and K (Soil Health Card, phase 7).
+    lab_p, lab_k, lab_n = session.get('lab_P'), session.get('lab_K'), session.get('lab_N')
+    if lab_p is not None and lab_k is not None and lab_n is not None:
+        result = recommend(
+            {
+                'N': float(lab_n), 'P': float(lab_p), 'K': float(lab_k),
+                'temperature': readings['temperature'], 'humidity': readings['humidity'],
+                'ph': readings['ph'], 'rainfall': readings['rainfall'],
+            },
+            source='lab',
+        )
+    else:
+        result = recommend(readings, source='field')
+
+    best = result['crops'][0]
     conn = db()
     conn.execute("""
         INSERT INTO history(
-            email,
-            crop,
-            confidence,
-            nitrogen,
-            phosphorus,
-            potassium,
-            ph,
-            temperature,
-            humidity,
-            rainfall,
-            city,
-            created_at
+            email, crop, confidence, nitrogen, phosphorus, potassium,
+            ph, temperature, humidity, rainfall, city, created_at
         )
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
-    """,(
+    """, (
         session.get("email", ""),
-        top3[0][0],
-        top3[0][1],
-        record["nitrogen"],
-        record["P"],
-        record["K"],
-        record["ph"],
-        record["temperature"],
-        record["humidity"],
-        record["rainfall"],
-        session.get("city",""),
-        datetime.now().strftime("%d-%m-%Y %I:%M %p")
+        best['crop'],
+        best['confidence'],
+        readings['nitrogen'],
+        lab_p,
+        lab_k,
+        readings['ph'],
+        readings['temperature'],
+        readings['humidity'],
+        readings['rainfall'],
+        session.get("city", ""),
+        datetime.now().strftime("%d-%m-%Y %I:%M %p"),
     ))
     conn.commit()
     conn.close()
-    soil_data={
-        "N":record["nitrogen"],
-        "P":record["P"],
-        "K":record["K"],
-        "ph":record["ph"],
-        "temperature":record["temperature"],
-        "humidity":record["humidity"],
-        "rainfall":record["rainfall"]
+
+    soil_data = {
+        "N": readings['nitrogen'],
+        "P": lab_p,
+        "K": lab_k,
+        "ph": readings['ph'],
+        "temperature": readings['temperature'],
+        "humidity": readings['humidity'],
+        "rainfall": readings['rainfall'],
     }
     return render_template(
         "result.html",
-        top3=top3,
+        top3=[(c['crop'], c['confidence']) for c in result['crops']],
+        crops=result['crops'],
+        unusual=result['unusual_readings'],
+        measured=result['source'] == 'lab',
         soil_data=soil_data,
-        active_page='results'
+        active_page='results',
     )
+
 
 @app.route('/settings')
 @login_required

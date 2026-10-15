@@ -409,7 +409,7 @@
                     document.getElementById("latVal").value = res.latitude;
                     document.getElementById("lonVal").value = res.longitude;
 
-                    status.innerText = "⏳ Calculating phosphorus and potassium...";
+                    status.innerText = "⏳ Reading the weather for your city...";
                     status.style.color = "#ffffff";
 
                     const weatherResponse = await fetch("/get_weather_by_city", {
@@ -427,8 +427,12 @@
 
                     if (weatherRes.success) {
 
-                        document.getElementById("pVal").value = weatherRes.phosphorus;
-                        document.getElementById("kVal").value = weatherRes.potassium;
+                        // Phosphorus and potassium are not published for a location: a soil test
+                        // is the only honest source, so the fields stay empty and say so.
+                        document.getElementById("pVal").value = "";
+                        document.getElementById("kVal").value = "";
+                        document.getElementById("pVal").placeholder = "Needs a soil test";
+                        document.getElementById("kVal").placeholder = "Needs a soil test";
 
                         status.innerText = `✅ Found: ${res.city}, ${res.country}`;
                         status.style.color = "#b9f6ca";

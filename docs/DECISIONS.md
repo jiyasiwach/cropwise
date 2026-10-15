@@ -18,3 +18,14 @@ One line each, newest last. Every decision the owner did not make personally is 
 - Replaced the stray `webbrowser.open()` at the end of `app.py` with a real `app.run()`, so `python app.py` starts the server.
 - Pinned dependencies in `requirements.txt` and retrained the three model files with the pinned scikit-learn, because the committed pickles were built on 1.7.0 and loaded under 1.5.1 with a correctness warning.
 - On Vercel the SQLite file goes to `/tmp`, which is wiped between cold starts: accounts will not persist there until Phase 3 moves the database to Postgres. This is stated in the README rather than hidden.
+
+## Phase 2 — an honest model (15 Oct 2026)
+- Split one model into two: a **field** model over what SoilGrids and Open-Meteo actually publish, and a **lab** model that uses real N-P-K from a Soil Health Card. Nothing is inferred to fill a gap.
+- Deleted `p_model.pkl` and `k_model.pkl`: predicting phosphorus and potassium from the classifier's own inputs added no information and inflated confidence. The 54 MB file also exceeded GitHub's size guidance.
+- Reported **stratified 5-fold cross-validation** instead of a single hold-out split: field 0.9695 accuracy / 0.9693 macro-F1, lab 0.9959 / 0.9959.
+- Compared RandomForest, ExtraTrees, HistGradientBoosting and LogisticRegression; RandomForest won both. LightGBM and XGBoost were dropped because this macOS Python cannot load `libomp`.
+- Added an IsolationForest per model (contamination 0.02) so unusual readings produce a warning instead of a confident answer; the dataset covers 22 crops in typical conditions and nothing else.
+- Explanations come from SHAP values for the individual prediction, worded as "rainfall 202.9mm suits this crop", and are shown as tick or warning chips. A failure to explain never blocks a prediction.
+- Replaced the `rainfall × 3, floor 50` fudge with the accumulated total scaled to a 30-day basis, and recorded that the dataset's own accumulation window is undocumented — a known weakness, not a solved problem.
+- Soil and climate pages now leave phosphorus and potassium empty with "Needs a soil test" rather than showing a guess as a reading.
+- Models moved to `models/*.joblib` (joblib, with the feature order stored alongside), replacing loose pickles at the repo root.

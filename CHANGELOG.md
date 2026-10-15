@@ -22,3 +22,24 @@
 - `docs/DECISIONS.md`, this changelog, `requirements.txt`, `.env.example`, `.gitignore`,
   `vercel.json`, and `tests/test_phase1.py` (22 checks, all passing).
 - Retrained `model.pkl`, `p_model.pkl`, `k_model.pkl` against the pinned scikit-learn.
+
+## Phase 2 — an honest model (15 Oct 2026)
+
+### Changed
+- Two models replace one: **field** (nitrogen, pH, clay, organic carbon, weather — 96.95% accuracy,
+  0.969 macro-F1) and **lab** (adds real N-P-K from a Soil Health Card — 99.59%, 0.996). Both by
+  stratified 5-fold cross-validation.
+- Phosphorus and potassium are no longer invented. The regressors that guessed them are deleted.
+- Rainfall is the accumulated total scaled to a 30-day basis, not the old `× 3, floor 50`.
+
+### Added
+- `scripts/train.py` — compares four model families, writes `models/*.joblib` and `docs/metrics.json`.
+- `predictor.py` — prediction, SHAP reasons and the outlier check in one place.
+- `docs/MODEL_CARD.md` — metrics, weakest crops, confusions, limits.
+- Per-crop reasons on the result page, a warning banner for unusual readings, and a line saying
+  whether the soil figures were measured or estimated.
+- Tests extended to 31 checks, all passing.
+
+### Removed
+- `model.pkl`, `features.pkl`, `p_model.pkl` (54 MB), `k_model.pkl`, `scaler.pkl` (never used),
+  `train_model.py`, `train_pk_models.py`.

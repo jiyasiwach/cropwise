@@ -1,0 +1,237 @@
+{
+  "field": {
+    "feature_set": "field",
+    "features": [
+      "nitrogen",
+      "ph",
+      "clay",
+      "organic_carbon",
+      "temperature",
+      "humidity",
+      "rainfall"
+    ],
+    "rows": 2200,
+    "classes": [
+      "apple",
+      "banana",
+      "blackgram",
+      "chickpea",
+      "coconut",
+      "coffee",
+      "cotton",
+      "grapes",
+      "jute",
+      "kidneybeans",
+      "lentil",
+      "maize",
+      "mango",
+      "mothbeans",
+      "mungbean",
+      "muskmelon",
+      "orange",
+      "papaya",
+      "pigeonpeas",
+      "pomegranate",
+      "rice",
+      "watermelon"
+    ],
+    "candidates": {
+      "RandomForest": {
+        "macro_f1": 0.9693,
+        "accuracy": 0.9695
+      },
+      "ExtraTrees": {
+        "macro_f1": 0.9649,
+        "accuracy": 0.965
+      },
+      "HistGradientBoosting": {
+        "macro_f1": 0.9623,
+        "accuracy": 0.9623
+      },
+      "LogisticRegression": {
+        "macro_f1": 0.8333,
+        "accuracy": 0.835
+      }
+    },
+    "winner": "RandomForest",
+    "macro_f1": 0.9693,
+    "accuracy": 0.9695,
+    "per_class_f1": {
+      "apple": 0.96,
+      "banana": 1.0,
+      "blackgram": 0.98,
+      "chickpea": 0.995,
+      "coconut": 0.995,
+      "coffee": 0.971,
+      "cotton": 0.98,
+      "grapes": 0.985,
+      "jute": 0.971,
+      "kidneybeans": 0.995,
+      "lentil": 0.966,
+      "maize": 0.971,
+      "mango": 0.957,
+      "mothbeans": 0.948,
+      "mungbean": 1.0,
+      "muskmelon": 1.0,
+      "orange": 0.902,
+      "papaya": 0.964,
+      "pigeonpeas": 0.908,
+      "pomegranate": 0.909,
+      "rice": 0.974,
+      "watermelon": 0.995
+    },
+    "top_confusions": [
+      {
+        "actual": "pigeonpeas",
+        "predicted": "mango",
+        "count": 9
+      },
+      {
+        "actual": "orange",
+        "predicted": "pomegranate",
+        "count": 8
+      },
+      {
+        "actual": "apple",
+        "predicted": "pomegranate",
+        "count": 5
+      },
+      {
+        "actual": "mothbeans",
+        "predicted": "lentil",
+        "count": 5
+      },
+      {
+        "actual": "rice",
+        "predicted": "jute",
+        "count": 5
+      },
+      {
+        "actual": "pigeonpeas",
+        "predicted": "coffee",
+        "count": 4
+      },
+      {
+        "actual": "pomegranate",
+        "predicted": "orange",
+        "count": 4
+      },
+      {
+        "actual": "pigeonpeas",
+        "predicted": "maize",
+        "count": 3
+      },
+      {
+        "actual": "blackgram",
+        "predicted": "maize",
+        "count": 2
+      },
+      {
+        "actual": "cotton",
+        "predicted": "grapes",
+        "count": 2
+      }
+    ]
+  },
+  "lab": {
+    "feature_set": "lab",
+    "features": [
+      "N",
+      "P",
+      "K",
+      "temperature",
+      "humidity",
+      "ph",
+      "rainfall"
+    ],
+    "rows": 2200,
+    "classes": [
+      "apple",
+      "banana",
+      "blackgram",
+      "chickpea",
+      "coconut",
+      "coffee",
+      "cotton",
+      "grapes",
+      "jute",
+      "kidneybeans",
+      "lentil",
+      "maize",
+      "mango",
+      "mothbeans",
+      "mungbean",
+      "muskmelon",
+      "orange",
+      "papaya",
+      "pigeonpeas",
+      "pomegranate",
+      "rice",
+      "watermelon"
+    ],
+    "candidates": {
+      "RandomForest": {
+        "macro_f1": 0.9959,
+        "accuracy": 0.9959
+      },
+      "ExtraTrees": {
+        "macro_f1": 0.9936,
+        "accuracy": 0.9936
+      },
+      "HistGradientBoosting": {
+        "macro_f1": 0.9923,
+        "accuracy": 0.9923
+      },
+      "LogisticRegression": {
+        "macro_f1": 0.9709,
+        "accuracy": 0.9709
+      }
+    },
+    "winner": "RandomForest",
+    "macro_f1": 0.9959,
+    "accuracy": 0.9959,
+    "per_class_f1": {
+      "apple": 1.0,
+      "banana": 1.0,
+      "blackgram": 0.995,
+      "chickpea": 1.0,
+      "coconut": 1.0,
+      "coffee": 1.0,
+      "cotton": 1.0,
+      "grapes": 1.0,
+      "jute": 0.966,
+      "kidneybeans": 1.0,
+      "lentil": 0.995,
+      "maize": 0.995,
+      "mango": 1.0,
+      "mothbeans": 0.995,
+      "mungbean": 1.0,
+      "muskmelon": 1.0,
+      "orange": 1.0,
+      "papaya": 1.0,
+      "pigeonpeas": 1.0,
+      "pomegranate": 1.0,
+      "rice": 0.964,
+      "watermelon": 1.0
+    },
+    "top_confusions": [
+      {
+        "actual": "rice",
+        "predicted": "jute",
+        "count": 7
+      },
+      {
+        "actual": "blackgram",
+        "predicted": "maize",
+        "count": 1
+      },
+      {
+        "actual": "mothbeans",
+        "predicted": "lentil",
+        "count": 1
+      }
+    ]
+  },
+  "seed": 42,
+  "cv": "stratified 5-fold"
+}
