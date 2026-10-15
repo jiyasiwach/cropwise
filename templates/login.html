@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Recommendation System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/login.css') }}">
+
+</head>
+
+<body>
+
+    <div class="background">
+
+        <div class="login-card">
+
+            <div class="logo">
+                🌱
+            </div>
+
+            <div class="title">
+    <h1>Crop Recommendation</h1>
+    <h2>System</h2>
+</div>
+
+            <p class="subtitle">
+                Login to continue
+            </p>
+
+            {% if error %}
+            <p class="form-error" role="alert"
+               style="background:#fdecea;color:#b42318;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:14px;">
+                {{ error }}
+            </p>
+            {% endif %}
+
+
+            <form action="/login" method="POST">
+
+                <label>Email</label>
+
+                <div class="input-container">
+
+                    <span class="icon">✉</span>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        required>
+
+                </div>
+
+
+                <label>Password</label>
+
+                <div class="input-container">
+
+                    <span class="icon">🔒</span>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required>
+
+                </div>
+
+
+                <button type="submit">
+                    LOGIN
+                </button>
+
+            </form>
+
+
+            <p class="signup">
+
+                Don't have an account?
+
+                <a href="{{ url_for('signup') }}">
+                    Sign Up
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
