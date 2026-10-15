@@ -12,9 +12,9 @@ PyJWT==2.9.0
 Werkzeug==3.0.3          # password hashing only
 psycopg2-binary==2.9.9   # Postgres driver; unused when DATABASE_URL is SQLite
 
-# Model
+# Model (SHAP lives in requirements-dev.txt: it is too large for a serverless function,
+# and predictions fall back to range-based explanations without it)
 numpy==1.26.4
 pandas==2.2.2
 scikit-learn==1.5.1
 joblib==1.4.2
-shap==0.51.0

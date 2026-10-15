@@ -9,3 +9,5 @@ docs/screenshots/*.tmp
 
 # superseded by scripts/train.py and models/*.joblib
 *.pkl
+.vercel
+.env*

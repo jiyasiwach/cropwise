@@ -1,0 +1,39 @@
+{
+  "_about": "Official helplines. Never invent a number; every entry must be checkable at the URL given.",
+  "helplines": [
+    {
+      "name": "Kisan Call Centre",
+      "number": "1800-180-1551",
+      "hours": "06:00-22:00 IST, all days",
+      "languages": 22,
+      "cost": "free",
+      "covers": "Any farming question, answered by agriculture graduates; escalated to subject experts.",
+      "url": "https://mkisan.gov.in/"
+    },
+    {
+      "name": "PM-KISAN helpline",
+      "number": "155261",
+      "alternate": "011-24300606",
+      "hours": "office hours",
+      "cost": "free",
+      "covers": "PM-KISAN instalment not received, eKYC, beneficiary status.",
+      "url": "https://pmkisan.gov.in/"
+    },
+    {
+      "name": "PMFBY crop insurance helpline",
+      "number": "14447",
+      "hours": "office hours",
+      "cost": "free",
+      "covers": "Crop insurance enrolment, claim status, loss intimation (within 72 hours of damage).",
+      "url": "https://pmfby.gov.in/"
+    },
+    {
+      "name": "Soil Health Card helpline",
+      "number": "011-24305591",
+      "hours": "office hours",
+      "cost": "standard call rate",
+      "covers": "Soil testing, getting or reprinting a Soil Health Card.",
+      "url": "https://soilhealth.dac.gov.in/"
+    }
+  ]
+}

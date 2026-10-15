@@ -73,3 +73,12 @@
 
 ### Notes
 - Mandi prices are labelled MOCK until `DATA_GOV_IN_API_KEY` is set. They are never shown as real.
+
+## Deployed (15 Oct 2026)
+
+- Live at https://cropwise-six.vercel.app, connected to `jiyasiwach/cropwise` for automatic deploys.
+- **Fixed a fabricated reading:** SoilGrids publishes nothing under built-up land, and the app had
+  been substituting hard-coded averages and showing them as measurements. It now samples nearby
+  farmland and says how far away the sample came from, or asks for a Soil Health Card.
+- Models compressed 68 MB → 10 MB; SHAP moved to `requirements-dev.txt` with a range-based
+  explanation fallback in production.

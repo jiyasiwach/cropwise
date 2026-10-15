@@ -120,11 +120,38 @@ def evaluate(X: pd.DataFrame, y: pd.Series, name: str) -> dict:
     }
 
 
+def save_ranges(X: pd.DataFrame, y: pd.Series, tag: str) -> None:
+    """The 10th-90th percentile of every feature for every crop.
+
+    This is what explains a prediction when SHAP is not installed — "rainfall 203 mm is in the
+    usual range for rice (154-262 mm)" is arguably clearer than a SHAP value anyway, and it costs
+    nothing at runtime, which keeps the deployed function inside its size limit.
+    """
+    ranges = {}
+    for crop in sorted(y.unique()):
+        subset = X[y == crop]
+        ranges[crop] = {
+            feature: {
+                "low": round(float(subset[feature].quantile(0.10)), 2),
+                "high": round(float(subset[feature].quantile(0.90)), 2),
+                "median": round(float(subset[feature].median()), 2),
+            }
+            for feature in X.columns
+        }
+    (MODELS / f"ranges_{tag}.json").write_text(json.dumps(ranges, indent=1) + "\n")
+
+
 def fit_and_save(X: pd.DataFrame, y: pd.Series, winner: str, tag: str) -> None:
     """Refit the winning pipeline on everything, plus an outlier detector over the same inputs."""
     model = candidates()[winner]
     model.fit(X, y)
-    joblib.dump({"model": model, "features": list(X.columns)}, MODELS / f"crop_{tag}.joblib")
+    # compress=3 keeps the deployed function inside Vercel's size limit; it costs a few
+    # milliseconds at load and shrinks a 400-tree forest by roughly ten times.
+    joblib.dump(
+        {"model": model, "features": list(X.columns)},
+        MODELS / f"crop_{tag}.joblib",
+        compress=3,
+    )
 
     # contamination=0.02: we assume the curated dataset is ~2% odd, so anything stranger than its
     # own 98th percentile is flagged rather than silently predicted on.
@@ -133,8 +160,10 @@ def fit_and_save(X: pd.DataFrame, y: pd.Series, winner: str, tag: str) -> None:
     joblib.dump(
         {"model": ood, "features": list(X.columns), "threshold": float(np.percentile(ood.score_samples(X), 2))},
         MODELS / f"ood_{tag}.joblib",
+        compress=3,
     )
-    print(f"  saved models/crop_{tag}.joblib and models/ood_{tag}.joblib")
+    save_ranges(X, y, tag)
+    print(f"  saved models/crop_{tag}.joblib, models/ood_{tag}.joblib and models/ranges_{tag}.json")
 
 
 def main() -> None:

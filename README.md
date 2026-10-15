@@ -1,5 +1,7 @@
 # CropWise
 
+**Live: https://cropwise-six.vercel.app** · API docs: https://cropwise-six.vercel.app/docs
+
 An AI farming assistant for Indian smallholders: tell it your city, and it reads the soil and
 weather for that location, recommends crops, and (from Phase 4 onward) tells you when to sow,
 what fertiliser to buy, where to buy it, and which mandi pays best after transport.
@@ -19,7 +21,7 @@ make run                 # http://127.0.0.1:8000  — API docs at /docs
 ## Tests
 
 ```bash
-make test                # 64 checks: models, API, auth, pages and the crop plan
+make test                # 67 checks: models, API, auth, pages and the crop plan
 ```
 
 ## How it works today

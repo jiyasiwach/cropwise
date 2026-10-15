@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+tests/
+docs/
+scripts/
+data/kb/
+Crop_recommendation.csv
+Crop_recommendation_9_features.csv
+*.db
+.claude/
+.claude-launch.sh

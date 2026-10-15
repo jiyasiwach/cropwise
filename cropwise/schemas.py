@@ -29,10 +29,13 @@ class SoilOut(BaseModel):
     country: str | None = None
     latitude: float
     longitude: float
-    nitrogen: float = Field(description="Total nitrogen, g/kg, 0-5 cm (ISRIC SoilGrids)")
-    ph: float
-    clay: float = Field(description="Clay content, %")
-    organic_carbon: float = Field(description="Organic carbon, g/kg")
+    nitrogen: float | None = Field(description="Total nitrogen, g/kg, 0-5 cm (ISRIC SoilGrids)")
+    ph: float | None = None
+    clay: float | None = Field(default=None, description="Clay content, %")
+    organic_carbon: float | None = Field(default=None, description="Organic carbon, g/kg")
+    missing: list[str] = Field(default_factory=list, description="Properties SoilGrids does not publish here")
+    sampled_offset_km: float = Field(default=0.0, description="How far away the sample was taken, km")
+    sample_note: str | None = None
     phosphorus: float | None = Field(default=None, description="Only from a soil test")
     potassium: float | None = Field(default=None, description="Only from a soil test")
     source: str = "ISRIC SoilGrids v2.0, 0-5 cm"
