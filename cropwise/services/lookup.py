@@ -51,10 +51,13 @@ class LookupError(Exception):
 
 
 async def geocode(city: str) -> dict:
-    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        response = await client.get(
-            GEOCODE_URL, params={"name": city, "count": 1, "language": "en", "format": "json"}
-        )
+    try:
+        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+            response = await client.get(
+                GEOCODE_URL, params={"name": city, "count": 1, "language": "en", "format": "json"}
+            )
+    except httpx.HTTPError as exc:
+        raise LookupError("Could not look up that city just now. Try again in a moment.") from exc
     if response.status_code != 200:
         raise LookupError("Could not look up that city. Try again in a moment.")
     results = (response.json() or {}).get("results")
@@ -159,7 +162,9 @@ async def _soil_for_city(city: str) -> dict:
     for distance, (plat, plon) in attempts:
         try:
             found = await _query_soilgrids(plat, plon)
-        except LookupError:
+        except (LookupError, httpx.HTTPError, asyncio.TimeoutError):
+            # A timeout here is ordinary, not exceptional: SoilGrids is often slow. Try the next
+            # point rather than letting the exception become a 500 the farmer cannot read.
             continue
         if any(v is not None for v in found.values()):
             layers, sampled_km = found, distance
@@ -218,19 +223,22 @@ async def weather_for_city(city: str, days: int = 30) -> dict:
     """
     days = max(1, min(int(days), 92))
     place = await geocode(city)
-    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        response = await client.get(
-            FORECAST_URL,
-            params={
-                "latitude": place["latitude"],
-                "longitude": place["longitude"],
-                "current": "relative_humidity_2m",
-                "daily": "temperature_2m_mean,precipitation_sum",
-                "past_days": max(0, days - 1),
-                "forecast_days": 1,
-                "timezone": "auto",
-            },
-        )
+    try:
+        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+            response = await client.get(
+                FORECAST_URL,
+                params={
+                    "latitude": place["latitude"],
+                    "longitude": place["longitude"],
+                    "current": "relative_humidity_2m",
+                    "daily": "temperature_2m_mean,precipitation_sum",
+                    "past_days": max(0, days - 1),
+                    "forecast_days": 1,
+                    "timezone": "auto",
+                },
+            )
+    except httpx.HTTPError as exc:
+        raise LookupError("The weather service is not responding. Try again in a moment.") from exc
     if response.status_code != 200:
         raise LookupError("The weather service is not responding. Try again in a moment.")
     payload = response.json()
