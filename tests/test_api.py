@@ -87,5 +87,32 @@ with TestClient(main.app) as client:
     client.post("/api/v1/auth/signup", json={"name": "Other", "email": "o@x.com", "password": "farming123"})
     check("new account sees an empty history", client.get("/api/v1/history").json() == [])
 
+    # --- demo sign-in (DEMO_MODE) ---
+    client.post("/api/v1/auth/logout")
+    r = client.post("/login", data={"email": "brand.new@example.com", "password": "1234"},
+                    follow_redirects=False)
+    check("demo password signs anyone in", r.headers.get("location") == "/dashboard", r.headers.get("location"))
+    check("demo sign-in creates the account", client.get("/dashboard").status_code == 200)
+    client.cookies.clear()
+    r = client.post("/login", data={"email": "brand.new@example.com", "password": "wrong"},
+                    follow_redirects=False)
+    check("a wrong password is still refused", "error" in r.headers.get("location", ""), r.headers.get("location"))
+    client.cookies.clear()
+    check("the login page says demo mode is on", "Demo mode" in client.get("/").text)
+
+    import cropwise.routers.pages as pages_module
+    os.environ["DEMO_MODE"] = "0"
+    try:
+        # A fresh address: "brand.new" now genuinely has 1234 as its password, because the
+        # demo sign-in created the account with it.
+        r = client.post("/login", data={"email": "never.seen@example.com", "password": "1234"},
+                        follow_redirects=False)
+        check("DEMO_MODE=0 turns the demo password off", "error" in r.headers.get("location", ""),
+              r.headers.get("location"))
+        check("the banner disappears with it", "Demo mode" not in client.get("/").text)
+    finally:
+        os.environ["DEMO_MODE"] = "1"
+    assert pages_module.demo_mode() is True
+
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)

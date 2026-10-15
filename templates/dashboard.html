@@ -1,318 +1,82 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>CropWise - Crop Recommendation</title> 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> 
- 
-    <style> 
-        .language-setting{ 
-            padding:8px 12px 10px 25px; 
-        } 
- 
-        .language-setting select{ 
-            width:100%; 
-            padding:9px 10px; 
-            border:1px solid #36f5a5; 
-            border-radius:9px; 
-            background:#123d2b; 
-            color:white; 
-            font-family:"Times New Roman",serif; 
-            font-size:14px; 
-            outline:none; 
-            cursor:pointer; 
-            box-shadow:0 0 8px rgba(54,245,165,.45); 
-        } 
- 
-        .language-setting select:focus{ 
-            box-shadow:0 0 12px rgba(54,245,165,.75); 
-        } 
- 
-        .language-setting select option{ 
-            background:#123d2b; 
-            color:white; 
-        } 
-    </style> 
-</head> 
- 
-<body> 
- 
-<div class="dashboard"> 
- 
-    <aside class="sidebar"> 
- 
-        <div class="logo"> 
-            <span>🌿</span> 
-            <h2>CropWise</h2> 
-        </div> 
- 
-        <nav class="sidebar-menu"> 
- 
-            <a href="{{ url_for('dashboard') }}" 
-               class="menu-item {% if active_page == 'dashboard' %}active{% endif %}"> 
-                <span>🏠</span> 
-                <span data-i18n="dashboard">Dashboard</span> 
-            </a> 
- 
-            <a href="{{ url_for('soil') }}" 
-               class="menu-item {% if active_page == 'soil' %}active{% endif %}"> 
-                <span>🧪</span> 
-                <span data-i18n="soilClimate">Soil & Climate</span> 
-            </a> 
- 
-            <a href="{{ url_for('history') }}" 
-               class="menu-item {% if active_page == 'results' %}active{% endif %}"> 
-                <span>📊</span> 
-                <span data-i18n="results">Results</span> 
-            </a> 
- 
-            <a href="{{ url_for('history') }}" 
-               class="menu-item {% if active_page == 'history' %}active{% endif %}"> 
-                <span>📜</span> 
-                <span data-i18n="history">History</span> 
-            </a> 
- 
-            <a href="{{ url_for('profile') }}" 
-               class="menu-item {% if active_page == 'profile' %}active{% endif %}"> 
-                <span>👤</span> 
-                <span data-i18n="profile">Profile</span> 
-            </a> 
- 
-            <a href="{{ url_for('settings') }}" 
-               class="menu-item {% if active_page == 'settings' %}active{% endif %}"> 
-                <span>⚙️</span> 
-                <span data-i18n="settings">Settings</span> 
-            </a> 
- 
-            <div class="language-setting"> 
-                <select id="dashboardLanguageSelect"> 
-                    <option value="en">🌐 English(English)</option> 
-                    <option value="hi">🌐 हिंदी(Hindi)</option> 
-                    <option value="te">🌐 తెలుగు(Telugu)</option> 
-                    <option value="ta">🌐 தமிழ்(Tamil)</option> 
-                    <option value="ml">🌐 മലയാളം(Malyalam)</option> 
-                    <option value="kn">🌐 ಕನ್ನಡ(Kannada)</option> 
-                </select> 
-            </div> 
- 
-        </nav> 
- 
-        <div class="sidebar-bottom"> 
- 
-            <a href="{{ url_for('logout') }}" class="menu-item logout"> 
-                <span>🚪</span> 
-                <span data-i18n="logout">Logout</span> 
-            </a> 
- 
-        </div> 
- 
-    </aside> 
- 
-    <main class="main-content"> 
- 
-        <header class="topbar"> 
- 
-            <div> 
-                <h1 data-i18n="CropRecommendationTitle">Crop Recommendation</h1> 
-                <p data-i18n="dashboardsubtitle">Smart farming starts here</p> 
-            </div> 
- 
-            <div class="user-section"> 
- 
-                <div class="notification">🔔</div> 
- 
-                <div class="profile-icon">👤</div> 
- 
-                <div class="profile-info"> 
-                    <div>User</div> 
-                    <span>Farmer</span> 
-                </div> 
- 
-            </div> 
- 
-        </header> 
+{% extends "base.html" %}
+{% block title %}CropWise{% endblock %}
 
+{% block body %}
+<div class="topbar">
+  <div class="greeting">
+    <h1>Namaste{% if name %}, {{ name }}{% endif %}</h1>
+    <div class="date">{{ today_long }}</div>
+  </div>
+  <a class="btn btn-amber" href="{{ url_for('soil') }}">Start an analysis</a>
+  <span class="avatar">{{ initial }}</span>
+</div>
 
-        <!-- ============================= -->
-        <!-- START ANALYSIS SECTION -->
-        <!-- ============================= -->
+{% if last %}
+<section class="card reveal hoverable" style="margin-bottom:18px">
+  <div class="row" style="align-items:center">
+    <div style="flex:2 1 320px">
+      <h2>Your last recommendation</h2>
+      <p class="muted">{{ last.city or 'your location' }} · {{ last.when }}</p>
+      <p style="margin-top:12px;font-size:24px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;text-transform:capitalize">
+        {{ last.crop }} <span class="chip" style="vertical-align:middle">{{ last.confidence }}% match</span>
+      </p>
+    </div>
+    <div style="flex:1 1 220px;display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn" href="/plan/{{ last.crop }}">Open the plan</a>
+      <a class="btn btn-ghost" href="{{ url_for('history') }}">All history</a>
+    </div>
+  </div>
+</section>
+{% endif %}
 
-        <section class="welcome-section"> 
- 
-            <div class="analysis-card"> 
- 
-                <div class="analysis-icon"> 
-                    🌱
-                </div> 
- 
-                <div class="analysis-content"> 
- 
-                    <h3 data-i18n="startAnalysis"> 
-                        Start Analysis 
-                    </h3> 
- 
-                    <p data-i18n="startAnalysisText"> 
-                        Enter your soil and climate information.
-                    </p> 
- 
-                    <a href="{{ url_for('soil') }}" 
-                       class="start-button" 
-                       data-i18n="startButton"> 
-                        🌱 Start Analysis 
-                    </a> 
- 
-                </div> 
- 
-            </div> 
- 
-        </section> 
+<div class="kpis reveal" style="margin-bottom:18px">
+  <div class="kpi"><span class="n" data-count="{{ total }}">0</span><span class="l">Analyses you have run</span></div>
+  <div class="kpi"><span class="n">22</span><span class="l">Crops the model knows</span></div>
+  <div class="kpi"><span class="n">97<small style="font-size:16px">%</small></span><span class="l">Accuracy from a city estimate</span></div>
+  <div class="kpi"><span class="n">6</span><span class="l">Languages</span></div>
+</div>
 
+<div class="grid">
+  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('soil') }}">
+    <h3>🧪 Check your soil</h3>
+    <p>Type a town. We read nitrogen, pH, clay and organic carbon from ISRIC SoilGrids, and tell
+       you how far away the reading was taken.</p>
+    <p style="margin-top:14px"><span class="chip">Step 1</span></p>
+  </a>
 
-        <!-- ============================= -->
-        <!-- PROJECT OVERVIEW SECTION -->
-        <!-- ============================= -->
+  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('soil') }}">
+    <h3>🌦 Add the weather</h3>
+    <p>Mean temperature, humidity and rainfall over the last 30 days, from Open-Meteo. No typing
+       numbers you do not have.</p>
+    <p style="margin-top:14px"><span class="chip">Step 2</span></p>
+  </a>
 
-        <section class="overview-section"> 
- 
-            <div class="section-heading"> 
- 
-                <div> 
- 
-                    <span data-i18n="systemOverview"> 
-                        PROJECT OVERVIEW 
-                    </span> 
- 
-                    <h2 data-i18n="whatProvides"> 
-                        What CropWise Provides 
-                    </h2> 
- 
-                </div> 
- 
-            </div> 
- 
-            <div class="overview-grid"> 
+  <a class="card col-4 reveal hoverable card-link" href="{{ url_for('history') }}">
+    <h3>🌾 Get three crops</h3>
+    <p>Each with a confidence, the reasons behind it, and a full plan: sowing window, fertiliser,
+       shops and which mandi pays most.</p>
+    <p style="margin-top:14px"><span class="chip">Step 3</span></p>
+  </a>
 
+  <section class="card col-8 reveal">
+    <h2>What this app will not do</h2>
+    <p>It will not invent a number to fill a gap. Three examples you can check:</p>
+    <ul class="stack" style="margin:12px 0 0;padding-left:18px">
+      <li><strong>Phosphorus and potassium are left blank</strong> unless you upload a soil test —
+        no map publishes them, and the earlier version of this app guessed them.</li>
+      <li><strong>Soil under a town is reported as sampled from nearby farmland</strong>, with the
+        distance, because satellites do not map built-up land.</li>
+      <li><strong>Mandi prices are labelled MOCK</strong> until a data.gov.in key is set.</li>
+    </ul>
+    <p style="margin-top:14px"><a class="btn btn-ghost btn-sm" href="/eval">See the measured numbers</a></p>
+  </section>
 
-                <!-- SOIL ANALYSIS -->
-
-                <div class="overview-card"> 
- 
-                    <div class="card-icon soil-icon"> 
-                        🧪
-                    </div> 
- 
-                    <h3 data-i18n="soilAnalysis"> 
-                        Soil Analysis 
-                    </h3> 
- 
-                    <p data-i18n="soilAnalysisText"> 
-                        Analyze important soil conditions and 
-                        nutrient information required for crop selection. 
-                    </p> 
- 
-                    <span class="card-link" 
-                          data-i18n="soilInformation"> 
-                        Soil Information → 
-                    </span> 
- 
-                </div> 
-
-
-                <!-- CLIMATE ANALYSIS -->
-
-                <div class="overview-card"> 
- 
-                    <div class="card-icon climate-icon"> 
-                        🌦️
-                    </div> 
- 
-                    <h3 data-i18n="climateAnalysis"> 
-                        Climate Analysis 
-                    </h3> 
- 
-                    <p data-i18n="climateAnalysisText"> 
-                        Use climate conditions such as temperature, 
-                        humidity and rainfall for better decisions. 
-                    </p> 
- 
-                    <span class="card-link" 
-                          data-i18n="climateInformation"> 
-                        Climate Information → 
-                    </span> 
- 
-                </div> 
-
-
-                <!-- CROP RECOMMENDATION -->
-
-                <div class="overview-card"> 
- 
-                    <div class="card-icon crop-icon"> 
-                        🌾
-                    </div> 
- 
-                    <h3 data-i18n="cropPrediction"> 
-                        Crop Recommendation 
-                    </h3> 
- 
-                    <p data-i18n="cropPredictionText"> 
-                        Our machine learning model analyzes the 
-                        available conditions and recommends suitable crops. 
-                    </p> 
- 
-                    <span class="card-link" 
-                          data-i18n="mlPrediction"> 
-                        Crop Recommendation → 
-                    </span> 
- 
-                </div> 
-
-
-                
- 
-                </div> 
-
-
-            </div> 
- 
-        </section> 
- 
-    </main> 
- 
-</div> 
- 
-<script src="{{ url_for('static', filename='js/lang.js') }}"></script> 
- 
-<script> 
-document.addEventListener("DOMContentLoaded", function(){ 
- 
-    const languageSelect = document.getElementById("dashboardLanguageSelect"); 
- 
-    const savedLanguage = localStorage.getItem("lang") || "en"; 
- 
-    languageSelect.value = savedLanguage; 
- 
-    applyLanguage(savedLanguage); 
- 
-    languageSelect.addEventListener("change", function(){ 
- 
-        const selectedLanguage = this.value; 
- 
-        applyLanguage(selectedLanguage); 
- 
-        localStorage.setItem("lang", selectedLanguage); 
- 
-    }); 
- 
-}); 
-</script> 
- 
-<a class="krishimitra-fab" href="/assistant" title="Ask KrishiMitra"
-   style="position:fixed;right:20px;bottom:20px;z-index:60;display:inline-flex;align-items:center;gap:8px;
-          padding:14px 18px;border-radius:999px;background:#f2b33d;color:#2a1c00;font-weight:700;
-          text-decoration:none;box-shadow:0 10px 24px -12px rgba(0,0,0,.6);font-family:system-ui,sans-serif">
-  Ask KrishiMitra
-</a>
-</body> 
-</html>
+  <section class="card col-4 reveal">
+    <h2>Ask in your language</h2>
+    <p>KrishiMitra answers from a cited knowledge base, in six languages, by voice or text. If it
+       does not know, it says so and gives you the Kisan Call Centre.</p>
+    <p style="margin-top:14px"><a class="btn btn-amber" href="/assistant">Open KrishiMitra</a></p>
+    <p class="small muted" style="margin-top:10px">Tip: press Ctrl + K anywhere.</p>
+  </section>
+</div>
+{% endblock %}

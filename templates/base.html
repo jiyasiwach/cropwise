@@ -1,0 +1,64 @@
+{# The shell every page sits in: sidebar on desktop, bottom bar on a phone, one stylesheet.
+   Pages fill `title`, `heading`, `subtitle` and the `body` block. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0f3b2a">
+<title>{% block title %}CropWise{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand"><span class="mark">🌱</span> CropWise</div>
+
+    <div class="nav-group">Grow</div>
+    <a class="menu-item {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span class="ic">⌂</span> <span data-i18n="dashboard">Dashboard</span></a>
+    <a class="menu-item {% if active_page == 'soil' %}active{% endif %}" href="{{ url_for('soil') }}"><span class="ic">🧪</span> <span data-i18n="soilClimate">Soil &amp; Climate</span></a>
+    <a class="menu-item {% if active_page == 'results' %}active{% endif %}" href="{{ url_for('history') }}"><span class="ic">🌾</span> <span data-i18n="results">Results</span></a>
+    <a class="menu-item {% if active_page == 'assistant' %}active{% endif %}" href="/assistant"><span class="ic">💬</span> KrishiMitra</a>
+
+    <div class="nav-group">Record</div>
+    <a class="menu-item {% if active_page == 'history' %}active{% endif %}" href="{{ url_for('history') }}"><span class="ic">📜</span> <span data-i18n="history">History</span></a>
+    <a class="menu-item {% if active_page == 'eval' %}active{% endif %}" href="/eval"><span class="ic">📊</span> How well it works</a>
+
+    <div class="nav-group">You</div>
+    <a class="menu-item {% if active_page == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}"><span class="ic">👤</span> <span data-i18n="profile">Profile</span></a>
+    <a class="menu-item {% if active_page == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}"><span class="ic">⚙</span> <span data-i18n="settings">Settings</span></a>
+    <a class="menu-item" href="{{ url_for('logout') }}"><span class="ic">↪</span> Sign out</a>
+
+    <div class="spacer"></div>
+    <div class="help-box">
+      Need a person?
+      <a href="tel:18001801551">1800-180-1551</a>
+      <span class="small">Kisan Call Centre · free · 6am–10pm</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    {% block body %}{% endblock %}
+  </main>
+</div>
+
+<a class="fab" href="/assistant" title="Ask KrishiMitra (Ctrl+K)">💬 Ask KrishiMitra</a>
+
+<nav class="bottom-nav">
+  <a class="{% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span class="ic">⌂</span> Home</a>
+  <a class="{% if active_page == 'soil' %}active{% endif %}" href="{{ url_for('soil') }}"><span class="ic">🧪</span> Analyse</a>
+  <a class="{% if active_page == 'history' %}active{% endif %}" href="{{ url_for('history') }}"><span class="ic">📜</span> History</a>
+  <a class="{% if active_page == 'assistant' %}active{% endif %}" href="/assistant"><span class="ic">💬</span> Ask</a>
+  <a class="{% if active_page == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}"><span class="ic">👤</span> You</a>
+</nav>
+
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lang.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

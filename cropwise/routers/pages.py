@@ -11,6 +11,7 @@ is stateless apart from the signed cookie, which is what lets it run on Vercel's
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 from datetime import date
 
@@ -27,6 +28,17 @@ from ..services.predictor import recommend
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 templates = Jinja2Templates(directory=str(ROOT / "templates"))
+
+def demo_mode() -> bool:
+    """A deliberately weak sign-in for showing the app: any email, one shared password.
+
+    It is loud about itself — the login page says so in a banner — and one environment variable
+    turns it off. It must be off before any real farmer data goes in.
+    """
+    return os.environ.get("DEMO_MODE", "1") == "1"
+
+
+DEMO_PASSWORD = os.environ.get("DEMO_PASSWORD", "1234")
 
 ROUTES = {
     "login": "/",
@@ -73,12 +85,26 @@ def require(user: User | None, path: str = "/") -> RedirectResponse | None:
 def login_page(request: Request, error: str | None = None, user: User | None = Depends(current_user_optional)):
     if user:
         return RedirectResponse("/dashboard", status_code=303)
-    return render(request, "login.html", error=error)
+    return render(request, "login.html", error=error, signup=False, demo_mode=demo_mode())
 
 
 @router.post("/login")
 def login_submit(email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    row = db.query(User).filter(User.email == email.strip().lower()).one_or_none()
+    email = email.strip().lower()
+    row = db.query(User).filter(User.email == email).one_or_none()
+
+    if demo_mode() and password == DEMO_PASSWORD:
+        if not row:
+            # First time in demo mode: make the account rather than bouncing the visitor.
+            row = User(
+                email=email,
+                password_hash=hash_password(DEMO_PASSWORD),
+                name=email.split("@")[0].replace(".", " ").title(),
+            )
+            db.add(row)
+            db.commit()
+        return signed_in(RedirectResponse("/dashboard", status_code=303), row.email)
+
     if not row or not verify_password(password, row.password_hash):
         return RedirectResponse("/?error=Those+details+did+not+match+an+account.", status_code=303)
     return signed_in(RedirectResponse("/dashboard", status_code=303), row.email)
@@ -86,7 +112,7 @@ def login_submit(email: str = Form(...), password: str = Form(...), db: Session 
 
 @router.get("/signup", response_class=HTMLResponse)
 def signup_page(request: Request, error: str | None = None):
-    return render(request, "signup.html", error=error)
+    return render(request, "signup.html", error=error, signup=True, demo_mode=demo_mode())
 
 
 @router.post("/signup")
@@ -117,8 +143,41 @@ def logout_page():
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
-def dashboard(request: Request, user: User | None = Depends(current_user_optional)):
-    return require(user) or render(request, "dashboard.html", active_page="dashboard")
+def dashboard(
+    request: Request,
+    user: User | None = Depends(current_user_optional),
+    db: Session = Depends(get_db),
+):
+    gate = require(user)
+    if gate:
+        return gate
+    total = db.query(Prediction).filter(Prediction.user_id == user.id).count()
+    latest = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id)
+        .order_by(desc(Prediction.created_at))
+        .first()
+    )
+    name = (user.name or user.email.split("@")[0]).split()[0].title()
+    return render(
+        request,
+        "dashboard.html",
+        active_page="dashboard",
+        name=name,
+        initial=name[0].upper(),
+        total=total,
+        today_long=date.today().strftime("%A, %d %B %Y"),
+        last=(
+            {
+                "crop": latest.crop,
+                "confidence": latest.confidence,
+                "city": latest.city,
+                "when": latest.created_at.strftime("%d %b, %I:%M %p"),
+            }
+            if latest
+            else None
+        ),
+    )
 
 
 @router.get("/soil", response_class=HTMLResponse)
@@ -213,6 +272,7 @@ def predict_page(
         crops=result["crops"],
         unusual=result["unusual_readings"],
         measured=False,
+        city=city,
         soil_data={
             "N": nitrogen,
             "P": None,

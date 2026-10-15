@@ -1,111 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Crop Recommendation System</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/login.css') }}">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0f3b2a">
+<title>{{ 'Create your account' if signup else 'Sign in' }} · CropWise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+<style>
+body { display: grid; grid-template-columns: 1.05fr 1fr; min-height: 100dvh; }
+.pitch {
+  background: linear-gradient(170deg, var(--forest), var(--deep));
+  color: #fff; padding: 48px 52px; display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.pitch h1 { font-size: 46px; line-height: 1.05; max-width: 15ch; }
+.pitch p { color: #c6d8cd; max-width: 46ch; font-size: 16px; }
+.pitch ul { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 12px; }
+.pitch li { display: flex; gap: 10px; align-items: flex-start; color: #e7efe9; }
+.tick { color: var(--amber); font-weight: 800; }
+.sun { position: absolute; width: 190px; height: 190px; border-radius: 50%;
+       background: radial-gradient(circle, rgba(242,179,61,.5), transparent 70%); top: -40px; right: -30px; }
+.rows { position: absolute; inset: auto 0 0 0; height: 150px; opacity: .22;
+        background: repeating-linear-gradient(115deg, var(--amber) 0 12px, transparent 12px 34px);
+        clip-path: polygon(0 52%, 22% 24%, 48% 56%, 74% 20%, 100% 48%, 100% 100%, 0 100%); }
+.panel { display: flex; align-items: center; justify-content: center; padding: 40px 26px; }
+.form-card { width: min(430px, 100%); }
+.brand-row { display: flex; align-items: center; gap: 11px; margin-bottom: 22px;
+             font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; }
+.swap { text-align: center; margin-top: 18px; color: var(--muted); font-size: 14px; }
+@media (max-width: 920px) {
+  body { grid-template-columns: 1fr; }
+  .pitch { padding: 34px 24px 40px; }
+  .pitch h1 { font-size: 32px; }
+  .pitch ul { display: none; }
+}
+</style>
 </head>
-
 <body>
 
-    <div class="background">
+<section class="pitch">
+  <div class="sun"></div>
+  <div class="brand-row"><span class="mark" style="width:36px;height:36px;border-radius:12px;background:linear-gradient(140deg,var(--amber),var(--orange));display:grid;place-items:center">🌱</span> CropWise</div>
+  <h1>Know what to grow, where to buy, and where to sell.</h1>
+  <p>Type the name of your town. We read the soil and the weather for that place, recommend three
+     crops with the reasons behind each, and plan the season around them.</p>
+  <ul>
+    <li><span class="tick">✓</span> <span>Soil and weather read for you — no numbers to look up</span></li>
+    <li><span class="tick">✓</span> <span>Sowing dates, fertiliser in bags, and shops on a map</span></li>
+    <li><span class="tick">✓</span> <span>The mandi that pays most <em>after</em> transport</span></li>
+    <li><span class="tick">✓</span> <span>Ask questions by voice in six languages</span></li>
+  </ul>
+  <div class="rows"></div>
+</section>
 
-        <div class="login-card">
+<section class="panel">
+  <div class="form-card">
+    <h2 style="font-size:26px">{{ 'Create your account' if signup else 'Welcome back' }}</h2>
+    <p class="muted" style="margin:6px 0 20px">
+      {{ 'A name, an email and a password is all we need.' if signup else 'Sign in to pick up where you left off.' }}
+    </p>
 
-            <div class="logo">
-                🌱
-            </div>
-
-            <div class="title">
-    <h1>Crop Recommendation</h1>
-    <h2>System</h2>
-</div>
-
-            <p class="subtitle">
-                Create your account
-            </p>
-
-            {% if error %}
-            <p class="form-error" role="alert"
-               style="background:#fdecea;color:#b42318;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:14px;">
-                {{ error }}
-            </p>
-            {% endif %}
-
-
-            <form action="{{ url_for('signup') }}" method="POST">
-
-                <label>Your name</label>
-
-                <div class="input-container">
-
-                    <span class="icon">👤</span>
-
-                    <input type="text" name="name" placeholder="Enter your name" required>
-
-                </div>
-
-
-                <label>Email</label>
-
-                <div class="input-container">
-
-                    <span class="icon">✉</span>
-
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email address"
-                        required>
-
-                </div>
-
-
-                <label>Password</label>
-
-                <div class="input-container">
-
-                    <span class="icon">🔒</span>
-
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="At least 8 characters"
-                        minlength="8"
-                        required>
-
-                </div>
-
-
-                <button type="submit">
-                    CREATE ACCOUNT
-                </button>
-
-            </form>
-
-
-            <p class="signup">
-
-                Already have an account?
-
-                <a href="{{ url_for('login') }}">
-                    Log in
-                </a>
-
-            </p>
-
-        </div>
-
+    {% if demo_mode %}
+    <div class="notice" style="margin-bottom:18px">
+      <strong>Demo mode.</strong> Sign in with <em>any</em> email address and the password
+      <strong>1234</strong>. An account is created for you the first time. Turn this off by
+      setting <code>DEMO_MODE=0</code> before using real data.
     </div>
+    {% endif %}
 
+    {% if error %}<div class="notice notice-bad" role="alert">{{ error }}</div>{% endif %}
+
+    <form action="{{ '/signup' if signup else '/login' }}" method="POST" class="card">
+      {% if signup %}
+      <div class="field">
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" placeholder="e.g. Jiya" required>
+      </div>
+      {% endif %}
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div style="position:relative">
+          <input type="password" id="password" name="password"
+                 placeholder="{{ 'At least 8 characters' if signup else '1234 in demo mode' }}"
+                 {% if signup %}minlength="8"{% endif %} required>
+          <button type="button" id="peek" class="btn-ghost"
+                  style="position:absolute;right:6px;top:6px;min-height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer"
+                  aria-label="Show password">show</button>
+        </div>
+      </div>
+
+      <button class="btn" type="submit" style="width:100%"
+              data-busy-label="{{ 'Creating your account…' if signup else 'Signing you in…' }}">
+        {{ 'Create account' if signup else 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="swap">
+      {% if signup %}
+        Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+      {% else %}
+        New here? <a href="{{ url_for('signup') }}">Create an account</a>
+      {% endif %}
+    </p>
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script>
+  const peek = document.getElementById('peek');
+  const password = document.getElementById('password');
+  peek.addEventListener('click', () => {
+    const showing = password.type === 'text';
+    password.type = showing ? 'password' : 'text';
+    peek.textContent = showing ? 'show' : 'hide';
+  });
+</script>
 </body>
-
 </html>

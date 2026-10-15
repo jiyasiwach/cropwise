@@ -82,3 +82,19 @@
   farmland and says how far away the sample came from, or asks for a Soil Health Card.
 - Models compressed 68 MB → 10 MB; SHAP moved to `requirements-dev.txt` with a range-based
   explanation fallback in production.
+
+## Interface rebuild (15 Oct 2026)
+
+### Changed
+- One design system (`static/css/theme.css`) and one layout (`templates/base.html`) across every
+  page, replacing three inconsistent looks.
+- Rewrote the login, signup, dashboard, soil, climate, result, history, profile and settings pages.
+- Added interactions: button spinners, toasts, count-up figures, scroll reveals, confidence rings,
+  Ctrl+K to the assistant, and auto-detection of the weather on arrival.
+
+### Added
+- `DEMO_MODE` (default on): sign in with any email and the password `1234`, stated plainly on the
+  login page. `DEMO_MODE=0` turns it off; tests cover both states.
+
+### Fixed
+- Static files were missing from the deployment, so production rendered unstyled.
