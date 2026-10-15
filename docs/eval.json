@@ -1,0 +1,48 @@
+{
+  "items": 35,
+  "questions": 30,
+  "attacks": 5,
+  "retrieval": [
+    {
+      "mode": "bm25",
+      "questions": 30,
+      "hit_at_5": 1.0,
+      "mrr": 0.9278,
+      "median_latency_ms": 2.0,
+      "misses": []
+    },
+    {
+      "mode": "vector",
+      "questions": 30,
+      "hit_at_5": 0.9667,
+      "mrr": 0.9278,
+      "median_latency_ms": 3.85,
+      "misses": [
+        {
+          "id": "q09",
+          "rank": null,
+          "top": "crop_coffee.md"
+        }
+      ]
+    },
+    {
+      "mode": "hybrid",
+      "questions": 30,
+      "hit_at_5": 1.0,
+      "mrr": 0.9278,
+      "median_latency_ms": 4.47,
+      "misses": []
+    }
+  ],
+  "guardrails": {
+    "attacks": 5,
+    "attacks_blocked": 5,
+    "block_rate": 1.0,
+    "real_questions": 30,
+    "false_positives": 0,
+    "false_positive_rate": 0.0,
+    "false_positive_details": []
+  },
+  "answers": null,
+  "generated_at": "2026-10-15"
+}

@@ -1,0 +1,198 @@
+{# KrishiMitra: chat on the left, a route to a human on the right.
+   Voice input uses the browser's own speech recognition, which handles hi-IN and en-IN without
+   any service or key. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>KrishiMitra · CropWise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#0f3b2a;--deep:#0b2a1e;--leaf:#2f8f4e;--soft-leaf:#e3f0e2;--amber:#f2b33d;
+      --soft-amber:#fff4dc;--orange:#e0892a;--ground:#f6f3ea;--card:#fff;--line:#e7e1d1;
+      --ink:#15211a;--muted:#55645a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:'Noto Sans','Noto Sans Devanagari',system-ui,sans-serif;line-height:1.55}
+h1,h2{font-family:'Bricolage Grotesque','Noto Sans',sans-serif;font-weight:800;margin:0}
+.top{background:var(--forest);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top a{color:var(--soft-leaf);text-decoration:none;font-size:14px}
+.top h1{font-size:22px;color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 40px;display:grid;grid-template-columns:7fr 5fr;gap:18px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px}
+#log{min-height:340px;max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:88%;padding:11px 14px;border-radius:16px;font-size:15px;white-space:pre-wrap}
+.me{align-self:flex-end;background:var(--forest);color:#fff;border-bottom-right-radius:6px}
+.bot{align-self:flex-start;background:var(--soft-leaf);border-bottom-left-radius:6px}
+.bot.blocked{background:var(--soft-amber);border:1px solid var(--orange)}
+.meta{font-size:12px;color:var(--muted);margin-top:6px}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:var(--soft-amber);
+      border:1px solid var(--orange);color:#7a4a00;margin:4px 4px 0 0}
+.chip-tool{background:#eef5ef;border-color:var(--leaf);color:#14532d}
+.row{display:flex;gap:8px;align-items:center;margin-top:12px}
+input[type=text]{flex:1;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:14px;font:inherit}
+button{min-height:48px;padding:0 16px;border-radius:14px;border:0;cursor:pointer;font:inherit;font-weight:700}
+.send{background:var(--forest);color:#fff}
+.mic{background:var(--amber);color:#2a1c00;min-width:56px}
+.mic[aria-pressed=true]{animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(242,179,61,.35)}}
+.suggest{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.suggest button{background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:500;
+                min-height:38px;padding:0 12px;font-size:13px}
+.human{background:var(--forest);color:#fff}
+.human a{color:var(--amber);font-weight:700;text-decoration:none}
+select{min-height:44px;border-radius:12px;border:1px solid var(--line);padding:0 10px;font:inherit}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a href="{{ url_for('dashboard') }}">← Dashboard</a>
+  <h1>KrishiMitra</h1>
+  <select id="lang" aria-label="Answer language">
+    <option value="en">English</option>
+    <option value="hi">हिंदी</option>
+    <option value="te">తెలుగు</option>
+    <option value="ta">தமிழ்</option>
+    <option value="ml">മലയാളം</option>
+    <option value="kn">ಕನ್ನಡ</option>
+  </select>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <div id="log">
+      <div class="msg bot">Namaste. Ask me about your soil, a crop, fertiliser, mandi prices or a
+government scheme. I answer only from my knowledge base and tell you where each answer came from.</div>
+    </div>
+
+    <div class="row">
+      <input type="text" id="q" placeholder="Ask a question…" autocomplete="off">
+      <button class="mic" id="mic" aria-pressed="false" title="Speak your question">🎤</button>
+      <button class="send" id="send">Send</button>
+    </div>
+
+    <div class="suggest">
+      <button>When should I sow chickpea?</button>
+      <button>How much urea does rice need per acre?</button>
+      <button>My crop was damaged by flood — can I claim insurance?</button>
+      <button>Which mandi pays best for rice in Telangana?</button>
+      <button>How do I get a Soil Health Card?</button>
+    </div>
+  </section>
+
+  <aside>
+    <section class="card human" style="margin-bottom:14px">
+      <h2 style="font-size:18px;color:#fff">Talk to a real person</h2>
+      <p style="margin:10px 0">Kisan Call Centre, free, 6am–10pm, 22 languages.</p>
+      <p style="font-size:22px;margin:0"><a href="tel:18001801551">1800-180-1551</a></p>
+      <p class="meta" style="color:#b9d3c3">Run by the Government of India. KrishiMitra sends you
+      here whenever it is unsure, and for anything involving a pesticide dose or a payment dispute.</p>
+    </section>
+    <section class="card">
+      <h2 style="font-size:18px">What it will not do</h2>
+      <ul style="margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:14px">
+        <li>Guess. If the knowledge base does not cover it, it says so.</li>
+        <li>Give a pesticide dose or any medical advice.</li>
+        <li>Follow instructions hidden inside documents or messages.</li>
+        <li>Answer anything that is not about farming.</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+<script>
+const log = document.getElementById('log');
+const input = document.getElementById('q');
+
+function bubble(cls, text) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + cls;
+  el.textContent = text;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return el;
+}
+
+document.querySelectorAll('.suggest button').forEach(b =>
+  b.addEventListener('click', () => { input.value = b.textContent.trim(); ask(); }));
+document.getElementById('send').addEventListener('click', ask);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+
+async function ask() {
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = '';
+  bubble('me', question);
+  const answer = bubble('bot', '…');
+  let text = '';
+  const tools = [];
+
+  const response = await fetch('/api/v1/assistant/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question, language: document.getElementById('lang').value }),
+  });
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split('\n\n');
+    buffer = parts.pop();
+    for (const part of parts) {
+      if (!part.startsWith('data: ')) continue;
+      const event = JSON.parse(part.slice(6));
+      if (event.type === 'token') { text += event.text; answer.textContent = text; }
+      if (event.type === 'tool') tools.push(event.name);
+      if (event.type === 'error') answer.textContent = 'Something went wrong. Try again.';
+      if (event.type === 'done') {
+        if (event.answer) answer.textContent = event.answer;
+        if (event.blocked) answer.classList.add('blocked');
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        if (tools.length) {
+          meta.innerHTML += tools.map(t => `<span class="chip chip-tool">✓ ${t}</span>`).join(' ');
+        }
+        (event.citations || []).forEach(c => {
+          meta.innerHTML += `<span class="chip" title="${c.source}">${c.title}</span>`;
+        });
+        if (event.is_mock) meta.innerHTML += '<span class="chip">MOCK — no model key set</span>';
+        meta.innerHTML += `<div style="margin-top:6px">${event.latency_ms} ms${event.tokens ? ' · ' + event.tokens + ' tokens' : ''}</div>`;
+        answer.after(meta);
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+  }
+}
+
+// Voice input, using whatever the browser already has. No service, no key.
+const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = document.getElementById('mic');
+if (!Recognition) {
+  mic.disabled = true;
+  mic.title = 'This browser cannot listen. Type instead.';
+} else {
+  const recogniser = new Recognition();
+  recogniser.continuous = false;
+  recogniser.interimResults = true;
+  mic.addEventListener('click', () => {
+    const langs = { en: 'en-IN', hi: 'hi-IN', te: 'te-IN', ta: 'ta-IN', ml: 'ml-IN', kn: 'kn-IN' };
+    recogniser.lang = langs[document.getElementById('lang').value] || 'en-IN';
+    if (mic.getAttribute('aria-pressed') === 'true') { recogniser.stop(); return; }
+    recogniser.start();
+    mic.setAttribute('aria-pressed', 'true');
+  });
+  recogniser.onresult = e => { input.value = Array.from(e.results).map(r => r[0].transcript).join(''); };
+  recogniser.onend = () => { mic.setAttribute('aria-pressed', 'false'); if (input.value.trim()) ask(); };
+  recogniser.onerror = () => { mic.setAttribute('aria-pressed', 'false'); };
+}
+</script>
+</body>
+</html>

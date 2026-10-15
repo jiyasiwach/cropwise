@@ -6,7 +6,7 @@ An AI farming assistant for Indian smallholders: tell it your city, and it reads
 weather for that location, recommends crops, and (from Phase 4 onward) tells you when to sow,
 what fertiliser to buy, where to buy it, and which mandi pays best after transport.
 
-**Status: Phases 1–4 of 10 complete.** See `CHANGELOG.md` for what has shipped and
+**Status: Phases 1–6 of 10 complete.** See `CHANGELOG.md` for what has shipped and
 `docs/AUDIT.md` for the state of the original code.
 
 ## Run it locally
@@ -21,7 +21,8 @@ make run                 # http://127.0.0.1:8000  — API docs at /docs
 ## Tests
 
 ```bash
-make test                # 67 checks: models, API, auth, pages and the crop plan
+make test                # 97 checks: models, API, auth, pages, crop plan and the assistant
+make eval                # retrieval, guardrail and answer metrics -> docs/EVAL.md
 ```
 
 ## How it works today
@@ -34,6 +35,23 @@ make test                # 67 checks: models, API, auth, pages and the crop plan
 | Predict | RandomForest → top 3 crops, each with SHAP reasons and a confidence, saved to your history |
 
 Neither external API needs a key; both are free.
+
+## KrishiMitra
+
+A grounded assistant at `/assistant`. It answers only from the knowledge base in `data/kb/` and
+from seven tools over the app's own services, cites every claim, and refuses when neither covers
+the question. Measured on a hand-labelled 30-question gold set plus 5 injection attacks:
+
+| Metric | Result |
+|---|---|
+| Hit@5 (hybrid: BM25 + LSA vectors + exact-name, fused with RRF) | **1.00** |
+| MRR | **0.928** |
+| Injection attacks blocked | **5/5** |
+| Real questions wrongly blocked | **0/30** |
+
+Full write-up: `docs/EVAL.md`, live at `/eval`. Without `OPENROUTER_API_KEY` the assistant still
+runs and returns extractive answers labelled **MOCK** — retrieval, citations, tools and
+guardrails all work; only the wording is not generated.
 
 ## Accuracy, honestly
 
@@ -64,6 +82,8 @@ accumulation window in the dataset is undocumented, so our 30-day mapping is a b
 | `GET /api/v1/stores` | Agri-input shops within 15 km (OpenStreetMap) |
 | `GET /api/v1/mandi` | Daily mandi prices and a 30-day trend, cached |
 | `GET /api/v1/best-market` | Mandis ranked by what you keep after transport |
+| `POST /api/v1/assistant` | Ask KrishiMitra; returns the answer, citations and tools used |
+| `POST /api/v1/assistant/stream` | The same, streamed as server-sent events |
 
 ## Configuration
 
@@ -81,14 +101,33 @@ accumulation window in the dataset is undocumented, so our 30-day mapping is a b
 Vercel (`vercel.json`, `@vercel/python`). Note that on Vercel the SQLite file lives in `/tmp` and is
 wiped on every cold start, so accounts do not persist there. Phase 3 moves the database to Postgres.
 
+## Architecture
+
+```mermaid
+flowchart TD
+    F[Farmer] --> W[FastAPI: pages + /api/v1]
+    W --> M[Crop models: field / lab + OOD]
+    W --> P[Crop plan: calendar, fertiliser]
+    W --> K[KrishiMitra]
+    K --> R[Hybrid retrieval: BM25 + LSA + RRF]
+    R --> KB[(data/kb — cited documents)]
+    K --> G[Guardrails: heuristics + LLM classifier]
+    K --> T[Tools]
+    T --> S[(SoilGrids)]
+    T --> O[(Open-Meteo)]
+    T --> OSM[(OpenStreetMap)]
+    T --> A[(data.gov.in mandi prices)]
+    W --> DB[(SQLite / Postgres)]
+```
+
 ## Roadmap
 
 1. ~~Audit and repair~~ ✅
 2. ~~Honest retrain: cross-validation, model card, SHAP reasons, out-of-distribution warnings~~ ✅
 3. ~~FastAPI backend, database layer, JWT auth~~ ✅
 4. ~~Crop plan: calendar, fertiliser, nearby shops, mandi prices, best market to sell~~ ✅
-5. KrishiMitra: hybrid RAG, agent tools, guardrails, streaming
-6. Evaluation harness and `/eval` dashboard
+5. ~~KrishiMitra: hybrid RAG, agent tools, guardrails, streaming~~ ✅
+6. ~~Evaluation harness and `/eval` dashboard~~ ✅
 7. Leaf disease, Soil Health Card reader, profit calculator, irrigation, alerts, schemes, PWA
 8. React + Tailwind rebuild to the "field & harvest" design, 9 languages
 9. Voice bot, phone helpline, human handover, support desk

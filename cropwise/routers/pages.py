@@ -286,6 +286,26 @@ def settings_page(request: Request, user: User | None = Depends(current_user_opt
     return require(user) or render(request, "settings.html", email=user.email, active_page="settings")
 
 
+@router.get("/eval", response_class=HTMLResponse)
+def eval_page(request: Request, user: User | None = Depends(current_user_optional)):
+    """The evaluation numbers, read from the file `make eval` writes."""
+    gate = require(user)
+    if gate:
+        return gate
+    path = pathlib.Path(__file__).resolve().parents[2] / "docs" / "eval.json"
+    if not path.exists():
+        return render(request, "plan_missing.html", crop="evaluation results", crops=["run make eval"])
+    data = json.loads(path.read_text())
+    best = max(data["retrieval"], key=lambda r: (r["mrr"], r["hit_at_5"]))
+    return render(request, "eval.html", data=data, best=best, active_page="eval")
+
+
+@router.get("/assistant", response_class=HTMLResponse)
+def assistant_page(request: Request, user: User | None = Depends(current_user_optional)):
+    """KrishiMitra, full page. The floating button on other pages links here."""
+    return require(user) or render(request, "assistant.html", active_page="assistant")
+
+
 @router.get("/plan/{crop}", response_class=HTMLResponse)
 def plan_page(
     request: Request,

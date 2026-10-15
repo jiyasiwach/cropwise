@@ -45,10 +45,13 @@ try:
 except ValueError:
     check("missing readings rejected", True)
 
-# Nothing anywhere may invent phosphorus or potassium again.
+# Nothing anywhere may invent phosphorus or potassium again. Word boundaries matter here:
+# "ask_model" contains "k_model" and is perfectly innocent.
+import re  # noqa: E402
+
 source = (pathlib.Path(__file__).resolve().parents[1] / "cropwise").rglob("*.py")
 text = "\n".join(p.read_text() for p in source)
-check("no P/K regressors anywhere", "p_model" not in text and "k_model" not in text)
+check("no P/K regressors anywhere", not re.search(r"\b[pk]_model\b", text))
 
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)
