@@ -1,0 +1,235 @@
+{# Crop plan: timeline, fertiliser, shops, prices and the best market to sell.
+   Styled to the "field & harvest" palette from the design brief; the React rebuild in Phase 8
+   replaces this page, but the farmer gets the plan now. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ crop|title }} plan · CropWise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --forest:#0f3b2a; --deep:#0b2a1e; --leaf:#2f8f4e; --soft-leaf:#e3f0e2;
+  --amber:#f2b33d; --soft-amber:#fff4dc; --orange:#e0892a;
+  --ground:#f6f3ea; --card:#fff; --line:#e7e1d1; --ink:#15211a; --muted:#55645a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:'Noto Sans',system-ui,sans-serif;line-height:1.55}
+h1,h2,h3,.big{font-family:'Bricolage Grotesque','Noto Sans',sans-serif;font-weight:800;letter-spacing:-0.01em;margin:0}
+a{color:var(--forest)}
+.top{background:var(--forest);color:#fff;padding:18px 24px}
+.top a{color:var(--soft-leaf);text-decoration:none;font-size:14px}
+.top h1{color:#fff;font-size:30px;margin:8px 0 2px;text-transform:capitalize}
+.top .sub{color:#b9d3c3;font-size:14px}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin-bottom:18px}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin:18px 0}
+.tab{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);
+     cursor:pointer;font:inherit;font-weight:600;white-space:nowrap;min-height:44px}
+.tab[aria-selected="true"]{background:var(--forest);color:#fff;border-color:var(--forest)}
+.panel[hidden]{display:none}
+.row{display:flex;flex-wrap:wrap;gap:14px}
+.kpi{flex:1 1 180px;background:var(--soft-leaf);border-radius:16px;padding:14px 16px}
+.kpi .big{font-size:26px;display:block}
+.kpi span.lbl{color:var(--muted);font-size:13px}
+.timeline{position:relative;height:74px;margin:22px 0 8px;background:linear-gradient(90deg,var(--soft-leaf),var(--soft-amber));border-radius:14px}
+.timeline .mark{position:absolute;top:0;bottom:0;width:3px;background:var(--forest)}
+.timeline .today{background:var(--amber);width:4px}
+.timeline .lab{position:absolute;top:78px;font-size:12px;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+.pill-mock{background:var(--soft-amber);color:#7a4a00;border:1px solid var(--orange)}
+.pill-best{background:var(--amber);color:#2a1c00}
+.warn{background:var(--soft-amber);border:1px solid var(--orange);color:#7a4a00;border-radius:14px;padding:12px 14px;font-size:14px;margin-bottom:14px}
+.src{color:var(--muted);font-size:12px;margin-top:10px}
+#map{height:320px;border-radius:16px;border:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:14px;
+     background:var(--amber);color:#2a1c00;font-weight:700;text-decoration:none;border:0;cursor:pointer}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a href="{{ url_for('dashboard') }}">← Back to dashboard</a>
+  <h1>{{ crop }} plan</h1>
+  <div class="sub">{{ timeline.season }} crop · {{ timeline.duration_days }} days from sowing to harvest{% if city %} · {{ city }}{% endif %}</div>
+</header>
+
+<div class="wrap">
+
+  {% if timeline.needs_verification %}
+  <div class="warn">
+    These dates and doses are the commonly published all-India figures, not advice for your field.
+    Confirm with your Krishi Vigyan Kendra before buying inputs.
+  </div>
+  {% endif %}
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-panel="timeline">Timeline</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="fertiliser">Fertiliser</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="shops">Shops near me</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="prices">Mandi prices</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="market">Best market</button>
+  </div>
+
+  <section class="panel card" id="panel-timeline">
+    <h2>When to sow</h2>
+    <div class="row" style="margin-top:14px">
+      <div class="kpi"><span class="big">{{ pretty_sow_from }}</span><span class="lbl">Sowing opens</span></div>
+      <div class="kpi"><span class="big">{{ pretty_sow_by }}</span><span class="lbl">Sow by — window closes</span></div>
+      <div class="kpi"><span class="big">{{ pretty_harvest }}</span><span class="lbl">Expected harvest</span></div>
+      <div class="kpi"><span class="big">{{ timeline.days_until_sowing }}</span>
+        <span class="lbl">{% if before_sowing %}Days until the window opens{% else %}Sow now — the window is open{% endif %}</span></div>
+    </div>
+
+    <div class="timeline">
+      <div class="mark" style="left:2%"></div><div class="lab" style="left:4%">Sowing · {{ pretty_sow_from }}</div>
+      {% if not before_sowing %}
+      <div class="mark today" style="left:{{ today_pct }}%"></div>
+      <div class="lab" style="left:{{ today_pct }}%;top:100px;color:#7a4a00;font-weight:600">Today</div>
+      {% endif %}
+      <div class="mark" style="left:97%"></div><div class="lab" style="left:88%">Harvest · {{ pretty_harvest }}</div>
+    </div>
+
+    <p style="margin-top:{{ 70 if before_sowing else 92 }}px">{{ timeline.note }}</p>
+    {% if before_sowing %}
+    <p class="src">Today is outside this crop's sowing window, so no "today" marker is shown on the bar.</p>
+    {% endif %}
+    <p>Water need: <strong>{{ timeline.water_need }}</strong></p>
+    <p class="src">{{ timeline.source }}</p>
+  </section>
+
+  <section class="panel card" id="panel-fertiliser" hidden>
+    <h2>What to buy for {{ fertiliser.acres }} acre{{ '' if fertiliser.acres == 1 else 's' }}</h2>
+    <table>
+      <thead><tr><th>Fertiliser</th><th>Quantity</th><th>50 kg bags</th></tr></thead>
+      <tbody>
+        <tr><td>DAP (phosphorus)</td><td>{{ fertiliser.buy.dap.kg }} kg</td><td>{{ fertiliser.buy.dap.bags_50kg }}</td></tr>
+        <tr><td>Urea (nitrogen)</td><td>{{ fertiliser.buy.urea.kg }} kg</td><td>{{ fertiliser.buy.urea.bags_50kg }}</td></tr>
+        <tr><td>MOP (potassium)</td><td>{{ fertiliser.buy.mop.kg }} kg</td><td>{{ fertiliser.buy.mop.bags_50kg }}</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px">Organic alternative: {{ fertiliser.organic_option.farmyard_manure_tonnes }} t farmyard manure
+       or {{ fertiliser.organic_option.vermicompost_tonnes }} t vermicompost.</p>
+    <h3 style="margin-top:16px;font-size:16px">How to apply</h3>
+    <ul>{% for step in fertiliser.how_to_apply %}<li>{{ step }}</li>{% endfor %}</ul>
+    {% if fertiliser.assumptions %}
+    <div class="warn" style="margin-top:14px">
+      {% for a in fertiliser.assumptions %}{{ a }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+    </div>
+    {% endif %}
+    <p class="src">{{ fertiliser.source }}</p>
+  </section>
+
+  <section class="panel card" id="panel-shops" hidden>
+    <h2>Agri-input shops near you</h2>
+    <p class="src" id="shopsNote">Finding shops…</p>
+    <div id="map" style="margin:14px 0"></div>
+    <div id="shopsList"></div>
+  </section>
+
+  <section class="panel card" id="panel-prices" hidden>
+    <h2>Mandi prices</h2>
+    <p class="src" id="pricesNote">Loading prices…</p>
+    <div id="pricesBody"></div>
+  </section>
+
+  <section class="panel card" id="panel-market" hidden>
+    <h2>Where to sell</h2>
+    <p class="src">Ranked by what you keep after transport, not by the headline price.</p>
+    <div id="marketBody">Loading…</div>
+  </section>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const CROP = {{ crop|tojson }};
+const STATE = {{ state|tojson }};
+const LAT = {{ latitude|tojson }};
+const LON = {{ longitude|tojson }};
+const rupees = n => n == null ? '—' : '₹' + Number(n).toLocaleString('en-IN');
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+    document.querySelectorAll('.panel').forEach(p => { p.hidden = p.id !== 'panel-' + tab.dataset.panel; });
+    if (tab.dataset.panel === 'shops') loadShops();
+    if (tab.dataset.panel === 'prices') loadPrices();
+    if (tab.dataset.panel === 'market') loadMarket();
+  });
+});
+
+let map, shopsLoaded = false, pricesLoaded = false, marketLoaded = false;
+
+async function loadShops() {
+  if (shopsLoaded) return; shopsLoaded = true;
+  const r = await fetch(`/api/v1/stores?latitude=${LAT}&longitude=${LON}&radius_km=15`);
+  const d = await r.json();
+  document.getElementById('shopsNote').textContent = d.note || '';
+  map = L.map('map').setView([LAT, LON], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
+  L.circleMarker([LAT, LON], { radius: 8, color: '#1d4ed8' }).addTo(map).bindPopup('You');
+  const list = d.stores.map(s => `
+    <tr><td><strong>${s.name}</strong><br><span style="color:#55645a;font-size:13px">${s.kind}${s.address ? ' · ' + s.address : ''}</span></td>
+        <td>${s.distance_km} km</td>
+        <td>${s.phone ? `<a href="tel:${s.phone}">Call</a> · ` : ''}<a href="${s.directions_url}" target="_blank" rel="noopener">Directions</a></td></tr>`).join('');
+  document.getElementById('shopsList').innerHTML = d.stores.length
+    ? `<table><thead><tr><th>Shop</th><th>Distance</th><th></th></tr></thead><tbody>${list}</tbody></table>`
+    : '<p>No shops are mapped within 15 km. Ask at your block agriculture office.</p>';
+  d.stores.forEach(s => L.circleMarker([s.latitude, s.longitude], { radius: 7, color: '#2f8f4e' })
+    .addTo(map).bindPopup(`<strong>${s.name}</strong><br>${s.distance_km} km`));
+}
+
+async function loadPrices() {
+  if (pricesLoaded) return; pricesLoaded = true;
+  const r = await fetch(`/api/v1/mandi?crop=${CROP}&state=${encodeURIComponent(STATE)}&latitude=${LAT}&longitude=${LON}`);
+  const d = await r.json();
+  document.getElementById('pricesNote').innerHTML =
+    (d.is_mock ? '<span class="pill pill-mock">MOCK DATA</span> ' : '') + d.source +
+    (d.last_updated ? ` · last updated ${d.last_updated}` : '');
+  const rows = d.markets.map(m => `<tr><td>${m.market}${m.district ? ' · ' + m.district : ''}</td>
+      <td>${rupees(m.min_price)}</td><td>${rupees(m.max_price)}</td><td><strong>${rupees(m.modal_price)}</strong></td><td>${m.price_date}</td></tr>`).join('');
+  const spark = d.trend.map(t => t.modal_price);
+  const w = 560, h = 90, min = Math.min(...spark), max = Math.max(...spark) || 1;
+  const points = spark.map((v, i) => `${(i / Math.max(1, spark.length - 1)) * w},${h - ((v - min) / (max - min || 1)) * (h - 10) - 5}`).join(' ');
+  document.getElementById('pricesBody').innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:110px;margin:10px 0">
+      <polyline fill="none" stroke="#2f8f4e" stroke-width="2.5" points="${points}"/>
+    </svg>
+    <p class="src">Modal price over the last ${d.trend.length} days (${d.unit}).</p>
+    <table><thead><tr><th>Market</th><th>Min</th><th>Max</th><th>Modal</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadMarket() {
+  if (marketLoaded) return; marketLoaded = true;
+  const r = await fetch(`/api/v1/best-market?crop=${CROP}&state=${encodeURIComponent(STATE)}&latitude=${LAT}&longitude=${LON}&quintals=10`);
+  const d = await r.json();
+  if (!d.best.length) {
+    document.getElementById('marketBody').innerHTML = '<p>No mandi with a map location was found for this crop yet.</p>';
+    return;
+  }
+  const rows = d.best.map((m, i) => `
+    <tr><td>${i === 0 ? '<span class="pill pill-best">Best</span> ' : ''}<strong>${m.market}</strong></td>
+        <td>${rupees(m.modal_price)}</td><td>${m.distance_km} km</td>
+        <td>−${rupees(m.transport_cost_per_quintal)}</td>
+        <td><strong>${rupees(m.net_price_per_quintal)}</strong></td>
+        <td>${m.gain_vs_nearest_total ? '+' + rupees(m.gain_vs_nearest_total) : '—'}</td></tr>`).join('');
+  document.getElementById('marketBody').innerHTML = `
+    ${d.is_mock ? '<p><span class="pill pill-mock">MOCK DATA</span> ' + d.source + '</p>' : ''}
+    <table><thead><tr><th>Mandi</th><th>Modal</th><th>Distance</th><th>Transport</th><th>You keep</th><th>Extra on 10 quintals</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <p class="src">${d.method}</p>`;
+}
+</script>
+</body>
+</html>

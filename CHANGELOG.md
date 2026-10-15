@@ -58,3 +58,18 @@
 ### Changed
 - Python 3.11 throughout. Flask removed; `app.py` deleted.
 - Predictions are stored per user, with the model used and whether the readings were unusual.
+
+## Phase 4 — the crop plan (15 Oct 2026)
+
+### Added
+- `data/crop_calendar.json` — season, sowing months, duration, N-P-K requirement and typical yield
+  for all 22 crops, with sources and a verification flag.
+- `/plan/{crop}` — a five-tab plan: timeline, fertiliser, shops near me, mandi prices, best market.
+- `GET /api/v1/plan/{crop}` (timeline + fertiliser, soil test optional),
+  `GET /api/v1/stores` (OpenStreetMap), `GET /api/v1/mandi` (cached Agmarknet prices and trend),
+  `GET /api/v1/best-market` (ranked by net price after transport).
+- Links from each recommended crop straight into its plan.
+- `tests/test_plan.py` — 24 checks covering the calendar, fertiliser maths, mock labelling and ranking.
+
+### Notes
+- Mandi prices are labelled MOCK until `DATA_GOV_IN_API_KEY` is set. They are never shown as real.

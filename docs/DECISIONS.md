@@ -43,3 +43,14 @@ One line each, newest last. Every decision the owner did not make personally is 
 - Login failures return one neutral message for "no such account" and "wrong password" alike.
 - CORS is an allow-list from `CORS_ORIGINS`, defaulting to localhost only.
 - Password hashing stays Werkzeug PBKDF2-SHA256 at 600k iterations: bcrypt needs a compiler this machine does not have, and this is the one dependency Flask leaves behind.
+
+## Phase 4 — the crop plan (15 Oct 2026)
+- Put every agronomic number in `data/crop_calendar.json` with its sources and a `needs_verification: true` flag, rather than scattering them through the code. The file states plainly that these are general all-India figures, and every screen that shows them repeats the warning.
+- A crop with no calendar entry returns 404 and a page that says so. The app never improvises a sowing date or a dose.
+- Sowing windows are computed from today, so the farmer reads "sow by 30 Nov 2026", not "Rabi". When today falls outside the window, no "today" marker is drawn on the timeline.
+- Fertiliser is quoted as bags to buy, not nutrients: DAP first for phosphorus, then urea for whatever nitrogen the DAP has not already supplied, then MOP. A soil test credits what is in the field; with no test the full dose is shown **and the assumption is printed**.
+- Shops come from **OpenStreetMap via Overpass**, with a second mirror when the first is busy, because it is free and needs no key. An empty result says "nothing is mapped nearby", not "nothing is there".
+- Unnamed OpenStreetMap pins are dropped: a marker with no name helps nobody.
+- Mandi prices use the data.gov.in Agmarknet resource, **cached per market per day**, because that API is slow and often down. A stale row with its date beats an empty page.
+- Without `DATA_GOV_IN_API_KEY` the app serves four clearly labelled MOCK mandis near the farmer, so the ranking can be demonstrated. Every row, the source line and the page carry the MOCK label.
+- "Best market" ranks by **net price = modal − distance × ₹/quintal/km** (default ₹2.5, configurable). The method line is shown to the farmer, including that straight-line distance makes the gain an upper bound. Mandis without coordinates are listed separately rather than ranked on a guessed distance.

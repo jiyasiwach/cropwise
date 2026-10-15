@@ -1,0 +1,51 @@
+{
+  "_about": {
+    "purpose": "Sowing windows, duration and nutrient requirements for the 22 crops the model knows.",
+    "units": {
+      "duration_days": "sowing to harvest",
+      "npk_kg_per_ha": "N, P2O5 and K2O recommended per hectare for the full crop",
+      "yield_t_per_ha": "typical rainfed/irrigated average, used only for the profit estimate"
+    },
+    "sources": [
+      "ICAR, Handbook of Agriculture (general all-India recommendations)",
+      "State Departments of Agriculture, Package of Practices (season windows)",
+      "Krishi Vigyan Kendra crop production guides"
+    ],
+    "status": "needs_verification",
+    "warning": "These are the commonly published all-India figures. They vary by state, variety, soil and irrigation. Every screen that shows them must tell the farmer to confirm with their local Krishi Vigyan Kendra before buying inputs. Replace each entry with a cited state-specific figure as the knowledge base in data/kb/ is filled in (Phase 5)."
+  },
+  "crops": {
+    "rice": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 125, "npk_kg_per_ha": {"N": 120, "P2O5": 60, "K2O": 40}, "yield_t_per_ha": 3.8, "water": "high", "note": "Transplanted 20-25 days after nursery sowing."},
+    "maize": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 100, "npk_kg_per_ha": {"N": 120, "P2O5": 60, "K2O": 40}, "yield_t_per_ha": 3.2, "water": "medium", "note": "Rabi maize is sown October-November in peninsular India."},
+    "chickpea": {"season": "Rabi", "sow_months": [10, 11], "duration_days": 110, "npk_kg_per_ha": {"N": 20, "P2O5": 40, "K2O": 20}, "yield_t_per_ha": 1.2, "water": "low", "note": "Fixes its own nitrogen; a starter dose only."},
+    "kidneybeans": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 100, "npk_kg_per_ha": {"N": 60, "P2O5": 60, "K2O": 30}, "yield_t_per_ha": 1.1, "water": "medium", "note": "Hill areas sow March-April."},
+    "pigeonpeas": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 180, "npk_kg_per_ha": {"N": 20, "P2O5": 50, "K2O": 20}, "yield_t_per_ha": 1.0, "water": "low", "note": "Long duration; intercropped with cotton or groundnut."},
+    "mothbeans": {"season": "Kharif", "sow_months": [7], "duration_days": 75, "npk_kg_per_ha": {"N": 15, "P2O5": 30, "K2O": 0}, "yield_t_per_ha": 0.5, "water": "very low", "note": "Arid-zone crop; tolerates drought."},
+    "mungbean": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 70, "npk_kg_per_ha": {"N": 20, "P2O5": 40, "K2O": 20}, "yield_t_per_ha": 0.8, "water": "low", "note": "Also a summer crop, sown March-April."},
+    "blackgram": {"season": "Kharif", "sow_months": [6, 7], "duration_days": 80, "npk_kg_per_ha": {"N": 20, "P2O5": 40, "K2O": 20}, "yield_t_per_ha": 0.8, "water": "low", "note": "Rabi crop in Andhra Pradesh and Tamil Nadu."},
+    "lentil": {"season": "Rabi", "sow_months": [10, 11], "duration_days": 120, "npk_kg_per_ha": {"N": 20, "P2O5": 40, "K2O": 20}, "yield_t_per_ha": 1.0, "water": "low", "note": "Sown on residual moisture after rice."},
+    "pomegranate": {"season": "Perennial", "sow_months": [2, 3, 7, 8], "duration_days": 180, "npk_kg_per_ha": {"N": 600, "P2O5": 250, "K2O": 250}, "yield_t_per_ha": 12.0, "water": "medium", "note": "Planting window; fruiting from the third year. Dose is per hectare of bearing orchard."},
+    "banana": {"season": "Perennial", "sow_months": [6, 7, 8, 2, 3], "duration_days": 330, "npk_kg_per_ha": {"N": 200, "P2O5": 60, "K2O": 300}, "yield_t_per_ha": 35.0, "water": "high", "note": "Heavy potassium feeder; split the dose across the crop."},
+    "mango": {"season": "Perennial", "sow_months": [7, 8], "duration_days": 365, "npk_kg_per_ha": {"N": 500, "P2O5": 250, "K2O": 500}, "yield_t_per_ha": 8.0, "water": "medium", "note": "Planting window; bearing from the fifth year."},
+    "grapes": {"season": "Perennial", "sow_months": [1, 2], "duration_days": 150, "npk_kg_per_ha": {"N": 500, "P2O5": 250, "K2O": 600}, "yield_t_per_ha": 20.0, "water": "medium", "note": "Pruned twice a year in peninsular India."},
+    "watermelon": {"season": "Zaid", "sow_months": [1, 2, 3], "duration_days": 85, "npk_kg_per_ha": {"N": 100, "P2O5": 50, "K2O": 50}, "yield_t_per_ha": 25.0, "water": "medium", "note": "Summer crop on river beds and light soils."},
+    "muskmelon": {"season": "Zaid", "sow_months": [1, 2, 3], "duration_days": 80, "npk_kg_per_ha": {"N": 100, "P2O5": 50, "K2O": 50}, "yield_t_per_ha": 18.0, "water": "medium", "note": "Needs dry weather at ripening."},
+    "apple": {"season": "Perennial", "sow_months": [12, 1, 2], "duration_days": 365, "npk_kg_per_ha": {"N": 350, "P2O5": 175, "K2O": 350}, "yield_t_per_ha": 11.0, "water": "medium", "note": "Temperate hills only; needs 1000+ chilling hours."},
+    "orange": {"season": "Perennial", "sow_months": [6, 7, 8], "duration_days": 300, "npk_kg_per_ha": {"N": 400, "P2O5": 200, "K2O": 400}, "yield_t_per_ha": 10.0, "water": "medium", "note": "Ambia and Mrig bahar flowering cycles."},
+    "papaya": {"season": "Perennial", "sow_months": [6, 7, 2, 3], "duration_days": 300, "npk_kg_per_ha": {"N": 250, "P2O5": 250, "K2O": 500}, "yield_t_per_ha": 40.0, "water": "medium", "note": "Economic life about three years."},
+    "coconut": {"season": "Perennial", "sow_months": [5, 6, 7], "duration_days": 365, "npk_kg_per_ha": {"N": 340, "P2O5": 170, "K2O": 680}, "yield_t_per_ha": 10.0, "water": "high", "note": "Bearing from the sixth year; dose per hectare of bearing palms."},
+    "cotton": {"season": "Kharif", "sow_months": [5, 6], "duration_days": 170, "npk_kg_per_ha": {"N": 120, "P2O5": 60, "K2O": 60}, "yield_t_per_ha": 1.8, "water": "medium", "note": "Bt hybrids; sowing follows the monsoon onset."},
+    "jute": {"season": "Kharif", "sow_months": [3, 4, 5], "duration_days": 120, "npk_kg_per_ha": {"N": 60, "P2O5": 30, "K2O": 30}, "yield_t_per_ha": 2.5, "water": "high", "note": "Needs standing water for retting after harvest."},
+    "coffee": {"season": "Perennial", "sow_months": [6, 7], "duration_days": 365, "npk_kg_per_ha": {"N": 140, "P2O5": 90, "K2O": 140}, "yield_t_per_ha": 1.0, "water": "medium", "note": "Shade-grown; bearing from the fourth year."}
+  },
+  "fertilizers": {
+    "_about": "Straight fertilisers used to close a nutrient gap, with their nutrient content by weight.",
+    "urea": {"nutrient": "N", "percent": 46, "unit": "kg", "note": "Apply in splits; losses are high if broadcast on dry soil."},
+    "dap": {"nutrient": "P2O5", "percent": 46, "also_supplies": {"N": 18}, "unit": "kg", "note": "Apply at sowing as a basal dose."},
+    "mop": {"nutrient": "K2O", "percent": 60, "unit": "kg", "note": "Muriate of potash; avoid on chloride-sensitive crops such as tobacco."},
+    "organic": {
+      "fym": {"rate_t_per_ha": 10, "note": "Farmyard manure, applied three weeks before sowing. Supplies roughly 5 kg N, 2.5 kg P2O5 and 5 kg K2O per tonne."},
+      "vermicompost": {"rate_t_per_ha": 5, "note": "Richer and faster-acting than farmyard manure; supplies roughly 15 kg N per tonne."}
+    }
+  }
+}

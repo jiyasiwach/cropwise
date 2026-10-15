@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+from datetime import date
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -21,7 +22,7 @@ from sqlalchemy.orm import Session
 
 from ..database import Prediction, User, get_db
 from ..security import COOKIE_NAME, current_user_optional, hash_password, set_session_cookie, verify_password
-from ..services import lookup
+from ..services import cropplan, lookup
 from ..services.predictor import recommend
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -283,6 +284,55 @@ def profile_page(request: Request, user: User | None = Depends(current_user_opti
 @router.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request, user: User | None = Depends(current_user_optional)):
     return require(user) or render(request, "settings.html", email=user.email, active_page="settings")
+
+
+@router.get("/plan/{crop}", response_class=HTMLResponse)
+def plan_page(
+    request: Request,
+    crop: str,
+    acres: float = 1.0,
+    city: str = "",
+    state: str = "Telangana",
+    latitude: float = 17.385,
+    longitude: float = 78.4867,
+    user: User | None = Depends(current_user_optional),
+):
+    """The plan for one crop: timeline, fertiliser, shops, prices and where to sell."""
+    gate = require(user)
+    if gate:
+        return gate
+    try:
+        timeline = cropplan.sowing_window(crop)
+        fertiliser = cropplan.fertiliser_plan(crop, acres=acres)
+    except cropplan.UnknownCrop:
+        return render(request, "plan_missing.html", crop=crop, crops=cropplan.known_crops())
+
+    # Where "today" sits on the sowing-to-harvest bar, as a percentage.
+    start = date.fromisoformat(timeline["sow_from"])
+    end = date.fromisoformat(timeline["expected_harvest"])
+    span = max(1, (end - start).days)
+    today_pct = min(97, max(2, round(((date.today() - start).days / span) * 100)))
+
+    def pretty(iso: str) -> str:
+        return date.fromisoformat(iso).strftime("%d %b %Y")
+
+    return render(
+        request,
+        "plan.html",
+        crop=crop,
+        timeline=timeline,
+        pretty_sow_from=pretty(timeline["sow_from"]),
+        pretty_sow_by=pretty(timeline["sow_by"]),
+        pretty_harvest=pretty(timeline["expected_harvest"]),
+        before_sowing=timeline["days_until_sowing"] > 0,
+        fertiliser=fertiliser,
+        city=city,
+        state=state,
+        latitude=latitude,
+        longitude=longitude,
+        today_pct=today_pct,
+        active_page="results",
+    )
 
 
 # ---- the lookups the current pages call with fetch ------------------------

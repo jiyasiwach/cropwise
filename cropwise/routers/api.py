@@ -23,7 +23,7 @@ from ..schemas import (
     WeatherOut,
 )
 from ..security import COOKIE_NAME, current_user, hash_password, set_session_cookie, verify_password
-from ..services import lookup
+from ..services import cropplan, lookup, mandi, market, stores
 from ..services.predictor import recommend
 
 router = APIRouter(prefix="/api/v1")
@@ -179,3 +179,68 @@ def history(
         )
         for r in rows
     ]
+
+
+# ---- the crop plan --------------------------------------------------------
+
+
+@router.get("/plan/{crop}")
+def crop_plan(
+    crop: str,
+    acres: float = 1.0,
+    soil_phosphorus: float | None = None,
+    soil_potassium: float | None = None,
+    soil_nitrogen: float | None = None,
+    _: User = Depends(current_user),
+) -> dict:
+    """When to sow, when to harvest, and what fertiliser to buy for this much land."""
+    try:
+        return {
+            "timeline": cropplan.sowing_window(crop),
+            "fertiliser": cropplan.fertiliser_plan(
+                crop,
+                acres=acres,
+                soil={"P": soil_phosphorus, "K": soil_potassium, "nitrogen": soil_nitrogen},
+            ),
+        }
+    except cropplan.UnknownCrop as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+
+
+@router.get("/stores")
+async def nearby_stores(
+    latitude: float,
+    longitude: float,
+    radius_km: float = 15,
+    _: User = Depends(current_user),
+) -> dict:
+    """Agri-input shops near a point, from OpenStreetMap."""
+    return await stores.find_stores(latitude, longitude, radius_km)
+
+
+@router.get("/mandi")
+async def mandi_prices(
+    crop: str,
+    state: str,
+    days: int = 30,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    _: User = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Daily mandi prices and a trend. Cached; labelled MOCK when no data.gov.in key is set."""
+    return await mandi.prices(db, crop, state, days, latitude, longitude)
+
+
+@router.get("/best-market")
+async def best_market(
+    crop: str,
+    state: str,
+    latitude: float,
+    longitude: float,
+    quintals: float = 10.0,
+    _: User = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Markets ranked by what the farmer actually keeps, after transport."""
+    return await market.best_markets(db, crop, state, latitude, longitude, quintals)

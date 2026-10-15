@@ -4,7 +4,7 @@ An AI farming assistant for Indian smallholders: tell it your city, and it reads
 weather for that location, recommends crops, and (from Phase 4 onward) tells you when to sow,
 what fertiliser to buy, where to buy it, and which mandi pays best after transport.
 
-**Status: Phases 1–3 of 10 complete.** See `CHANGELOG.md` for what has shipped and
+**Status: Phases 1–4 of 10 complete.** See `CHANGELOG.md` for what has shipped and
 `docs/AUDIT.md` for the state of the original code.
 
 ## Run it locally
@@ -19,7 +19,7 @@ make run                 # http://127.0.0.1:8000  — API docs at /docs
 ## Tests
 
 ```bash
-make test                # 40 checks: the models, the API, auth and the pages
+make test                # 64 checks: models, API, auth, pages and the crop plan
 ```
 
 ## How it works today
@@ -58,6 +58,10 @@ accumulation window in the dataset is undocumented, so our 30-day mapping is a b
 | `GET /api/v1/weather?city=&days=` | Mean temperature, humidity, accumulated rainfall |
 | `POST /api/v1/predict` | Top three crops with reasons; uses the lab model when a soil test is supplied |
 | `GET /api/v1/history` | This farmer's past recommendations |
+| `GET /api/v1/plan/{crop}` | Sowing window, harvest date and the fertiliser to buy |
+| `GET /api/v1/stores` | Agri-input shops within 15 km (OpenStreetMap) |
+| `GET /api/v1/mandi` | Daily mandi prices and a 30-day trend, cached |
+| `GET /api/v1/best-market` | Mandis ranked by what you keep after transport |
 
 ## Configuration
 
@@ -66,6 +70,8 @@ accumulation window in the dataset is undocumented, so our 30-day mapping is a b
 | `SECRET_KEY` | yes in production | Signs the session cookie |
 | `DATABASE_URL` | no | Postgres URL; defaults to local SQLite |
 | `CORS_ORIGINS` | no | Comma-separated allow-list for browser calls |
+| `DATA_GOV_IN_API_KEY` | no | Real mandi prices; without it prices are labelled MOCK |
+| `TRANSPORT_RATE_PER_QUINTAL_KM` | no | Used to rank markets by net price (default ₹2.5) |
 | `OPENROUTER_API_KEY` | Phase 5 | The assistant's language model |
 
 ## Deployment
@@ -78,7 +84,7 @@ wiped on every cold start, so accounts do not persist there. Phase 3 moves the d
 1. ~~Audit and repair~~ ✅
 2. ~~Honest retrain: cross-validation, model card, SHAP reasons, out-of-distribution warnings~~ ✅
 3. ~~FastAPI backend, database layer, JWT auth~~ ✅
-4. Crop plan: calendar, fertiliser, nearby shops, mandi prices, best market to sell
+4. ~~Crop plan: calendar, fertiliser, nearby shops, mandi prices, best market to sell~~ ✅
 5. KrishiMitra: hybrid RAG, agent tools, guardrails, streaming
 6. Evaluation harness and `/eval` dashboard
 7. Leaf disease, Soil Health Card reader, profit calculator, irrigation, alerts, schemes, PWA

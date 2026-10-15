@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "cropwise", "runtimeExecutable": "./.claude-launch.sh", "runtimeArgs": [], "port": 8000 }
+  ]
+}
