@@ -301,6 +301,17 @@ button:hover{
         </div>
 
         <form action="/predict" method="post" autocomplete="off">
+
+            {# The wizard is stateless: step 1's readings travel with step 2's submission. #}
+            {% if carry %}
+            <input type="hidden" name="city" value="{{ carry.city }}">
+            <input type="hidden" name="latitude" value="{{ carry.latitude }}">
+            <input type="hidden" name="longitude" value="{{ carry.longitude }}">
+            <input type="hidden" name="nitrogen" value="{{ carry.nitrogen }}">
+            <input type="hidden" name="ph" value="{{ carry.ph }}">
+            <input type="hidden" name="clay" value="{{ carry.clay }}">
+            <input type="hidden" name="organic_carbon" value="{{ carry.organic_carbon }}">
+            {% endif %}
             <div class="form-row">
                 <div class="input-group">
                     <label id="temp">Temperature (°C)</label>

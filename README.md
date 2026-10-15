@@ -4,23 +4,22 @@ An AI farming assistant for Indian smallholders: tell it your city, and it reads
 weather for that location, recommends crops, and (from Phase 4 onward) tells you when to sow,
 what fertiliser to buy, where to buy it, and which mandi pays best after transport.
 
-**Status: Phases 1–2 of 10 complete.** See `CHANGELOG.md` for what has shipped and
+**Status: Phases 1–3 of 10 complete.** See `CHANGELOG.md` for what has shipped and
 `docs/AUDIT.md` for the state of the original code.
 
 ## Run it locally
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python scripts/train.py   # builds models/ (about a minute)
+make install             # python3.11 venv + dependencies
+make train               # builds models/ (about a minute)
 cp .env.example .env     # then set SECRET_KEY
-python app.py            # http://127.0.0.1:5000
+make run                 # http://127.0.0.1:8000  — API docs at /docs
 ```
 
 ## Tests
 
 ```bash
-python tests/test_app.py
+make test                # 40 checks: the models, the API, auth and the pages
 ```
 
 ## How it works today
@@ -48,6 +47,27 @@ Remaining known limits: the dataset is a clean 2 200-row Kaggle teaching set, no
 trials; SoilGrids is a ~250 m regional estimate at 0–5 cm, not your field; and the rainfall
 accumulation window in the dataset is undocumented, so our 30-day mapping is a best guess.
 
+## API
+
+`/docs` is the generated OpenAPI documentation. Everything the pages do is available as JSON:
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/v1/auth/signup` · `login` · `logout` | Accounts; the session is a JWT in an httpOnly cookie |
+| `GET /api/v1/soil?city=` | Nitrogen, pH, clay, organic carbon from ISRIC SoilGrids |
+| `GET /api/v1/weather?city=&days=` | Mean temperature, humidity, accumulated rainfall |
+| `POST /api/v1/predict` | Top three crops with reasons; uses the lab model when a soil test is supplied |
+| `GET /api/v1/history` | This farmer's past recommendations |
+
+## Configuration
+
+| Variable | Needed | Meaning |
+|---|---|---|
+| `SECRET_KEY` | yes in production | Signs the session cookie |
+| `DATABASE_URL` | no | Postgres URL; defaults to local SQLite |
+| `CORS_ORIGINS` | no | Comma-separated allow-list for browser calls |
+| `OPENROUTER_API_KEY` | Phase 5 | The assistant's language model |
+
 ## Deployment
 
 Vercel (`vercel.json`, `@vercel/python`). Note that on Vercel the SQLite file lives in `/tmp` and is
@@ -57,7 +77,7 @@ wiped on every cold start, so accounts do not persist there. Phase 3 moves the d
 
 1. ~~Audit and repair~~ ✅
 2. ~~Honest retrain: cross-validation, model card, SHAP reasons, out-of-distribution warnings~~ ✅
-3. FastAPI backend, Postgres, JWT auth
+3. ~~FastAPI backend, database layer, JWT auth~~ ✅
 4. Crop plan: calendar, fertiliser, nearby shops, mandi prices, best market to sell
 5. KrishiMitra: hybrid RAG, agent tools, guardrails, streaming
 6. Evaluation harness and `/eval` dashboard

@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 import joblib
 
-MODELS = pathlib.Path(__file__).resolve().parent / "models"
+MODELS = pathlib.Path(__file__).resolve().parents[2] / "models"
 Source = Literal["field", "lab"]
 
 # How each feature reads in a sentence, and the unit a farmer sees.

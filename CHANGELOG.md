@@ -43,3 +43,18 @@
 ### Removed
 - `model.pkl`, `features.pkl`, `p_model.pkl` (54 MB), `k_model.pkl`, `scaler.pkl` (never used),
   `train_model.py`, `train_pk_models.py`.
+
+## Phase 3 — FastAPI, database layer and JWT auth (15 Oct 2026)
+
+### Added
+- `main.py` — one FastAPI app serving the pages and `/api/v1`, with OpenAPI docs at `/docs`.
+- `/api/v1`: `auth/signup`, `auth/login`, `auth/logout`, `me`, `soil`, `weather`, `predict`, `history`.
+- `cropwise/database.py` — SQLAlchemy models (users, predictions, mandi price cache) behind one
+  `DATABASE_URL`; SQLite locally, Postgres in production without a code change.
+- `cropwise/security.py` — PBKDF2 password hashing and JWT sessions in an httpOnly cookie.
+- `cropwise/schemas.py` — typed request and response bodies; out-of-range readings are refused.
+- `Makefile` (`make run`, `make test`, `make train`), `tests/test_api.py` (30 checks).
+
+### Changed
+- Python 3.11 throughout. Flask removed; `app.py` deleted.
+- Predictions are stored per user, with the model used and whether the readings were unusual.

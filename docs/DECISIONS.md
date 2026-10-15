@@ -29,3 +29,17 @@ One line each, newest last. Every decision the owner did not make personally is 
 - Replaced the `rainfall × 3, floor 50` fudge with the accumulated total scaled to a 30-day basis, and recorded that the dataset's own accumulation window is undocumented — a known weakness, not a solved problem.
 - Soil and climate pages now leave phosphorus and potassium empty with "Needs a soil test" rather than showing a guess as a reading.
 - Models moved to `models/*.joblib` (joblib, with the feature order stored alongside), replacing loose pickles at the repo root.
+
+## Phase 3 — FastAPI, a real data layer and JWT auth (15 Oct 2026)
+- Moved to **Python 3.11**: the Mac's default 3.9 cannot express `str | None` for Pydantic v2, and Vercel runs 3.12 anyway.
+- One FastAPI app serves **both** the JSON API and the existing Jinja pages, rather than running two servers. The farmer-facing site keeps working while the React front end is built in Phase 8.
+- Kept the Flask-shaped `url_for` as a Jinja global, so the six templates needed no rewrite for a framework change.
+- **SQLAlchemy with a single `DATABASE_URL`**: SQLite by default so the project runs with no setup, Postgres (Supabase) by changing one variable. `postgres://` is rewritten to `postgresql+psycopg2://`, which SQLAlchemy 2 requires.
+- Postgres was not provisioned because that needs the owner's Supabase account; the code is ready for it and the README says what to set.
+- Sessions are a **signed JWT in an httpOnly, SameSite=Lax cookie**, not a Flask session: the app is then stateless, which is what lets it run on Vercel's functions, and no token is reachable from JavaScript.
+- The cookie is `Secure` only in production, so the app still works over plain `http://localhost`.
+- The wizard carries its soil readings in hidden form fields instead of a server session, for the same statelessness reason.
+- Pydantic schemas bound every input (pH 0–14, humidity 0–100, rainfall 0–5000), so nonsense is refused at the edge with a 422 rather than reaching the model.
+- Login failures return one neutral message for "no such account" and "wrong password" alike.
+- CORS is an allow-list from `CORS_ORIGINS`, defaulting to localhost only.
+- Password hashing stays Werkzeug PBKDF2-SHA256 at 600k iterations: bcrypt needs a compiler this machine does not have, and this is the one dependency Flask leaves behind.

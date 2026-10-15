@@ -1,0 +1,323 @@
+"""The server-rendered pages, still Jinja, now served by FastAPI.
+
+The templates were written for Flask, so `url_for('soil')` and `url_for('static', filename=…)`
+are provided here with the same shape. They are replaced wholesale by the React front end in
+Phase 8; until then the farmer keeps a working site.
+
+The wizard carries its readings in hidden form fields rather than a server session: the backend
+is stateless apart from the signed cookie, which is what lets it run on Vercel's functions.
+"""
+
+from __future__ import annotations
+
+import json
+import pathlib
+
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
+from ..database import Prediction, User, get_db
+from ..security import COOKIE_NAME, current_user_optional, hash_password, set_session_cookie, verify_password
+from ..services import lookup
+from ..services.predictor import recommend
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+templates = Jinja2Templates(directory=str(ROOT / "templates"))
+
+ROUTES = {
+    "login": "/",
+    "signup": "/signup",
+    "dashboard": "/dashboard",
+    "soil": "/soil",
+    "climate": "/climate",
+    "history": "/history",
+    "profile": "/profile",
+    "settings": "/settings",
+    "logout": "/logout",
+}
+
+
+def url_for(name: str, **params) -> str:
+    """Flask-shaped url_for, so the existing templates need no edits."""
+    if name == "static":
+        return f"/static/{params['filename']}"
+    return ROUTES.get(name, "/")
+
+
+templates.env.globals["url_for"] = url_for
+
+router = APIRouter()
+
+
+def render(request: Request, template: str, **context) -> HTMLResponse:
+    return templates.TemplateResponse(request=request, name=template, context=context)
+
+
+def signed_in(response: RedirectResponse, email: str) -> RedirectResponse:
+    set_session_cookie(response, email)
+    return response
+
+
+def require(user: User | None, path: str = "/") -> RedirectResponse | None:
+    return None if user else RedirectResponse(path, status_code=303)
+
+
+# ---- sign in / sign up ----------------------------------------------------
+
+
+@router.get("/", response_class=HTMLResponse)
+def login_page(request: Request, error: str | None = None, user: User | None = Depends(current_user_optional)):
+    if user:
+        return RedirectResponse("/dashboard", status_code=303)
+    return render(request, "login.html", error=error)
+
+
+@router.post("/login")
+def login_submit(email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    row = db.query(User).filter(User.email == email.strip().lower()).one_or_none()
+    if not row or not verify_password(password, row.password_hash):
+        return RedirectResponse("/?error=Those+details+did+not+match+an+account.", status_code=303)
+    return signed_in(RedirectResponse("/dashboard", status_code=303), row.email)
+
+
+@router.get("/signup", response_class=HTMLResponse)
+def signup_page(request: Request, error: str | None = None):
+    return render(request, "signup.html", error=error)
+
+
+@router.post("/signup")
+def signup_submit(
+    name: str = Form(""),
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    email = email.strip().lower()
+    if len(password) < 8:
+        return RedirectResponse("/signup?error=Use+a+password+of+at+least+8+characters.", status_code=303)
+    if db.query(User).filter(User.email == email).one_or_none():
+        return RedirectResponse("/signup?error=That+email+already+has+an+account.", status_code=303)
+    db.add(User(email=email, password_hash=hash_password(password), name=name.strip() or email.split("@")[0]))
+    db.commit()
+    return signed_in(RedirectResponse("/dashboard", status_code=303), email)
+
+
+@router.get("/logout")
+def logout_page():
+    response = RedirectResponse("/", status_code=303)
+    response.delete_cookie(COOKIE_NAME, path="/")
+    return response
+
+
+# ---- the app --------------------------------------------------------------
+
+
+@router.get("/dashboard", response_class=HTMLResponse)
+def dashboard(request: Request, user: User | None = Depends(current_user_optional)):
+    return require(user) or render(request, "dashboard.html", active_page="dashboard")
+
+
+@router.get("/soil", response_class=HTMLResponse)
+def soil_page(request: Request, user: User | None = Depends(current_user_optional)):
+    return require(user) or render(request, "soil.html", active_page="soil")
+
+
+@router.post("/climate", response_class=HTMLResponse)
+def climate_page(
+    request: Request,
+    city: str = Form(""),
+    latitude: float = Form(0.0),
+    longitude: float = Form(0.0),
+    nitrogen: float = Form(1.4),
+    ph: float = Form(6.5),
+    clay: float = Form(25.0),
+    organic_carbon: float = Form(12.0),
+    user: User | None = Depends(current_user_optional),
+):
+    """Step 2 of the wizard. The soil readings travel on in hidden fields."""
+    gate = require(user)
+    if gate:
+        return gate
+    return render(
+        request,
+        "climate.html",
+        locked_city=city,
+        carry={
+            "city": city,
+            "latitude": latitude,
+            "longitude": longitude,
+            "nitrogen": nitrogen,
+            "ph": ph,
+            "clay": clay,
+            "organic_carbon": organic_carbon,
+        },
+    )
+
+
+@router.post("/predict", response_class=HTMLResponse)
+def predict_page(
+    request: Request,
+    temperature: float = Form(...),
+    humidity: float = Form(...),
+    rainfall: float = Form(...),
+    city: str = Form(""),
+    latitude: float = Form(0.0),
+    longitude: float = Form(0.0),
+    nitrogen: float = Form(1.4),
+    ph: float = Form(6.5),
+    clay: float = Form(25.0),
+    organic_carbon: float = Form(12.0),
+    user: User | None = Depends(current_user_optional),
+    db: Session = Depends(get_db),
+):
+    gate = require(user)
+    if gate:
+        return gate
+
+    readings = {
+        "nitrogen": nitrogen,
+        "ph": ph,
+        "clay": clay,
+        "organic_carbon": organic_carbon,
+        "temperature": temperature,
+        "humidity": humidity,
+        "rainfall": rainfall,
+    }
+    result = recommend(readings, source="field")
+    best = result["crops"][0]
+
+    db.add(
+        Prediction(
+            user_id=user.id,
+            crop=best["crop"],
+            confidence=best["confidence"],
+            model_source=result["source"],
+            unusual_readings=result["unusual_readings"],
+            city=city or None,
+            latitude=latitude or None,
+            longitude=longitude or None,
+            alternatives=json.dumps(result["crops"][1:]),
+            **readings,
+        )
+    )
+    db.commit()
+
+    return render(
+        request,
+        "result.html",
+        top3=[(c["crop"], c["confidence"]) for c in result["crops"]],
+        crops=result["crops"],
+        unusual=result["unusual_readings"],
+        measured=False,
+        soil_data={
+            "N": nitrogen,
+            "P": None,
+            "K": None,
+            "ph": ph,
+            "temperature": temperature,
+            "humidity": humidity,
+            "rainfall": rainfall,
+        },
+        active_page="results",
+    )
+
+
+@router.get("/history", response_class=HTMLResponse)
+def history_page(request: Request, user: User | None = Depends(current_user_optional), db: Session = Depends(get_db)):
+    gate = require(user)
+    if gate:
+        return gate
+    rows = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id)
+        .order_by(desc(Prediction.created_at))
+        .limit(100)
+        .all()
+    )
+    records = [
+        {
+            "crop": r.crop,
+            "confidence": r.confidence,
+            "city": r.city or "—",
+            "nitrogen": r.nitrogen,
+            "phosphorus": r.phosphorus,
+            "potassium": r.potassium,
+            "ph": r.ph,
+            "temperature": r.temperature,
+            "humidity": r.humidity,
+            "rainfall": r.rainfall,
+            "created_at": r.created_at.strftime("%d-%m-%Y %I:%M %p"),
+        }
+        for r in rows
+    ]
+    return render(request, "history.html", records=records, active_page="history")
+
+
+@router.get("/profile", response_class=HTMLResponse)
+def profile_page(request: Request, user: User | None = Depends(current_user_optional), db: Session = Depends(get_db)):
+    gate = require(user)
+    if gate:
+        return gate
+    total = db.query(Prediction).filter(Prediction.user_id == user.id).count()
+    last = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id)
+        .order_by(desc(Prediction.created_at))
+        .first()
+    )
+    return render(
+        request,
+        "profile.html",
+        email=user.email,
+        initial=(user.name or user.email)[0].upper(),
+        name=user.name or user.email.split("@")[0].title(),
+        total=total,
+        last=(last.crop, last.created_at.strftime("%d-%m-%Y %I:%M %p")) if last else None,
+        active_page="profile",
+    )
+
+
+@router.get("/settings", response_class=HTMLResponse)
+def settings_page(request: Request, user: User | None = Depends(current_user_optional)):
+    return require(user) or render(request, "settings.html", email=user.email, active_page="settings")
+
+
+# ---- the lookups the current pages call with fetch ------------------------
+# These keep the existing JavaScript working; the React front end will use /api/v1 instead.
+
+
+@router.post("/get_soil_by_city")
+async def legacy_soil(request: Request, user: User | None = Depends(current_user_optional)):
+    if not user:
+        return JSONResponse({"success": False, "message": "Please sign in."}, status_code=401)
+    body = await request.json()
+    try:
+        data = await lookup.soil_for_city((body.get("city") or "").strip())
+    except lookup.LookupError as exc:
+        return JSONResponse({"success": False, "message": str(exc)}, status_code=502)
+    return JSONResponse({"success": True, **data})
+
+
+@router.post("/get_weather_by_city")
+async def legacy_weather(request: Request, user: User | None = Depends(current_user_optional)):
+    if not user:
+        return JSONResponse({"success": False, "message": "Please sign in."}, status_code=401)
+    body = await request.json()
+    try:
+        data = await lookup.weather_for_city(
+            (body.get("city") or "").strip(), int(body.get("range", 30))
+        )
+    except lookup.LookupError as exc:
+        return JSONResponse({"success": False, "message": str(exc)}, status_code=502)
+    return JSONResponse(
+        {
+            "success": True,
+            **data,
+            "phosphorus": None,
+            "potassium": None,
+            "nutrient_note": "Phosphorus and potassium need a soil test.",
+        }
+    )
