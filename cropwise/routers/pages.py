@@ -291,7 +291,9 @@ def eval_page(request: Request, user: User = Depends(get_visitor)):
         return render(request, "plan_missing.html", crop="evaluation results", crops=["run make eval"])
     data = json.loads(path.read_text())
     best = max(data["retrieval"], key=lambda r: (r["mrr"], r["hit_at_5"]))
-    return render(request, "eval.html", data=data, best=best, active_page="eval")
+    doctor_path = path.parent / "doctor_eval.json"
+    doctor = json.loads(doctor_path.read_text()) if doctor_path.exists() else None
+    return render(request, "eval.html", data=data, best=best, doctor=doctor, active_page="eval")
 
 
 @router.get("/impact", response_class=HTMLResponse)
@@ -299,6 +301,13 @@ def impact_page(request: Request, user: User = Depends(get_visitor)):
     """The problem CropWise works on, with a source for every figure, and a calculator."""
     crops = sorted(json.loads(cropplan.DATA.read_text())["crops"])
     return render(request, "impact.html", crops=crops, active_page="impact")
+
+
+@router.get("/doctor", response_class=HTMLResponse)
+def doctor_page(request: Request, crop: str = "", user: User = Depends(get_visitor)):
+    """Crop Doctor: photo of a sick leaf in, grounded advice or an honest escalation out."""
+    crops = sorted(json.loads(cropplan.DATA.read_text())["crops"])
+    return render(request, "doctor.html", crops=crops, crop=crop.lower(), active_page="doctor")
 
 
 @router.get("/assistant", response_class=HTMLResponse)

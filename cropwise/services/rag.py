@@ -177,6 +177,8 @@ class Index:
         generic = {"crop", "scheme", "guide", "about", "cropwise", "helplines", "production"}
         self.names: dict[str, list[int]] = {}
         for i, chunk in enumerate(chunks):
+            if chunk.doc.startswith("disease_"):
+                continue  # named by crop too; boosting them would bury the crop guides
             stem = chunk.doc.replace(".md", "")
             for prefix in ("crop_", "scheme_"):
                 stem = stem.removeprefix(prefix)

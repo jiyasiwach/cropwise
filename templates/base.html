@@ -24,6 +24,7 @@
     <a class="menu-item {% if active_page == 'soil' %}active{% endif %}" href="{{ url_for('soil') }}"><span class="ic">🧪</span> <span data-i18n="soilClimate">Soil &amp; Climate</span></a>
     <a class="menu-item {% if active_page == 'results' %}active{% endif %}" href="{{ url_for('history') }}"><span class="ic">🌾</span> <span data-i18n="results">Results</span></a>
     <a class="menu-item {% if active_page == 'assistant' %}active{% endif %}" href="/assistant"><span class="ic">💬</span> KrishiMitra</a>
+    <a class="menu-item {% if active_page == 'doctor' %}active{% endif %}" href="/doctor"><span class="ic">📷</span> Crop Doctor</a>
 
     <div class="nav-group">Record</div>
     <a class="menu-item {% if active_page == 'history' %}active{% endif %}" href="{{ url_for('history') }}"><span class="ic">📜</span> <span data-i18n="history">History</span></a>

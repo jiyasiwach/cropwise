@@ -52,6 +52,7 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .btn{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:14px;
      background:var(--amber);color:#2a1c00;font-weight:700;text-decoration:none;border:0;cursor:pointer}
 .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.doctor-link{display:inline-block;margin-top:10px;background:#f2b33d;color:#15211a !important;font-weight:700;border-radius:999px;padding:6px 14px;font-size:14px}
 .listen{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px}
 .listen-btn{border:1px solid var(--leaf,#2f8f4e);background:#fff;color:#14532d;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
 .listen-note{font-size:12px;color:var(--muted,#55645a)}
@@ -63,6 +64,7 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   <a href="{{ url_for('dashboard') }}">← Back to dashboard</a>
   <h1>{{ crop }} plan</h1>
   <div class="sub">{{ timeline.season }} crop · {{ timeline.duration_days }} days from sowing to harvest{% if city %} · {{ city }}{% endif %}</div>
+  <a class="doctor-link" href="/doctor?crop={{ crop|lower|urlencode }}">📷 Check a sick plant</a>
 </header>
 
 <div class="wrap">

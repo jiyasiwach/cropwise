@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>KrishiMitra · CropWise</title>
+{% set og_title = 'KrishiMitra — grounded farming assistant' %}{% set og_desc = 'Ask about crops, soil, fertiliser, mandi prices or schemes in six languages. Answers only from cited sources, refuses when unsure.' %}{% set og_path = '/assistant' %}{% include '_og.html' %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
@@ -88,6 +89,12 @@ government scheme. I answer only from my knowledge base and tell you where each 
   </section>
 
   <aside>
+    <section class="card" style="margin-bottom:14px">
+      <h2 style="font-size:18px">📷 Check a sick plant</h2>
+      <p class="meta" style="margin:8px 0 10px">Photograph a leaf with spots, rust or curl. Crop Doctor names the likely
+      problem and what to do, from cited sources only.</p>
+      <a class="chip chip-tool" style="text-decoration:none;font-size:14px" href="/doctor">Open Crop Doctor →</a>
+    </section>
     <section class="card human" style="margin-bottom:14px">
       <h2 style="font-size:18px;color:#fff">Talk to a real person</h2>
       <p style="margin:10px 0">Kisan Call Centre, free, 6am–10pm, 22 languages.</p>

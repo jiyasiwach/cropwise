@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from cropwise import __version__
 from cropwise.database import init_db
 from cropwise.visitor import COOKIE_MAX_AGE, COOKIE_NAME, _new_id
-from cropwise.routers import api, assistant, pages
+from cropwise.routers import api, assistant, doctor, pages
 
 app = FastAPI(
     title="CropWise API",
@@ -41,6 +41,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(api.router)
 app.include_router(assistant.router)
+app.include_router(doctor.router)
 app.include_router(pages.router)
 
 

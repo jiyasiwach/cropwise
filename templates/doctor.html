@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Crop Doctor · CropWise</title>
+{% set og_title = 'Crop Doctor — photo of a sick leaf, grounded advice' %}{% set og_desc = 'Likely condition, confidence and advice from cited sources only. Unsure, blurry or not a plant? It says so and sends you to an expert.' %}{% set og_path = '/doctor' %}{% include '_og.html' %}
+<meta name="description" content="Photograph a sick leaf: likely condition, confidence, and advice grounded in cited sources — or an honest 'ask an expert'.">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#0f3b2a;--leaf:#2f8f4e;--soft-leaf:#e3f0e2;--amber:#f2b33d;--soft-amber:#fff4dc;
+      --ground:#f6f3ea;--card:#fff;--line:#e7e1d1;--ink:#15211a;--muted:#55645a;--red:#9b2c1c;--soft-red:#fbe9e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:'Noto Sans',system-ui,sans-serif;line-height:1.55}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;margin:0}
+.top{background:var(--forest);color:#fff;padding:18px 24px}
+.top a{color:var(--soft-leaf);font-size:14px;text-decoration:none}
+.top h1{color:#fff;font-size:28px;margin-top:8px}
+.top p{color:#b9d3c3;margin:6px 0 0;max-width:62ch}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin-bottom:18px}
+.card h2{font-size:22px;margin-bottom:6px}
+.src{color:var(--muted);font-size:13px}
+.src a,.card a{color:var(--leaf)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:2px dashed #c8d8c6;
+      border-radius:18px;padding:22px;text-align:center;cursor:pointer;background:#fbfdf9;min-height:180px}
+.drop img{max-width:100%;max-height:280px;border-radius:12px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff}
+button.primary{margin-top:14px;width:100%;padding:13px 16px;border:0;border-radius:12px;background:var(--forest);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button.primary:disabled{opacity:.6;cursor:wait}
+.result{display:none}
+.result.show{display:block}
+.badge{display:inline-block;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:8px}
+.ok{background:var(--soft-leaf);color:#14532d}.stop{background:var(--soft-amber);color:#7a4b00}.bad{background:var(--soft-red);color:var(--red)}
+.message{font-size:17px;font-weight:600;margin:4px 0 10px}
+.treat{white-space:pre-wrap;background:#fbfdf9;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:15px}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:var(--soft-amber);margin:6px 6px 0 0}
+.call{display:inline-block;margin-top:12px;background:var(--amber);color:var(--ink);font-weight:700;border-radius:12px;padding:10px 14px;text-decoration:none}
+details{margin-top:14px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+ol.trace{font-size:13px;color:var(--muted);padding-left:20px}
+.demo{background:var(--soft-amber);border:1px solid #efd9a6;border-radius:14px;padding:14px;margin-top:14px;display:none}
+.demo.show{display:block}
+.err{color:var(--red);font-size:14px;margin-top:10px}
+.listen{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 0}
+.listen-btn{border:1px solid var(--leaf);background:#fff;color:#14532d;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.listen-note{font-size:12px;color:var(--muted)}
+ul.tips{margin:6px 0 0;padding-left:18px;font-size:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="/">← CropWise</a>
+  <h1>📷 Crop Doctor</h1>
+  <p>Photograph one sick leaf. You get the likely problem, how sure the model is, and what to do —
+     taken only from cited sources. When it is not sure, it says so and sends you to an expert.</p>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <form id="form">
+      <label class="drop" id="drop" for="photo">
+        <span id="dropText">📷 Tap to take or choose a photo of the affected leaf</span>
+        <img id="preview" alt="Your photo" hidden>
+      </label>
+      <input id="photo" type="file" accept="image/*" capture="environment" hidden>
+      <div class="row">
+        <div><label for="crop">Crop</label>
+          <select id="crop">
+            <option value="">Not sure</option>
+            {% for c in crops %}<option value="{{ c }}" {% if c == crop %}selected{% endif %}>{{ c|capitalize }}</option>{% endfor %}
+          </select></div>
+        <div><label for="lang">Answer language</label>
+          <select id="lang">
+            <option value="en">English</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option><option value="ml">മലയാളം</option><option value="kn">ಕನ್ನಡ</option>
+          </select></div>
+      </div>
+      <button class="primary" id="go" type="submit" disabled>Check this plant</button>
+    </form>
+    <p class="src" style="margin-top:10px">Your photo is shrunk on your phone, checked once and then discarded —
+       never stored, never logged. No sign-up.</p>
+    <ul class="tips src"><li>One leaf, filling the frame</li><li>Daylight, not flash</li><li>Hold steady</li></ul>
+  </section>
+
+  <section class="card result" id="result" aria-live="polite">
+    <span class="badge" id="badge"></span>
+    <div class="message" id="message"></div>
+    <div id="signs" class="src"></div>
+    <div id="treatWrap" hidden>
+      <h3 style="font-size:17px;margin:12px 0 6px">What to do</h3>
+      <div class="treat" id="treat"></div>
+      <div id="cites"></div>
+    </div>
+    <div id="listenSlot"></div>
+    <a class="call" href="tel:18001801551">📞 Kisan Call Centre 1800-180-1551</a>
+    <div class="demo" id="demo">
+      <strong>Demo mode.</strong> No vision model key is configured on this server, so the photo could not be
+      analysed. Choose a condition to play the classifier — every step after it (guardrails, retrieval,
+      grounded answer) runs for real.
+      <div class="row">
+        <div><select id="demoCondition"><option value="">Choose a condition…</option></select></div>
+        <div><button type="button" class="primary" id="demoGo" style="margin-top:0">Run the rest</button></div>
+      </div>
+    </div>
+    <details><summary>How this answer was reached</summary><ol class="trace" id="trace"></ol>
+      <p class="src" id="meta"></p></details>
+  </section>
+  <div class="err" id="err" role="alert"></div>
+
+  <section class="card">
+    <h2>What it can and cannot do</h2>
+    <p class="src">It advises only on the conditions in its knowledge base (<a href="/api/v1/doctor/conditions">see the list</a>),
+       each written from a cited agricultural-university or ICAR page. Anything else, any blurry photo and any
+       guess under 60% confidence goes to a person instead. It never invents a pesticide or a dose.
+       Accuracy is measured on the <a href="/eval">evaluation page</a>.</p>
+  </section>
+</div>
+
+<script src="/static/js/listen.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let photoBlob = null;
+
+// Shrink in the browser: ≤1024 px JPEG keeps the upload far under Vercel's 4.5 MB limit and
+// makes a phone on 2G usable.
+function shrink(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1024 / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(img.src);
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not read that photo.')), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => reject(new Error('That file is not a photo this browser can open.'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+$('photo').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  $('err').textContent = '';
+  try {
+    photoBlob = await shrink(file);
+    $('preview').src = URL.createObjectURL(photoBlob);
+    $('preview').hidden = false; $('dropText').textContent = 'Tap to change the photo';
+    $('go').disabled = false;
+  } catch (ex) { $('err').textContent = ex.message; }
+});
+
+const BADGES = {
+  answered: ['Likely condition found', 'ok'], healthy: ['Looks healthy', 'ok'],
+  retake: ['Please retake the photo', 'stop'], not_a_plant: ['Not a plant', 'stop'],
+  low_confidence: ['Not sure — ask an expert', 'stop'], escalate: ['Ask an expert', 'stop'],
+  blocked: ['Photo not used', 'bad'], error: ['Something went wrong', 'bad'],
+};
+
+async function check(demoCondition) {
+  if (!photoBlob) return;
+  $('go').disabled = true; $('go').textContent = 'Checking…'; $('err').textContent = '';
+  const form = new FormData();
+  form.append('photo', photoBlob, 'leaf.jpg');
+  form.append('crop', $('crop').value);
+  form.append('language', $('lang').value);
+  if (demoCondition) form.append('demo_condition', demoCondition);
+  try {
+    const r = await fetch('/api/v1/doctor', { method: 'POST', body: form });
+    const d = await r.json();
+    if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Please try another photo.');
+    show(d);
+  } catch (ex) {
+    $('err').textContent = ex.message || 'Could not reach the server. Try again.';
+  } finally {
+    $('go').disabled = false; $('go').textContent = 'Check this plant';
+  }
+}
+
+function show(d) {
+  const [label, tone] = BADGES[d.status] || [d.status, 'stop'];
+  $('badge').textContent = (d.is_mock ? 'DEMO · ' : '') + label; $('badge').className = 'badge ' + tone;
+  $('message').textContent = d.message;
+  const signs = (d.diagnosis && d.diagnosis.visible_signs) || [];
+  $('signs').textContent = signs.length ? 'Seen: ' + signs.join(' · ') : '';
+  $('treatWrap').hidden = !d.treatment;
+  $('treat').textContent = d.treatment || '';
+  $('cites').innerHTML = '';
+  (d.citations || []).forEach(c => {
+    const chip = document.createElement('span'); chip.className = 'chip';
+    chip.textContent = 'Source: ' + c.source; $('cites').appendChild(chip);
+  });
+  $('listenSlot').innerHTML = '';
+  const lang = $('lang').value;
+  const listen = window.listenButton(() => d.message + '. ' + (d.treatment || ''), () => lang);
+  if (listen) $('listenSlot').appendChild(listen);
+  $('trace').innerHTML = '';
+  (d.trace || []).forEach(t => {
+    const li = document.createElement('li');
+    const extra = Object.entries(t).filter(([k]) => k !== 'step' && k !== 'decision')
+      .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' · ');
+    li.textContent = `${t.step} → ${t.decision}${extra ? ' (' + extra + ')' : ''}`;
+    $('trace').appendChild(li);
+  });
+  $('meta').textContent = `${d.latency_ms} ms` + (d.model ? ` · ${d.model}` : '') + (d.is_mock ? ' · no model key: demo' : '');
+  $('demo').classList.toggle('show', !!d.is_mock);
+  $('result').classList.add('show');
+  $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+$('form').addEventListener('submit', e => { e.preventDefault(); check(); });
+$('demoGo').addEventListener('click', () => { const c = $('demoCondition').value; if (c) check(c); });
+
+fetch('/api/v1/doctor/conditions').then(r => r.json()).then(list => {
+  const options = [...list.map(c => [c.key, c.title]), ['healthy', 'Healthy leaf'], ['other', 'Something not in the list']];
+  options.forEach(([key, title]) => {
+    const o = document.createElement('option'); o.value = key; o.textContent = title; $('demoCondition').appendChild(o);
+  });
+}).catch(() => {});
+</script>
+</body>
+</html>
