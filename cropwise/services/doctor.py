@@ -45,7 +45,7 @@ log = logging.getLogger("cropwise.doctor")
 
 KB_DIR = pathlib.Path(__file__).resolve().parents[2] / "data" / "kb"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-VISION_MODEL = os.environ.get("VISION_MODEL", "google/gemini-2.0-flash-001")
+VISION_MODEL = os.environ.get("VISION_MODEL", "google/gemini-2.5-flash-lite")
 TIMEOUT = httpx.Timeout(45.0, connect=10.0)
 MIN_CONFIDENCE = 0.6
 MAX_IMAGE_BYTES = 4 * 1024 * 1024  # Vercel's request limit is 4.5 MB; the browser sends ≤1024 px

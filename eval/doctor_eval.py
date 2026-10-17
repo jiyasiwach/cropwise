@@ -41,7 +41,7 @@ from cropwise.services import doctor  # noqa: E402
 GOLD = ROOT / "eval" / "doctor_gold.jsonl"
 IMAGES = ROOT / "eval" / "doctor_images"
 OUT = ROOT / "docs" / "doctor_eval.json"
-JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "google/gemini-2.0-flash-001")
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "google/gemini-2.5-flash-lite")
 REFUSALS = {"not_a_plant", "retake", "low_confidence", "escalate", "blocked", "error"}
 
 JUDGE_PROMPT = """You check advice given to a farmer against the one source document it cites.

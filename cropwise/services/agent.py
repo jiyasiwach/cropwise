@@ -30,7 +30,7 @@ DISEASE_WORDS = re.compile(
     r"fung\w*|virus|pest|infect\w*|lesion\w*|spray\w*|leaf|leaves|patch\w*|dying|dry(ing)?)\b"
 )
 RELEVANCE_FLOOR = 0.5  # below this, the knowledge base does not cover the question
-DEFAULT_MODEL = os.environ.get("LLM_MODEL", "google/gemini-2.0-flash-001")
+DEFAULT_MODEL = os.environ.get("LLM_MODEL", "google/gemini-2.5-flash-lite")
 TIMEOUT = httpx.Timeout(60.0, connect=10.0)
 
 SYSTEM_PROMPT = """You are KrishiMitra, an assistant for Indian smallholder farmers inside the
@@ -242,7 +242,7 @@ class Answer:
     tokens: int = 0
 
 
-def extractive_answer(question: str, hits: list) -> Answer:
+def extractive_answer(question: str, hits: list, header: str | None = None) -> Answer:
     """What the assistant says when no model key is configured.
 
     It quotes the best passages verbatim and cites them. Labelled MOCK, because a quotation is
@@ -256,7 +256,7 @@ def extractive_answer(question: str, hits: list) -> Answer:
             ),
             is_mock=True,
         )
-    lines = ["[MOCK ANSWER — no language model key is set. These are the matching passages.]", ""]
+    lines = [header or "[MOCK ANSWER — no language model key is set. These are the matching passages.]", ""]
     for hit in hits[:2]:
         # Headings and list marks read badly inside a quotation; keep the words.
         snippet = " ".join(w for w in hit.chunk.text.split()[:90] if w.strip("#-*")).replace("**", "")
@@ -385,49 +385,63 @@ async def answer(
     tools_used: list[str] = []
     tokens = 0
 
-    for round_number in range(3):  # at most two tool rounds, then it must answer
-        calls_this_round: list[dict] = []
-        async for event in _stream_completion(messages, tools=round_number < 2):
-            if "delta" in event:
-                text_parts.append(event["delta"])
-                emit({"type": "token", "text": event["delta"]})
-            elif "tool_calls" in event:
-                calls_this_round = event["tool_calls"]
-            elif "usage" in event:
-                tokens += event["usage"].get("total_tokens", 0)
+    try:
+        for round_number in range(3):  # at most two tool rounds, then it must answer
+            calls_this_round: list[dict] = []
+            async for event in _stream_completion(messages, tools=round_number < 2):
+                if "delta" in event:
+                    text_parts.append(event["delta"])
+                    emit({"type": "token", "text": event["delta"]})
+                elif "tool_calls" in event:
+                    calls_this_round = event["tool_calls"]
+                elif "usage" in event:
+                    tokens += event["usage"].get("total_tokens", 0)
 
-        if not calls_this_round:
-            break
+            if not calls_this_round:
+                break
 
-        messages.append(
-            {
-                "role": "assistant",
-                "content": None,
-                "tool_calls": [
-                    {
-                        "id": f"call_{i}",
-                        "type": "function",
-                        "function": {"name": c["name"], "arguments": c["arguments"] or "{}"},
-                    }
-                    for i, c in enumerate(calls_this_round)
-                ],
-            }
-        )
-        for i, call in enumerate(calls_this_round):
-            try:
-                args = json.loads(call["arguments"] or "{}")
-            except json.JSONDecodeError:
-                args = {}
-            executed = await run_tool(call["name"], args, db)
-            tools_used.append(executed.summary())
-            emit({"type": "tool", "name": call["name"], "arguments": args, "error": executed.error})
             messages.append(
                 {
-                    "role": "tool",
-                    "tool_call_id": f"call_{i}",
-                    "content": json.dumps(executed.result or {"error": executed.error}, default=str)[:4000],
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": f"call_{i}",
+                            "type": "function",
+                            "function": {"name": c["name"], "arguments": c["arguments"] or "{}"},
+                        }
+                        for i, c in enumerate(calls_this_round)
+                    ],
                 }
             )
+            for i, call in enumerate(calls_this_round):
+                try:
+                    args = json.loads(call["arguments"] or "{}")
+                except json.JSONDecodeError:
+                    args = {}
+                executed = await run_tool(call["name"], args, db)
+                tools_used.append(executed.summary())
+                emit({"type": "tool", "name": call["name"], "arguments": args, "error": executed.error})
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": f"call_{i}",
+                        "content": json.dumps(executed.result or {"error": executed.error}, default=str)[:4000],
+                    }
+                )
+    except (httpx.HTTPError, json.JSONDecodeError, KeyError) as exc:
+        # The model service failing (out of credit, rate limit, an outage) must not become a 500
+        # in front of a farmer: answer with the cited passages and say why.
+        fallback = extractive_answer(
+            gate.masked_text,
+            hits,
+            header="[The language model did not answer just now, so these are the matching "
+            "passages from the knowledge base.]",
+        )
+        fallback.is_mock = False
+        fallback.tools_used = tools_used
+        fallback.latency_ms = int((time.monotonic() - started) * 1000)
+        return fallback
 
     return Answer(
         text="".join(text_parts).strip(),

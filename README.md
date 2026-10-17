@@ -74,7 +74,7 @@ Real numbers from `make test`, `make eval` and `make train`; nothing here is est
 | Real questions wrongly blocked | **0/30** | [docs/EVAL.md](docs/EVAL.md) |
 | Crop model accuracy, town estimate / with soil test | **96.95% / 99.59%** (stratified 5-fold CV) | [docs/MODEL_CARD.md](docs/MODEL_CARD.md) |
 | Crop Doctor top-1 accuracy, refusals, faithfulness | not measured yet — needs a vision-model key (`make eval-doctor`) | [/eval](https://cropwise-six.vercel.app/eval) |
-| Automated checks | **167**, all passing (`make test`) | [tests/](tests/) |
+| Automated checks | **169**, all passing (`make test`) | [tests/](tests/) |
 
 ## Engineering decisions worth reading
 
@@ -119,7 +119,7 @@ make eval-doctor         # Crop Doctor metrics (needs OPENROUTER_API_KEY)
 |---|---|---|
 | `SECRET_KEY` | yes in production | Signs the visitor cookie |
 | `OPENROUTER_API_KEY` | no | Language and vision models; without it answers are extractive and Crop Doctor runs a labelled demo |
-| `LLM_MODEL` / `VISION_MODEL` | no | OpenRouter model ids (default `google/gemini-2.0-flash-001`) |
+| `LLM_MODEL` / `VISION_MODEL` | no | OpenRouter model ids (default `google/gemini-2.5-flash-lite`) |
 | `DATA_GOV_IN_API_KEY` | no | Real Agmarknet mandi prices; without it prices are labelled MOCK |
 | `TRANSPORT_RATE_PER_QUINTAL_KM` | no | Transport cost used in the mandi ranking (default ₹2.5) |
 | `DATABASE_URL` | no | Postgres URL; defaults to SQLite |

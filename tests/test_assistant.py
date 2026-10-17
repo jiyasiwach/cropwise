@@ -118,5 +118,33 @@ with TestClient(main.app) as client:
     check("eval page shows how many gold items, not a Python object", "built-in method" not in page.text
           and "Measured on 35 gold items" in page.text)
 
+# --- the model service failing (no credit, rate limit, outage) is never a 500 ---
+import asyncio as _asyncio  # noqa: E402
+import httpx as _httpx  # noqa: E402
+from cropwise.services import agent as _agent  # noqa: E402
+
+_saved_stream, _saved_key = _agent._stream_completion, os.environ.get("OPENROUTER_API_KEY")
+
+
+async def _broken_stream(messages, tools):
+    raise _httpx.HTTPStatusError("402 Payment Required", request=_httpx.Request("POST", "https://x"),
+                                 response=_httpx.Response(402))
+    yield {}  # pragma: no cover — makes this an async generator
+
+_agent._stream_completion = _broken_stream
+os.environ["OPENROUTER_API_KEY"] = "test-not-a-real-key"
+try:
+    outage = _asyncio.run(_agent.answer("When should I sow chickpea?", db=None))
+    check("a model outage falls back to cited passages", outage.citations and "did not answer" in outage.text, outage.text[:120])
+    check("a model outage is not labelled as 'no key'", "MOCK" not in outage.text and not outage.is_mock)
+except Exception as exc:  # noqa: BLE001
+    check("a model outage falls back to cited passages", False, repr(exc))
+finally:
+    _agent._stream_completion = _saved_stream
+    if _saved_key is None:
+        os.environ.pop("OPENROUTER_API_KEY", None)
+    else:
+        os.environ["OPENROUTER_API_KEY"] = _saved_key
+
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)
