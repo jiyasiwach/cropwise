@@ -382,8 +382,10 @@ async def diagnose(
     step("answer", "model" if used_model else "extractive", grounded=True)
     return finish(Result(
         "answered",
-        f"Likely {condition.title.split(' —')[0].lower()} (confidence {diagnosis.confidence:.0%}). "
-        "Confirm with your Krishi Vigyan Kendra before spraying anything.",
+        (f"Demo: you chose {condition.title.split(' —')[0].lower()}; the photo was not analysed. "
+         if is_mock else
+         f"Likely {condition.title.split(' —')[0].lower()} (confidence {diagnosis.confidence:.0%}). ")
+        + "Confirm with your Krishi Vigyan Kendra before spraying anything.",
         summary,
         {"key": condition.key, "crop": condition.crop, "title": condition.title},
         treatment,
