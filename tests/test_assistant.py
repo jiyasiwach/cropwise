@@ -104,6 +104,14 @@ with TestClient(main.app) as client:
     check("stream reports which documents were retrieved", "retrieved" in kinds, kinds)
     check("stream finishes with a done event", events[-1]["type"] == "done", kinds)
 
+    sow = client.post("/api/v1/assistant", json={"question": "When should I sow chickpea?"}).json()
+    check("a sowing question does not cite a disease document",
+          not any(c["doc"].startswith("disease_") for c in sow["citations"]), [c["doc"] for c in sow["citations"]])
+    check("quoted passages carry no raw markdown headings", "##" not in sow["answer"], sow["answer"][:120])
+    sick = client.post("/api/v1/assistant", json={"question": "My rice leaves have spindle-shaped grey spots. What disease is it?"}).json()
+    check("a disease question can still use the disease documents",
+          any(c["doc"].startswith("disease_rice") for c in sick["citations"]), [c["doc"] for c in sick["citations"]])
+
     check("assistant page renders", "KrishiMitra" in client.get("/assistant").text)
     page = client.get("/eval")
     check("eval page renders the measured numbers", "Hit@5" in page.text, page.status_code)

@@ -152,8 +152,12 @@
 ### Fixed
 - The impact calculator returned a 500 for an unknown town; it now returns a 404 with a sentence.
 - The résumé bullets quoted a mandi comparison made on placeholder prices; removed.
+- KrishiMitra cited a disease document for "when should I sow chickpea?"; disease documents now
+  answer only questions about a sick plant. Quoted passages no longer show raw `##` marks.
+- KrishiMitra refused a real disease question because the exact-name boost ranked the rice guide
+  first; the "is this covered" decision now uses the best match among the results.
 
 ### Measured
-- 159 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+- 162 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
   MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
 

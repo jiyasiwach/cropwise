@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from typing import AsyncIterator, Callable
 
@@ -24,6 +25,10 @@ from . import cropplan, guardrails, lookup, mandi, market, rag, stores
 from .predictor import recommend
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+DISEASE_WORDS = re.compile(
+    r"\b(disease|sick|spot|spots|blight|blast|rust|mildew|scab|curl|rot|greening|yellow\w*|wilt\w*|"
+    r"fung\w*|virus|pest|infect\w*|lesion\w*|spray\w*|leaf|leaves|patch\w*|dying|dry(ing)?)\b"
+)
 RELEVANCE_FLOOR = 0.5  # below this, the knowledge base does not cover the question
 DEFAULT_MODEL = os.environ.get("LLM_MODEL", "google/gemini-2.0-flash-001")
 TIMEOUT = httpx.Timeout(60.0, connect=10.0)
@@ -253,7 +258,8 @@ def extractive_answer(question: str, hits: list) -> Answer:
         )
     lines = ["[MOCK ANSWER — no language model key is set. These are the matching passages.]", ""]
     for hit in hits[:2]:
-        snippet = " ".join(hit.chunk.text.split()[:90])
+        # Headings and list marks read badly inside a quotation; keep the words.
+        snippet = " ".join(w for w in hit.chunk.text.split()[:90] if w.strip("#-*"))
         lines.append(f"From **{hit.chunk.title}**: {snippet}…")
         lines.append("")
     return Answer(
@@ -336,13 +342,19 @@ async def answer(
         return Answer(text=gate.message or "", blocked=gate.reason, latency_ms=0)
 
     hits = rag.search(gate.masked_text, top_k=5)
+    # Disease documents mention sowing, fertiliser and crops too, so they surface for unrelated
+    # questions ("when should I sow chickpea?"). They answer only questions about a sick plant.
+    if not DISEASE_WORDS.search(gate.masked_text.lower()):
+        hits = [h for h in hits if not h.chunk.doc.startswith("disease_")]
     emit({"type": "retrieved", "documents": [h.chunk.title for h in hits]})
 
     # A question the knowledge base does not cover must be refused, not answered from the
     # model's own memory. RRF scores are rank-based and nearly constant, so the decision uses
     # the raw signals instead: measured on the gold set, farming questions score 1.1-2.0 and
     # off-topic ones 0.00-0.18, so 0.5 separates them with room to spare.
-    if not hits or hits[0].relevance < RELEVANCE_FLOOR:
+    # The best match among the results decides, not the first: the exact-name boost can rank a
+    # crop guide first ("rice …") above the passage that actually answers the question.
+    if not hits or max(h.relevance for h in hits) < RELEVANCE_FLOOR:
         return Answer(
             text=(
                 "I could not find this in my farming knowledge base, so I will not guess. "
