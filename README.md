@@ -8,7 +8,11 @@ languages — with its accuracy measured in public.**
 [Crop Doctor](https://cropwise-six.vercel.app/doctor) · [KrishiMitra](https://cropwise-six.vercel.app/assistant) ·
 [Measured results](https://cropwise-six.vercel.app/eval) · [API docs](https://cropwise-six.vercel.app/docs)
 
-<!-- Screenshot / GIF: add docs/demo.gif (town → plan → Crop Doctor → KrishiMitra) and link it here. -->
+![CropWise on a phone: home, the sourced problem page, Crop Doctor with a leaf photo, grounded advice, a blocked prompt injection, and the measured results](docs/screenshots/strip.png)
+
+<sub>Live site on a phone, 17 Oct 2026, running without API keys — so answers are labelled demo/MOCK.
+Leaf photo from the PlantVillage dataset (Mohanty et al., 2016), CC BY-SA 3.0. Animated version:
+[docs/demo.gif](docs/demo.gif).</sub>
 
 ## The problem
 
