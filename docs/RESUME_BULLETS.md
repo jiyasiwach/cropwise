@@ -44,7 +44,7 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
   users.
 - Rebuilt a prototype Flask app into **FastAPI with typed Pydantic schemas, JWT sessions in
   httpOnly cookies and a database layer portable between SQLite and Postgres**, behind
-  **158 automated checks** covering auth, validation, model behaviour and every guardrail path.
+  **159 automated checks** covering auth, validation, model behaviour and every guardrail path.
 
 ## Not yet built (do not claim these)
 
