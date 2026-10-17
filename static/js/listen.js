@@ -17,8 +17,8 @@
   }
 
   function clean(text) {
-    // Emoji and arrows are read out as their names ("right arrow"); drop them.
-    return text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}→←↑↓•·]/gu, ' ').replace(/\s+/g, ' ').trim();
+    // Emoji, arrows and markdown marks are read out as their names ("asterisk"); drop them.
+    return text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}→←↑↓•·*_#`>|]/gu, ' ').replace(/\s+/g, ' ').trim();
   }
 
   function stop() {
