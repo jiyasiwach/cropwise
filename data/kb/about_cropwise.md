@@ -25,6 +25,14 @@ The dataset is a clean 2,200-row teaching set, not Indian field trials, so treat
 an upper bound. When your readings fall outside anything the model was trained on, the app says
 so instead of answering confidently.
 
-**What CropWise cannot do:** it cannot diagnose a disease from a description, cannot recommend a
+**Crop Doctor** (at /doctor) looks at a photo of one sick leaf and names the likely problem, with
+how sure it is, for the diseases in its knowledge base only: rice blast, rice bacterial leaf
+blight, rice brown spot, maize turcicum leaf blight, maize common rust, apple scab, grape downy
+mildew, citrus greening, cotton leaf curl and mango powdery mildew. Its advice is quoted from
+cited TNAU and Government of India sources. If the photo is unclear, it is not sure, or the
+problem is not in that list, it gives no treatment and sends you to an expert. Photos are never
+stored.
+
+**What CropWise cannot do:** it cannot diagnose a disease from a description, cannot invent a
 pesticide dose, cannot see your field, and does not know your irrigation, rotation or soil
 salinity. For any of those, ask your Krishi Vigyan Kendra or call 1800-180-1551.

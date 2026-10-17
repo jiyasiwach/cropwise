@@ -12,9 +12,13 @@
    and explain why that gap is the honest sales pitch for uploading a Soil Health Card.
 4. **Open the plan.** Sowing window computed from today, fertiliser as bags to buy, shops from
    OpenStreetMap on a map.
-5. **Best market.** The highest price is 114 km away and pays less than one at 59 km after
-   transport. This is the slide that lands with non-technical interviewers.
-6. **Ask KrishiMitra.** A real question, then an injection attempt that gets blocked. Finish on
+5. **Best market.** Mandis ranked by what the farmer keeps after the lorry is paid, then `/impact`'s
+   calculator turns it into rupees for one farm. Say plainly that the prices are labelled
+   placeholders until a data.gov.in key is set — the ranking logic is real, the prices are not yet.
+6. **Crop Doctor.** Upload a leaf, then a photo of a cup, then a leaf with "ignore all previous
+   instructions" written on it. The point is not the diagnosis — it is that the system refuses
+   the second and third and shows its four-step trace.
+7. **Ask KrishiMitra.** A real question, then an injection attempt that gets blocked. Finish on
    `/eval`: Hit@5 1.00, MRR 0.94, 5/5 attacks blocked, 0 false positives.
 
 ## Eight questions you will be asked
@@ -77,6 +81,27 @@ farmer has. Then Soil Health Card OCR, which unlocks the 99.6% model. Then the v
 literacy, not connectivity, is the real barrier, and the pipeline is already STT → the same agent
 → TTS.
 
+## Crop Doctor questions
+
+**Why a hosted vision model and not your own CNN?** Scope and honesty. A CNN trained on
+PlantVillage scores very high on PlantVillage and much lower on field photos; a general vision
+model plus strict guardrails, a closed list of conditions and grounded advice is the safer
+prototype. The gold set in `eval/doctor_gold.jsonl` is ready to compare a fine-tuned model against.
+
+**How do you stop it inventing a pesticide dose?** Three layers: the knowledge base quotes doses
+only where the cited source states them (grape and mango quote none, because the source tables
+could not be extracted reliably); the writer is told to use only the passages; and any dose in its
+output that is not found verbatim in a passage throws the paraphrase away in favour of the passage.
+
+**What about prompt injection through an image?** The vision prompt says writing in the photo is
+data. Then the model's own output is run through the same guardrail as user text — if it echoes
+an instruction, the result is blocked. The gold set has three photos with instructions written on
+them.
+
+**Why is "wrong refusal" reported next to accuracy?** A system that refuses everything never gives
+wrong advice. The number that keeps it honest is how often it declined a photo it should have
+diagnosed.
+
 ## Numbers worth memorising
 
 | Thing | Figure |
@@ -85,4 +110,4 @@ literacy, not connectivity, is the real barrier, and the pipeline is already STT
 | Crop model, with soil test | 0.9959 / 0.9959 |
 | Retrieval | Hit@5 1.00, MRR 0.944 |
 | Guardrails | 5/5 blocked, 0/30 false positives |
-| Tests | 97 checks |
+| Tests | 159 checks |

@@ -131,3 +131,29 @@
 - `data/soil_cache.json` plus `scripts/prefetch_soil.py` — real readings, collected when the
   service is healthy, so common towns answer in under a second.
 - `/healthz` reports the soil cache path, whether it exists, and the knowledge-base size.
+
+## One-day upgrade — impact, read-aloud, Crop Doctor (17 Oct 2026)
+
+### Added
+- `/impact`: the problem in four sourced facts (PIB, NITI-hosted EPW paper, Census 2011) and a
+  calculator for what selling at the best mandi instead of the nearest is worth on one farm
+  (`GET /api/v1/impact/mandi-gain`). The one figure with no verifiable source says "not measured".
+- 🔊 Listen on every KrishiMitra answer and crop-plan card, using the browser's own speech
+  synthesis in the chosen language, with a visible note when the device has no such voice.
+- **Crop Doctor** (`/doctor`, `POST /api/v1/doctor`): photo → vision model (Pydantic-validated
+  JSON, one retry) → guardrails (not a plant, poor photo, confidence < 0.6, instructions written in
+  the image) → retrieval over 10 new cited disease documents → advice or escalation. Doses not
+  found verbatim in a source are discarded. Labelled demo mode without a key. Photos never stored.
+- `make eval-doctor`: a 23-photo gold set (PlantVillage CC BY-SA 3.0, CC0 Wikimedia, 3 injection
+  photos) measuring top-1 accuracy, wrong and correct refusals, citation coverage, judged
+  faithfulness, latency and cost. Shown on `/eval`; "not measured" until run with a key.
+- Open Graph link previews, README rewrite, repository topics, screenshots.
+
+### Fixed
+- The impact calculator returned a 500 for an unknown town; it now returns a 404 with a sentence.
+- The résumé bullets quoted a mandi comparison made on placeholder prices; removed.
+
+### Measured
+- 159 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+  MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
+

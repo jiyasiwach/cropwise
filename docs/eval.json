@@ -7,8 +7,8 @@
       "mode": "bm25",
       "questions": 30,
       "hit_at_5": 0.9667,
-      "mrr": 0.8639,
-      "median_latency_ms": 1.78,
+      "mrr": 0.8594,
+      "median_latency_ms": 1.72,
       "misses": [
         {
           "id": "q02",
@@ -22,7 +22,7 @@
       "questions": 30,
       "hit_at_5": 0.9667,
       "mrr": 0.9028,
-      "median_latency_ms": 3.23,
+      "median_latency_ms": 2.72,
       "misses": [
         {
           "id": "q09",
@@ -36,7 +36,7 @@
       "questions": 30,
       "hit_at_5": 1.0,
       "mrr": 0.9444,
-      "median_latency_ms": 3.44,
+      "median_latency_ms": 3.21,
       "misses": []
     }
   ],

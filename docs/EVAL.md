@@ -9,9 +9,9 @@ labelled by hand in `eval/gold.jsonl`.
 
 | Configuration | Hit@5 | MRR | Median latency |
 |---|---|---|---|
-| bm25 | 0.967 | 0.864 | 1.8 ms |
-| vector | 0.967 | 0.903 | 3.2 ms |
-| hybrid | 1.000 | 0.944 | 3.4 ms |
+| bm25 | 0.967 | 0.859 | 1.7 ms |
+| vector | 0.967 | 0.903 | 2.7 ms |
+| hybrid | 1.000 | 0.944 | 3.2 ms |
 
 **hybrid** wins on MRR. Hybrid fuses BM25, latent-semantic vectors and an exact-name boost with Reciprocal Rank Fusion: BM25 handles "PMFBY" and "urea", the vectors handle "government money every four months", and neither alone handles both.
 
