@@ -32,6 +32,9 @@ h1,h2{font-family:'Bricolage Grotesque','Noto Sans',sans-serif;font-weight:800;m
 .chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:var(--soft-amber);
       border:1px solid var(--orange);color:#7a4a00;margin:4px 4px 0 0}
 .chip-tool{background:#eef5ef;border-color:var(--leaf);color:#14532d}
+.listen{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 2px}
+.listen-btn{border:1px solid var(--leaf);background:#fff;color:#14532d;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.listen-note{font-size:12px;color:var(--muted)}
 .row{display:flex;gap:8px;align-items:center;margin-top:12px}
 input[type=text]{flex:1;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:14px;font:inherit}
 button{min-height:48px;padding:0 16px;border-radius:14px;border:0;cursor:pointer;font:inherit;font-weight:700}
@@ -104,6 +107,7 @@ government scheme. I answer only from my knowledge base and tell you where each 
   </aside>
 </div>
 
+<script src="/static/js/listen.js"></script>
 <script>
 const log = document.getElementById('log');
 const input = document.getElementById('q');
@@ -128,13 +132,14 @@ async function ask() {
   input.value = '';
   bubble('me', question);
   const answer = bubble('bot', '…');
+  const language = document.getElementById('lang').value;
   let text = '';
   const tools = [];
 
   const response = await fetch('/api/v1/assistant/stream', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question, language: document.getElementById('lang').value }),
+    body: JSON.stringify({ question, language }),
   });
 
   const reader = response.body.getReader();
@@ -165,6 +170,10 @@ async function ask() {
         });
         if (event.is_mock) meta.innerHTML += '<span class="chip">MOCK — no model key set</span>';
         meta.innerHTML += `<div style="margin-top:6px">${event.latency_ms} ms${event.tokens ? ' · ' + event.tokens + ' tokens' : ''}</div>`;
+        if (!event.blocked) {
+          const listen = window.listenButton(() => answer.textContent, () => language);
+          if (listen) meta.prepend(listen);
+        }
         answer.after(meta);
       }
       log.scrollTop = log.scrollHeight;

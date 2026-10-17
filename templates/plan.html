@@ -52,6 +52,9 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .btn{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:14px;
      background:var(--amber);color:#2a1c00;font-weight:700;text-decoration:none;border:0;cursor:pointer}
 .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.listen{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px}
+.listen-btn{border:1px solid var(--leaf,#2f8f4e);background:#fff;color:#14532d;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.listen-note{font-size:12px;color:var(--muted,#55645a)}
 </style>
 </head>
 <body>
@@ -163,6 +166,19 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/listen.js"></script>
+<script>
+// A Listen button on every plan card. The plan is written in English, so it is read in English.
+document.querySelectorAll('section.panel > h2').forEach(h => {
+  const card = h.parentElement;
+  const listen = window.listenButton(() => {
+    const copy = card.cloneNode(true);
+    copy.querySelectorAll('button, script, .listen, .leaflet-container').forEach(n => n.remove());
+    return copy.innerText || copy.textContent;
+  }, () => 'en');
+  if (listen) h.after(listen);
+});
+</script>
 <script>
 const CROP = {{ crop|tojson }};
 const STATE = {{ state|tojson }};

@@ -108,6 +108,9 @@ with TestClient(main.app) as client:
     page = client.get("/plan/rice?city=Hyderabad&state=Telangana")
     check("plan page renders", page.status_code == 200 and "Timeline" in page.text, page.status_code)
     check("plan page shows the verification warning", "Krishi Vigyan Kendra" in page.text)
+    check("plan cards can be read aloud", "/static/js/listen.js" in page.text)
+    check("the read-aloud script is served", client.get("/static/js/listen.js").status_code == 200)
+    check("assistant answers can be read aloud", "listenButton" in client.get("/assistant").text)
     missing = client.get("/plan/dragonfruit")
     check("missing crop page is honest", "no sowing calendar" in missing.text.lower(), missing.status_code)
 
