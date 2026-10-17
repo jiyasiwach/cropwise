@@ -227,7 +227,7 @@ async def mandi_gain(
         return await impact.mandi_gain(db, crop.lower().strip(), acres, town, state, latitude, longitude)
     except cropplan.UnknownCrop as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
-    except LookupError as exc:
+    except (lookup.LookupError, LookupError) as exc:  # lookup has its own LookupError
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
 
 

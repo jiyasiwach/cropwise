@@ -97,6 +97,15 @@ with TestClient(main.app) as client:
           client.get("/api/v1/impact/mandi-gain?crop=dragonfruit&acres=1&state=Telangana&latitude=17.4&longitude=78.5").status_code == 404)
     check("calculator rejects nonsense acres",
           client.get("/api/v1/impact/mandi-gain?crop=rice&acres=-3&state=Telangana&latitude=17.4&longitude=78.5").status_code == 422)
+    from cropwise.services import lookup as _lookup
+
+    async def _nowhere(city):
+        raise _lookup.LookupError(f"We could not find a place called '{city}'.")
+    _real_geocode, _lookup.geocode = _lookup.geocode, _nowhere
+    missing_town = client.get("/api/v1/impact/mandi-gain?crop=rice&acres=1&town=Qwxzzyplace")
+    _lookup.geocode = _real_geocode
+    check("an unknown town is a friendly 404, not a server error",
+          missing_town.status_code == 404 and "could not find" in missing_town.json()["detail"], missing_town.status_code)
     check("calculator needs a place", client.get("/api/v1/impact/mandi-gain?crop=rice&acres=1").status_code == 422)
     impact_page = client.get("/impact")
     check("impact page renders", impact_page.status_code == 200 and "What it does not do yet" in impact_page.text)
