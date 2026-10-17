@@ -89,3 +89,15 @@ Four separate faults, found by testing the deployed site rather than the local o
 4. **The whole flow depended on a service that is currently unreliable** — SoilGrids answered in 36 seconds or not at all while this was being fixed. So: readings are cached in the database and in `data/soil_cache.json` (filled by `scripts/prefetch_soil.py`, which pauses between towns and can be resumed), and when nothing answers the form switches to manual entry and says so instead of leaving a spinner.
 
 `/healthz` now reports what the running instance can actually see on disk — the soil cache path, whether it exists, and the knowledge-base size — because a file present in the repository is not necessarily present in a deployment bundle, and that is exactly what went wrong earlier with `data/kb`.
+
+## Impact page, read-aloud, Crop Doctor (17 Oct 2026)
+- `/impact` quotes only figures checked against the source document itself (PIB releases, the PIB Soil Health Card factsheet, the NITI-hosted EPW fertiliser paper, the Census 2011 language paper). No verifiable national figure was found for what selling at the nearest mandi costs farmers, so the page says "not measured" and offers a per-farm calculator instead of a headline number.
+- The earlier claim "the highest headline price was 114 km away and paid less than a mandi at 59 km" came from the labelled placeholder prices, not real ones; it was removed from the résumé bullets.
+- Read-aloud uses the browser's own `speechSynthesis`: no service, no key, nothing leaves the phone. When a device has no voice for the chosen language the page says so rather than reading silently or in the wrong accent.
+- Crop Doctor uses a hosted vision model through OpenRouter rather than training a CNN: the project rule is no retraining today, and a general model plus strict guardrails and grounding is the honest scope for a prototype. A fine-tuned classifier is the obvious next step and is measured against the same gold set.
+- The classifier must choose a condition from the knowledge base's own list (or "healthy" / "other"), so every diagnosis can be looked up; "other" always escalates to a person.
+- Guardrail order is fixed: injected text, not a plant, photo quality, confidence < 0.6, healthy, then retrieval. A refusal is cheap; a wrong treatment costs a farmer money and can harm the crop.
+- Disease documents contain no pesticide doses unless the cited source states them, and any dose the model writes that is not in a passage word for word causes its paraphrase to be discarded in favour of the passage itself.
+- Disease documents are excluded from the exact-name boost in retrieval, so a question about "rice" still ranks the rice crop guide first.
+- Without a key the photo is not analysed. The page offers a labelled demo where the visitor names the condition and every later step runs for real, instead of a fake diagnosis.
+- Photos are resized to ≤1024 px in the browser (keeps requests far under Vercel's 4.5 MB limit), held in memory for one request, and never written to disk or logs; the pipeline logs decisions only.

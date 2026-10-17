@@ -4,12 +4,12 @@ Numbers are the measured ones from `docs/EVAL.md` and `docs/MODEL_CARD.md`, rege
 `make eval` and `make train`. Blanks are phases not yet built, left blank on purpose.
 
 **CropWise — AI farming assistant** | Python, FastAPI, scikit-learn, SHAP, hybrid RAG (BM25 + LSA
-vectors + RRF), SQLAlchemy, Docker, Vercel
+vectors + RRF), multimodal LLM (OpenRouter), Pydantic, SQLAlchemy, Vercel
 https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
 
 - Built a grounded agricultural assistant with **hybrid retrieval** (BM25 + latent-semantic
-  vectors + exact-name boost, fused with Reciprocal Rank Fusion) over a 29-document ICAR/KVK and
-  government-scheme knowledge base, reaching **Hit@5 1.00 and MRR 0.93** on a hand-labelled
+  vectors + exact-name boost, fused with Reciprocal Rank Fusion) over a 39-document ICAR/KVK, TNAU and
+  government-scheme knowledge base, reaching **Hit@5 1.00 and MRR 0.94** on a hand-labelled
   30-question gold set, with every answer citing its source and refusing when the base does not
   cover the question.
 - Shipped a **two-layer prompt-injection guardrail** (weighted heuristics, then an LLM classifier
@@ -27,16 +27,28 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
 - Found a second fabrication in production: SoilGrids publishes nothing under built-up land and
   the app was substituting hard-coded averages as measurements; replaced with a sampling ring
   that reports how far away the real reading came from.
-- Integrated **live mandi prices (data.gov.in/Agmarknet, cached daily), OpenStreetMap agri-store
-  search and Open-Meteo forecasts** into a "best market to sell" ranking by **net price after
-  transport cost**, which reorders the naive ranking: the highest headline price was 114 km away
-  and paid less than a mandi at 59 km.
+- Built a **"best market to sell" ranking by net price after transport** over data.gov.in
+  (Agmarknet) mandi prices, OpenStreetMap agri-store search and Open-Meteo forecasts, plus an
+  impact calculator that turns it into rupees for one farm. Runs on clearly labelled placeholder
+  prices until a data.gov.in key is configured — no real-price result is claimed yet.
+- Built **Crop Doctor**, a multimodal, agentic diagnosis pipeline (classify → guardrail →
+  retrieve → answer or escalate): a vision model returns **Pydantic-validated structured JSON**
+  with one retry, guardrails stop on non-plant, poor or under-60%-confidence photos and on
+  instructions written inside the image, and advice comes only from cited knowledge-base passages,
+  with any generated dose not found verbatim in a source discarded. Every guardrail path is
+  covered by automated tests that run without an API key. Accuracy: _fill from `make eval-doctor`
+  — not measured yet_.
+- Added a sourced **problem-and-impact page** (Agriculture Census via PIB, NITI-hosted EPW
+  fertiliser paper, Census 2011 language data) that marks the one figure no public source could
+  verify as "not measured", and **browser-native read-aloud** in six languages for low-literacy
+  users.
 - Rebuilt a prototype Flask app into **FastAPI with typed Pydantic schemas, JWT sessions in
   httpOnly cookies and a database layer portable between SQLite and Postgres**, behind
-  **97 automated checks** covering auth, validation, model behaviour and guardrails.
+  **158 automated checks** covering auth, validation, model behaviour and every guardrail path.
 
 ## Not yet built (do not claim these)
 
+- Crop Doctor accuracy figures (until `make eval-doctor` has been run with a key)
 - Leaf-disease CNN with Grad-CAM, Soil Health Card OCR, irrigation advisor, alerts, PWA
 - React rebuild of the interface
 - Voice helpline, phone IVR, support-desk ticketing

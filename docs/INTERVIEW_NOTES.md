@@ -15,7 +15,7 @@
 5. **Best market.** The highest price is 114 km away and pays less than one at 59 km after
    transport. This is the slide that lands with non-technical interviewers.
 6. **Ask KrishiMitra.** A real question, then an injection attempt that gets blocked. Finish on
-   `/eval`: Hit@5 1.00, MRR 0.93, 5/5 attacks blocked, 0 false positives.
+   `/eval`: Hit@5 1.00, MRR 0.94, 5/5 attacks blocked, 0 false positives.
 
 ## Eight questions you will be asked
 
@@ -83,6 +83,6 @@ literacy, not connectivity, is the real barrier, and the pipeline is already STT
 |---|---|
 | Crop model, city estimate | 0.9695 accuracy / 0.9693 macro-F1 |
 | Crop model, with soil test | 0.9959 / 0.9959 |
-| Retrieval | Hit@5 1.00, MRR 0.928 |
+| Retrieval | Hit@5 1.00, MRR 0.944 |
 | Guardrails | 5/5 blocked, 0/30 false positives |
 | Tests | 97 checks |

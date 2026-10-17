@@ -1,135 +1,131 @@
 # CropWise
 
-**Live: https://cropwise-six.vercel.app** · API docs: https://cropwise-six.vercel.app/docs
+**An AI farming assistant for India's small farmers: the right crop for the soil, fertiliser in
+bags, the best mandi after transport, a photo-based Crop Doctor, and a grounded assistant in six
+languages — with its accuracy measured in public.**
 
-An AI farming assistant for Indian smallholders: tell it your city, and it reads the soil and
-weather for that location, recommends crops, and (from Phase 4 onward) tells you when to sow,
-what fertiliser to buy, where to buy it, and which mandi pays best after transport.
+**Live: https://cropwise-six.vercel.app** · [The problem](https://cropwise-six.vercel.app/impact) ·
+[Crop Doctor](https://cropwise-six.vercel.app/doctor) · [KrishiMitra](https://cropwise-six.vercel.app/assistant) ·
+[Measured results](https://cropwise-six.vercel.app/eval) · [API docs](https://cropwise-six.vercel.app/docs)
 
-**Status: Phases 1–6 of 10 complete.** See `CHANGELOG.md` for what has shipped and
-`docs/AUDIT.md` for the state of the original code.
+<!-- Screenshot / GIF: add docs/demo.gif (town → plan → Crop Doctor → KrishiMitra) and link it here. -->
 
-## Run it locally
+## The problem
 
-```bash
-make install             # python3.11 venv + dependencies
-make train               # builds models/ (about a minute)
-cp .env.example .env     # then set SECRET_KEY
-make run                 # http://127.0.0.1:8000  — API docs at /docs
-```
+About **86% of India's farm holdings are small or marginal** and the average holding is **1.08 ha**
+([PIB](https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=1906888), [PIB 2026](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2246182)).
+On a farm that size, the wrong crop, a guessed fertiliser dose (India's N:P:K use was 8.2:3.2:1
+against a recommended 4:2:1 — [NITI-hosted EPW paper](https://niti.gov.in/sites/default/files/2023-02/4_EPW_Article_Fertiliser_Use_and_Imbalance_in_India.pdf))
+or a sale at the nearest mandi instead of the best one is a large share of the year's income —
+and advice is often not in the farmer's language (Hindi, the largest, is the mother tongue of
+43.6% of Indians — [Census 2011](https://cdn.downtoearth.org.in/library/0.58521300_1530794876_census-of-india-2011.pdf)).
+Sources and a calculator: [/impact](https://cropwise-six.vercel.app/impact).
 
-## Tests
+## What it does
 
-```bash
-make test                # 98 checks: models, API, auth, pages, crop plan and the assistant
-make eval                # retrieval, guardrail and answer metrics -> docs/EVAL.md
-```
-
-## How it works today
-
-| Step | What happens |
+| | |
 |---|---|
-| Open it | No sign-in. A cookie keeps your history separate; nothing personal is stored |
-| Soil | City → Open-Meteo geocoding → ISRIC SoilGrids (nitrogen, pH, clay, organic carbon at 0–5 cm) |
-| Climate | Open-Meteo forecast over 1 / 15 / 30 days (mean temperature, humidity, rainfall) |
-| Predict | RandomForest → top 3 crops, each with SHAP reasons and a confidence, saved to your history |
-
-Neither external API needs a key; both are free.
-
-## KrishiMitra
-
-A grounded assistant at `/assistant`. It answers only from the knowledge base in `data/kb/` and
-from seven tools over the app's own services, cites every claim, and refuses when neither covers
-the question. Measured on a hand-labelled 30-question gold set plus 5 injection attacks:
-
-| Metric | Result |
-|---|---|
-| Hit@5 (hybrid: BM25 + LSA vectors + exact-name, fused with RRF) | **1.00** |
-| MRR | **0.928** |
-| Injection attacks blocked | **5/5** |
-| Real questions wrongly blocked | **0/30** |
-
-Full write-up: `docs/EVAL.md`, live at `/eval`. Without `OPENROUTER_API_KEY` the assistant still
-runs and returns extractive answers labelled **MOCK** — retrieval, citations, tools and
-guardrails all work; only the wording is not generated.
-
-## Accuracy, honestly
-
-| Model | What it sees | Accuracy | Macro-F1 |
-|---|---|---|---|
-| Field | SoilGrids + Open-Meteo for any city (no P or K) | **96.95%** | 0.969 |
-| Lab | Adds real N-P-K from a Soil Health Card | **99.59%** | 0.996 |
-
-Stratified 5-fold cross-validation, RandomForest chosen over ExtraTrees, HistGradientBoosting and
-LogisticRegression. Full details, weakest crops and limits: `docs/MODEL_CARD.md`.
-
-Remaining known limits: the dataset is a clean 2 200-row Kaggle teaching set, not Indian field
-trials; SoilGrids is a ~250 m regional estimate at 0–5 cm, not your field; and the rainfall
-accumulation window in the dataset is undocumented, so our 30-day mapping is a best guess.
-
-## API
-
-`/docs` is the generated OpenAPI documentation. Everything the pages do is available as JSON:
-
-| Endpoint | Purpose |
-|---|---|
-| `GET /api/v1/season?city=` | Live conditions, suited crops and prices (cached 15 min) |
-| `GET /api/v1/profit?crop=&acres=` | Yield, revenue, costs and profit per acre |
-| `GET /api/v1/soil?city=` | Nitrogen, pH, clay, organic carbon from ISRIC SoilGrids |
-| `GET /api/v1/weather?city=&days=` | Mean temperature, humidity, accumulated rainfall |
-| `POST /api/v1/predict` | Top three crops with reasons; uses the lab model when a soil test is supplied |
-| `GET /api/v1/history` | This farmer's past recommendations |
-| `GET /api/v1/plan/{crop}` | Sowing window, harvest date and the fertiliser to buy |
-| `GET /api/v1/stores` | Agri-input shops within 15 km (OpenStreetMap) |
-| `GET /api/v1/mandi` | Daily mandi prices and a 30-day trend, cached |
-| `GET /api/v1/best-market` | Mandis ranked by what you keep after transport |
-| `POST /api/v1/assistant` | Ask KrishiMitra; returns the answer, citations and tools used |
-| `POST /api/v1/assistant/stream` | The same, streamed as server-sent events |
-
-## Configuration
-
-| Variable | Needed | Meaning |
-|---|---|---|
-| `SECRET_KEY` | yes in production | Signs the session cookie |
-| `DATABASE_URL` | no | Postgres URL; defaults to local SQLite |
-| `CORS_ORIGINS` | no | Comma-separated allow-list for browser calls |
-| `DATA_GOV_IN_API_KEY` | no | Real mandi prices; without it prices are labelled MOCK |
-| `TRANSPORT_RATE_PER_QUINTAL_KM` | no | Used to rank markets by net price (default ₹2.5) |
-| `OPENROUTER_API_KEY` | Phase 5 | The assistant's language model |
-
-## Deployment
-
-Vercel (`vercel.json`, `@vercel/python`). Note that on Vercel the SQLite file lives in `/tmp` and is
-wiped on every cold start, so accounts do not persist there. Phase 3 moves the database to Postgres.
+| **Crop plan** | Town → soil (ISRIC SoilGrids) + weather (Open-Meteo) → three crops with SHAP reasons → sowing window, fertiliser in bags of urea/DAP/MOP, nearby shops (OpenStreetMap), mandis ranked by **net price after transport**, profit per acre |
+| **📷 Crop Doctor** | Photo of a sick leaf → likely condition, confidence, and advice **only from cited sources**. Not a plant, blurry, under 60% confidence or not in the knowledge base → no treatment, an honest "ask an expert" and the Kisan Call Centre |
+| **💬 KrishiMitra** | Hybrid-RAG assistant with 7 tools over the app's own services, citations on every answer, a two-layer prompt-injection guardrail, voice in and 🔊 read-aloud out, six languages |
+| **📊 /eval** | Retrieval, guardrail and Crop Doctor metrics regenerated by `make eval`, shown in the app |
 
 ## Architecture
 
 ```mermaid
-flowchart TD
-    F[Farmer] --> W[FastAPI: pages + /api/v1]
-    W --> M[Crop models: field / lab + OOD]
-    W --> P[Crop plan: calendar, fertiliser]
-    W --> K[KrishiMitra]
-    K --> R[Hybrid retrieval: BM25 + LSA + RRF]
-    R --> KB[(data/kb — cited documents)]
-    K --> G[Guardrails: heuristics + LLM classifier]
-    K --> T[Tools]
-    T --> S[(SoilGrids)]
-    T --> O[(Open-Meteo)]
-    T --> OSM[(OpenStreetMap)]
-    T --> A[(data.gov.in mandi prices)]
-    W --> DB[(SQLite / Postgres)]
+flowchart LR
+    subgraph Plan
+      T[Town] --> SW[Soil: SoilGrids<br/>Weather: Open-Meteo]
+      SW --> M[Crop models<br/>RF + SHAP + OOD]
+      M --> P[Season plan<br/>calendar · fertiliser · shops]
+      P --> MK[Mandi ranking<br/>net of transport]
+    end
+    subgraph Ask
+      Q[Question / voice] --> G1[Guardrail<br/>heuristics → LLM classifier]
+      G1 --> R[Hybrid retrieval<br/>BM25 + LSA + exact, RRF]
+      R --> TL[7 tools]
+      TL --> A[Grounded answer<br/>+ citations]
+    end
+    subgraph Doctor
+      PH[Leaf photo<br/>resized in browser] --> V[Vision model<br/>Pydantic-validated JSON]
+      V --> G2[Guardrail<br/>plant? quality? ≥0.6? injected text?]
+      G2 -->|pass| R2[Retrieve disease docs]
+      G2 -->|stop| H[Retake / KVK · 1800-180-1551]
+      R2 -->|match| D[Advice from cited passages<br/>dose check]
+      R2 -->|no match| H
+    end
+    R --- KB[(data/kb<br/>cited documents)]
+    R2 --- KB
 ```
+
+## Measured results
+
+Real numbers from `make test`, `make eval` and `make train`; nothing here is estimated.
+
+| What | Result | Where |
+|---|---|---|
+| Retrieval Hit@5 (hybrid) | **1.00** on 30 hand-labelled questions | [docs/EVAL.md](docs/EVAL.md) |
+| Retrieval MRR (hybrid) | **0.94** | [docs/EVAL.md](docs/EVAL.md) |
+| Prompt-injection attacks blocked | **5/5** | [docs/EVAL.md](docs/EVAL.md) |
+| Real questions wrongly blocked | **0/30** | [docs/EVAL.md](docs/EVAL.md) |
+| Crop model accuracy, town estimate / with soil test | **96.95% / 99.59%** (stratified 5-fold CV) | [docs/MODEL_CARD.md](docs/MODEL_CARD.md) |
+| Crop Doctor top-1 accuracy, refusals, faithfulness | not measured yet — needs a vision-model key (`make eval-doctor`) | [/eval](https://cropwise-six.vercel.app/eval) |
+| Automated checks | **158**, all passing (`make test`) | [tests/](tests/) |
+
+## Engineering decisions worth reading
+
+- **Found and removed a data leak.** Two regressors inferred phosphorus and potassium from the classifier's own inputs, inflating accuracy to 0.995. Split into an honest *field* model and a *lab* model that uses a real soil test.
+- **Found a fabrication in production.** SoilGrids publishes nothing under built-up land and the app was substituting hard-coded averages as measurements; replaced with a sampling ring that reports how far away the real reading came from.
+- **Net price, not headline price.** Mandis are ranked by modal price minus transport, so a far-away high price can lose to a nearer market.
+- **Two-layer guardrail.** Cheap weighted heuristics on every message; an LLM classifier only on the uncertain band. Raised from 3/5 to 5/5 attacks blocked by adding narrow patterns, not by lowering the threshold — false positives stayed at 0.
+- **Refuse rather than guess.** The assistant refuses when retrieval relevance is low; Crop Doctor refuses on non-plants, poor photos, low confidence or no knowledge-base match, and throws away any generated dose that is not written in a cited passage.
+- **Mock mode everywhere.** With no API keys the whole app still runs, and every placeholder (prices, model answers, Crop Doctor's demo) is labelled as such, so tests need no secrets.
+
+More in [docs/DECISIONS.md](docs/DECISIONS.md) and [docs/INTERVIEW_NOTES.md](docs/INTERVIEW_NOTES.md).
+
+## Limits
+
+- A working prototype: **not field-tested with farmers**, no user numbers.
+- The crop model is trained on a public 2,200-row Kaggle teaching dataset, not Indian field trials.
+- SoilGrids is a ~250 m regional estimate at 0–5 cm, not your field; a Soil Health Card is better.
+- Mandi prices are labelled placeholders until a `DATA_GOV_IN_API_KEY` is configured.
+- Crop Doctor covers only the diseases in `data/kb/disease_*.md`; everything else is escalated.
 
 ## Roadmap
 
-1. ~~Audit and repair~~ ✅
-2. ~~Honest retrain: cross-validation, model card, SHAP reasons, out-of-distribution warnings~~ ✅
-3. ~~FastAPI backend, database layer, JWT auth~~ ✅
-4. ~~Crop plan: calendar, fertiliser, nearby shops, mandi prices, best market to sell~~ ✅
-5. ~~KrishiMitra: hybrid RAG, agent tools, guardrails, streaming~~ ✅
-6. ~~Evaluation harness and `/eval` dashboard~~ ✅
-7. Leaf disease, Soil Health Card reader, profit calculator, irrigation, alerts, schemes, PWA
-8. React + Tailwind rebuild to the "field & harvest" design, 9 languages
-9. Voice bot, phone helpline, human handover, support desk
-10. Docker, CI, deploy
+1. React front end and an installable PWA
+2. Satellite crop-health (NDVI) for the farmer's own plot
+3. WhatsApp and phone (IVR) access for farmers without smartphones
+4. A multi-agent season planner that re-plans as weather and prices change
+
+## Run locally
+
+```bash
+make install             # python3.11 venv + dependencies
+cp .env.example .env     # set SECRET_KEY; API keys are optional
+make run                 # http://127.0.0.1:8000 — API docs at /docs
+make test                # all checks; the AI paths need no keys or network
+make eval                # retrieval + guardrail metrics -> docs/EVAL.md and /eval
+make eval-doctor         # Crop Doctor metrics (needs OPENROUTER_API_KEY)
+```
+
+### Configuration
+
+| Variable | Needed | Meaning |
+|---|---|---|
+| `SECRET_KEY` | yes in production | Signs the visitor cookie |
+| `OPENROUTER_API_KEY` | no | Language and vision models; without it answers are extractive and Crop Doctor runs a labelled demo |
+| `LLM_MODEL` / `VISION_MODEL` | no | OpenRouter model ids (default `google/gemini-2.0-flash-001`) |
+| `DATA_GOV_IN_API_KEY` | no | Real Agmarknet mandi prices; without it prices are labelled MOCK |
+| `TRANSPORT_RATE_PER_QUINTAL_KM` | no | Transport cost used in the mandi ranking (default ₹2.5) |
+| `DATABASE_URL` | no | Postgres URL; defaults to SQLite |
+| `CORS_ORIGINS` | no | Comma-separated allow-list for browser calls |
+
+### API
+
+Everything the pages do is available as JSON, documented at [/docs](https://cropwise-six.vercel.app/docs):
+`/api/v1/predict`, `/plan/{crop}`, `/stores`, `/mandi`, `/best-market`, `/profit`, `/season`,
+`/impact/mandi-gain`, `/assistant` (+ `/stream`), `/doctor` and `/doctor/conditions`.
+
+Privacy: no sign-up; a random cookie keeps one visitor's history separate. Crop Doctor photos are
+processed in memory and never stored or logged.
