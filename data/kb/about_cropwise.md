@@ -29,8 +29,9 @@ so instead of answering confidently.
 how sure it is, for the diseases in its knowledge base only: rice blast, rice bacterial leaf
 blight, rice brown spot, maize turcicum leaf blight, maize common rust, apple scab, grape downy
 mildew, citrus greening, cotton leaf curl and mango powdery mildew. Its advice is quoted from
-cited TNAU and Government of India sources. If the photo is unclear, it is not sure, or the
-problem is not in that list, it gives no treatment and sends you to an expert. Photos are never
+cited TNAU and Government of India sources. If the photo is unclear or it is not sure, it
+gives no treatment and sends you to an expert. It is meant to do the same for a problem not in
+that list, but it can mistake one for a listed disease, so confirm with your KVK before spraying. Photos are never
 stored.
 
 **What CropWise cannot do:** it cannot diagnose a disease from a description, cannot invent a

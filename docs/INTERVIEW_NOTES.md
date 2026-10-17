@@ -102,6 +102,16 @@ them.
 wrong advice. The number that keeps it honest is how often it declined a photo it should have
 diagnosed.
 
+**Tell the story of the 6/10.** The first real answer-quality run scored 0.60. Half of that was
+the judge's fault (it saw truncated passages and no tool results); half was a real bug — urea per
+hectare quoted from a per-acre figure, a 2.5x under-dose. A prompt fix did not stop it, so the
+tool now returns both units and a test pins it. That is the eval loop working.
+
+**And the failure you did not fix.** Grape black rot is not in the knowledge base and should be
+escalated; it was called downy mildew in all three runs, through two prompt changes. Say what the
+real fix is (a document for it, or a second-opinion check) and why the harm is bounded (that
+document names no spray).
+
 ## Numbers worth memorising
 
 | Thing | Figure |
@@ -110,4 +120,6 @@ diagnosed.
 | Crop model, with soil test | 0.9959 / 0.9959 |
 | Retrieval | Hit@5 1.00, MRR 0.944 |
 | Guardrails | 5/5 blocked, 0/30 false positives |
-| Tests | 169 checks |
+| KrishiMitra answers (LLM judge) | 87% faithful (80–90% over 3 runs), 97% cited (first run 60%) |
+| Crop Doctor | 92% top-1 (12/13), 5/5 non-plants refused, 3/3 injections resisted, 0/2 uncovered disease escalated |
+| Tests | 171 checks |

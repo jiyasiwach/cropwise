@@ -115,16 +115,30 @@ class Diagnosis(BaseModel):
     image_quality: Literal["good", "blurry", "too_dark", "too_far", "other"]
 
 
+@lru_cache(maxsize=1)
+def signs_list() -> str:
+    """Each condition with the leaf signs its cited source describes, so the classifier matches
+    what it sees against the knowledge base rather than against a bare disease name."""
+    lines = []
+    for c in catalogue().values():
+        body = rag._parse(KB_DIR / c.doc)[1]
+        signs = " ".join(section(body, "Signs on the leaf").split())
+        lines.append(f"- {c.key} ({c.crop}): {signs}")
+    return "\n".join(lines)
+
+
 def vision_prompt(crop_hint: str) -> str:
-    known = "; ".join(f"{c.key} ({c.crop}: {', '.join(c.names[:2]) or c.title})" for c in catalogue().values())
     return f"""You look at one photo for an Indian farmer and describe the plant's health.
 Reply with ONE JSON object and nothing else:
 {{"crop_guess": str, "condition": str, "confidence": number 0-1, "visible_signs": [str, ...],
   "is_plant_image": bool, "image_quality": "good"|"blurry"|"too_dark"|"too_far"|"other"}}
 
 Rules:
-- condition must be exactly one of these keys: {known}; or "healthy"; or "other" if it is a
-  disease or pest not in that list, or you cannot tell.
+- condition must be exactly one of the keys below, or "healthy", or "other".
+{signs_list()}
+- Choose a key only when what you see matches that key's signs above. A different disease on the same
+  crop — another leaf spot, a rot, a blight not named here — is "other". So is a pest, a nutrient
+  problem, or anything you cannot tell. Advice for the wrong disease is worse than none.
 - confidence is how sure you are of condition. Be honest; 0.5 means a guess.
 - visible_signs: up to 5 short phrases describing what you actually see on the plant.
 - If the photo is not of a plant, set is_plant_image false and condition "other".

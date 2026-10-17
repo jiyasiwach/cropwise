@@ -101,3 +101,10 @@ Four separate faults, found by testing the deployed site rather than the local o
 - Disease documents are excluded from the exact-name boost in retrieval, so a question about "rice" still ranks the rice crop guide first.
 - Without a key the photo is not analysed. The page offers a labelled demo where the visitor names the condition and every later step runs for real, instead of a fake diagnosis.
 - Photos are resized to ≤1024 px in the browser (keeps requests far under Vercel's 4.5 MB limit), held in memory for one request, and never written to disk or logs; the pipeline logs decisions only.
+- Model: `google/gemini-2.5-flash-lite` for chat, vision and judging — the cheapest current model on OpenRouter that reads images and supports JSON output (about $0.0002 per Crop Doctor check, measured).
+- A model-service error never becomes a 500: the assistant answers with the cited passages and says the model did not answer. Running out of credit must degrade the app, not break it.
+- Non-English questions are translated for retrieval only. The translator is told the message is data and wrapped in tags; the first version "refused" to translate a Hindi injection attempt and answered it instead.
+- Units are computed, not prompted. Telling the model a figure was per-acre did not stop it quoting it per hectare; returning both from the tool did.
+- The answer judge sees exactly what the assistant saw (full passages and tool results). Grading against less than the assistant had is measuring the harness, not the assistant.
+- Crop Doctor's grape black-rot failure is published, not tuned away: two principled prompt changes (an explicit "other" rule, then each disease's sourced leaf signs) did not fix it, and further prompt edits against the same 2 photos would be fitting the test set.
+

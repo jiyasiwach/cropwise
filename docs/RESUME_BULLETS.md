@@ -11,7 +11,9 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
   vectors + exact-name boost, fused with Reciprocal Rank Fusion) over a 39-document ICAR/KVK, TNAU and
   government-scheme knowledge base, reaching **Hit@5 1.00 and MRR 0.94** on a hand-labelled
   30-question gold set, with every answer citing its source and refusing when the base does not
-  cover the question.
+  cover the question. An LLM judge rates **87% of answers faithful and 97% correctly cited** (10 questions ×
+  3 runs), up from 60% after the first run exposed a unit bug (per-acre figures quoted as
+  per-hectare) and an unfair judge.
 - Shipped a **two-layer prompt-injection guardrail** (weighted heuristics, then an LLM classifier
   on the uncertain band) measured at **5/5 attacks blocked with 0 false positives** on 30 real
   questions; raised from 3/5 by adding three patterns after the first evaluation run rather than
@@ -36,19 +38,18 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
   with one retry, guardrails stop on non-plant, poor or under-60%-confidence photos and on
   instructions written inside the image, and advice comes only from cited knowledge-base passages,
   with any generated dose not found verbatim in a source discarded. Every guardrail path is
-  covered by automated tests that run without an API key. Accuracy: _fill from `make eval-doctor`
-  — not measured yet_.
+  covered by automated tests that run without an API key. Measured on a 23-photo gold set: **92% top-1 accuracy**, **5/5 non-plant photos refused**, **3/3 photo
+  prompt-injections resisted**, advice judged **13/13 faithful** to its source, about **$0.0002 and 2.6 s per check**.
 - Added a sourced **problem-and-impact page** (Agriculture Census via PIB, NITI-hosted EPW
   fertiliser paper, Census 2011 language data) that marks the one figure no public source could
   verify as "not measured", and **browser-native read-aloud** in six languages for low-literacy
   users.
 - Rebuilt a prototype Flask app into **FastAPI with typed Pydantic schemas, JWT sessions in
   httpOnly cookies and a database layer portable between SQLite and Postgres**, behind
-  **169 automated checks** covering auth, validation, model behaviour and every guardrail path.
+  **171 automated checks** covering auth, validation, model behaviour and every guardrail path.
 
 ## Not yet built (do not claim these)
 
-- Crop Doctor accuracy figures (until `make eval-doctor` has been run with a key)
 - Leaf-disease CNN with Grad-CAM, Soil Health Card OCR, irrigation advisor, alerts, PWA
 - React rebuild of the interface
 - Voice helpline, phone IVR, support-desk ticketing

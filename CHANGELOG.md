@@ -159,6 +159,28 @@
 - `/eval` printed "<built-in method items of dict object>" instead of the number of gold items.
 
 ### Measured
-- 169 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+- 171 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
   MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
+
+## AI switched on — measured with a real model (17 Oct 2026)
+
+### Fixed
+- The configured model (`google/gemini-2.0-flash-001`) had been retired, so every model call
+  returned 404 and KrishiMitra answered with a 500. Now `google/gemini-2.5-flash-lite`, and any
+  model-service failure (no credit, rate limit, outage) falls back to the cited passages instead.
+- Questions in Hindi, Telugu, Tamil, Malayalam or Kannada found nothing, because retrieval is over
+  English documents. They are translated for retrieval only; the answer stays in the farmer's
+  language, and the guardrail also checks the translation, so an attack written in Hindi is blocked.
+- Urea *per hectare* was answered with the calculator's *per-acre* figure (a 2.5x under-dose). The
+  fertiliser tool now returns per-acre and per-hectare figures itself.
+- The answer judge saw truncated passages and no tool results; it now sees exactly what the
+  assistant saw, and checks units.
+
+### Measured
+- KrishiMitra, LLM judge on 10 questions asked 3 times: faithfulness 0.87 (0.80–0.90) and citation
+  accuracy 0.97 (first run 0.60 / 0.80, before the fixes above). One single run scored 1.00; the
+  repeated measurement replaced it, because one lucky run is not a result.
+- Crop Doctor, 23 photos: 92% top-1 accuracy (12/13), 0% wrong refusals, 5/5 non-plants refused,
+  3/3 photo injections resisted, 13/13 judged faithful, $0.0002 and 2.6 s per check. Known
+  failure: 0/2 grape black-rot photos escalated (called downy mildew), unchanged by two prompt fixes.
 

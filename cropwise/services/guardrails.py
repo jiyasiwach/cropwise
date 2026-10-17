@@ -16,7 +16,7 @@ from dataclasses import dataclass
 # Phrases that try to move the model off its instructions. Weighted, because one alone is weak
 # evidence ("ignore the rain") and three together is not.
 INJECTION_PATTERNS: list[tuple[str, float]] = [
-    (r"\bignore (all |any |the )?(previous|prior|above|earlier)\b", 0.6),
+    (r"\bignore (all |any |the |all the |all of the )?(previous|prior|above|earlier)\b", 0.6),
     (r"\bdisregard (all |any |the )?(previous|prior|above|earlier|instructions)\b", 0.6),
     (r"\b(system|developer) (prompt|message|instructions?)\b", 0.5),
     (r"\breveal|show me (your|the) (prompt|instructions|rules)\b", 0.5),

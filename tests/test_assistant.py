@@ -118,6 +118,13 @@ with TestClient(main.app) as client:
     check("eval page shows how many gold items, not a Python object", "built-in method" not in page.text
           and "Measured on 35 gold items" in page.text)
 
+# --- the fertiliser tool states per-acre and per-hectare itself; the model never converts ---
+import asyncio as _aio  # noqa: E402
+from cropwise.services import agent as _ag  # noqa: E402
+_cal = _aio.run(_ag.run_tool("crop_calendar", {"crop": "rice", "acres": 3}, None)).result["fertiliser_to_buy"]
+check("fertiliser tool gives per-hectare figures", abs(_cal["per_hectare"]["urea"]["kg"] - 2.47 * _cal["per_acre"]["urea"]["kg"]) < 2, _cal)
+check("fertiliser tool gives the farmer's own acres", abs(_cal["for_your_3_acres"]["urea"]["kg"] - 3 * _cal["per_acre"]["urea"]["kg"]) < 1, _cal)
+
 # --- the model service failing (no credit, rate limit, outage) is never a 500 ---
 import asyncio as _asyncio  # noqa: E402
 import httpx as _httpx  # noqa: E402

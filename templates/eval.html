@@ -72,7 +72,12 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     {% if data.answers %}
     <p>Faithfulness <strong>{{ '%.2f'|format(data.answers.faithfulness) }}</strong> ·
        citation accuracy <strong>{{ '%.2f'|format(data.answers.citation_accuracy) }}</strong>,
-       judged by {{ data.answers.model }} on {{ data.answers.judged }} answers.</p>
+       judged by {{ data.answers.model }} on {{ data.answers.judged }} questions{% if data.answers.repeats %},
+       asked {{ data.answers.repeats }} times each (faithfulness ranged
+       {{ '%.2f'|format(data.answers.faithfulness_range[0]) }}–{{ '%.2f'|format(data.answers.faithfulness_range[1]) }}){% endif %}.</p>
+    <p class="src">The first judged run scored 0.60. Half of that was the judge seeing less than the
+       assistant had; half was a real bug — urea per hectare quoted from a per-acre figure — now
+       fixed in the tool and pinned by a test. Details in docs/EVAL.md.</p>
     {% else %}
     <p>Not measured: no language-model key is configured, so the assistant returns extractive
        answers and there is nothing for a judge to grade.</p>
