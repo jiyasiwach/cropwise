@@ -259,8 +259,8 @@ def extractive_answer(question: str, hits: list) -> Answer:
     lines = ["[MOCK ANSWER — no language model key is set. These are the matching passages.]", ""]
     for hit in hits[:2]:
         # Headings and list marks read badly inside a quotation; keep the words.
-        snippet = " ".join(w for w in hit.chunk.text.split()[:90] if w.strip("#-*"))
-        lines.append(f"From **{hit.chunk.title}**: {snippet}…")
+        snippet = " ".join(w for w in hit.chunk.text.split()[:90] if w.strip("#-*")).replace("**", "")
+        lines.append(f"From {hit.chunk.title}: {snippet}…")
         lines.append("")
     return Answer(
         text="\n".join(lines).strip(),

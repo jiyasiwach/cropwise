@@ -107,7 +107,7 @@ with TestClient(main.app) as client:
     sow = client.post("/api/v1/assistant", json={"question": "When should I sow chickpea?"}).json()
     check("a sowing question does not cite a disease document",
           not any(c["doc"].startswith("disease_") for c in sow["citations"]), [c["doc"] for c in sow["citations"]])
-    check("quoted passages carry no raw markdown headings", "##" not in sow["answer"], sow["answer"][:120])
+    check("quoted passages carry no raw markdown marks", "##" not in sow["answer"] and "**" not in sow["answer"], sow["answer"][:120])
     sick = client.post("/api/v1/assistant", json={"question": "My rice leaves have spindle-shaped grey spots. What disease is it?"}).json()
     check("a disease question can still use the disease documents",
           any(c["doc"].startswith("disease_rice") for c in sick["citations"]), [c["doc"] for c in sick["citations"]])
