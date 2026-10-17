@@ -115,6 +115,8 @@ with TestClient(main.app) as client:
     check("assistant page renders", "KrishiMitra" in client.get("/assistant").text)
     page = client.get("/eval")
     check("eval page renders the measured numbers", "Hit@5" in page.text, page.status_code)
+    check("eval page shows how many gold items, not a Python object", "built-in method" not in page.text
+          and "Measured on 35 gold items" in page.text)
 
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)

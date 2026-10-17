@@ -156,8 +156,9 @@
   answer only questions about a sick plant. Quoted passages no longer show raw `##` marks.
 - KrishiMitra refused a real disease question because the exact-name boost ranked the rice guide
   first; the "is this covered" decision now uses the best match among the results.
+- `/eval` printed "<built-in method items of dict object>" instead of the number of gold items.
 
 ### Measured
-- 162 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+- 163 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
   MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
 

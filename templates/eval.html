@@ -31,7 +31,7 @@ th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 <header class="top">
   <a href="{{ url_for('dashboard') }}">← Dashboard</a>
   <h1>How well does the assistant work?</h1>
-  <div class="src" style="color:#b9d3c3">Measured on {{ data.items }} gold items · generated {{ data.generated_at }}</div>
+  <div class="src" style="color:#b9d3c3">Measured on {{ data['items'] }} gold items · generated {{ data.generated_at }}</div>
 </header>
 
 <div class="wrap">

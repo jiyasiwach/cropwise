@@ -110,4 +110,4 @@ diagnosed.
 | Crop model, with soil test | 0.9959 / 0.9959 |
 | Retrieval | Hit@5 1.00, MRR 0.944 |
 | Guardrails | 5/5 blocked, 0/30 false positives |
-| Tests | 162 checks |
+| Tests | 163 checks |

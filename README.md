@@ -70,7 +70,7 @@ Real numbers from `make test`, `make eval` and `make train`; nothing here is est
 | Real questions wrongly blocked | **0/30** | [docs/EVAL.md](docs/EVAL.md) |
 | Crop model accuracy, town estimate / with soil test | **96.95% / 99.59%** (stratified 5-fold CV) | [docs/MODEL_CARD.md](docs/MODEL_CARD.md) |
 | Crop Doctor top-1 accuracy, refusals, faithfulness | not measured yet — needs a vision-model key (`make eval-doctor`) | [/eval](https://cropwise-six.vercel.app/eval) |
-| Automated checks | **162**, all passing (`make test`) | [tests/](tests/) |
+| Automated checks | **163**, all passing (`make test`) | [tests/](tests/) |
 
 ## Engineering decisions worth reading
 
