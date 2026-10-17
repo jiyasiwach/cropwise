@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from ..database import Prediction, User, get_db
 from ..schemas import HistoryItem, PredictIn, PredictOut, SoilOut, UserOut, WeatherOut
 from ..visitor import get_visitor
-from ..services import cropplan, lookup, mandi, market, profit, season, stores
+from ..services import cropplan, impact, lookup, mandi, market, profit, season, stores
 from ..services.predictor import recommend
 
 router = APIRouter(prefix="/api/v1")
@@ -205,6 +205,30 @@ async def best_market(
 ) -> dict:
     """Markets ranked by what the farmer actually keeps, after transport."""
     return await market.best_markets(db, crop, state, latitude, longitude, quintals)
+
+
+@router.get("/impact/mandi-gain")
+async def mandi_gain(
+    crop: str,
+    acres: float = 1.0,
+    town: str | None = None,
+    state: str | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    _: User = Depends(get_visitor),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Rupees gained by selling at the best net mandi instead of the nearest. An estimate."""
+    if not (0 < acres <= 1000):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Acres must be between 0 and 1000.")
+    if not town and (latitude is None or longitude is None or not state):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Give a town, or a point and a state.")
+    try:
+        return await impact.mandi_gain(db, crop.lower().strip(), acres, town, state, latitude, longitude)
+    except cropplan.UnknownCrop as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
 
 
 @router.get("/profit")

@@ -79,6 +79,7 @@ async def best_markets(
         "quintals": quintals,
         "transport_rate_per_quintal_km": rate,
         "best": costed[:top],
+        "nearest": nearest,
         "uncosted": [r for r in ranked if r["net_price_per_quintal"] is None][:5],
         "is_mock": data["is_mock"],
         "last_updated": data["last_updated"],

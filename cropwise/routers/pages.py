@@ -294,6 +294,13 @@ def eval_page(request: Request, user: User = Depends(get_visitor)):
     return render(request, "eval.html", data=data, best=best, active_page="eval")
 
 
+@router.get("/impact", response_class=HTMLResponse)
+def impact_page(request: Request, user: User = Depends(get_visitor)):
+    """The problem CropWise works on, with a source for every figure, and a calculator."""
+    crops = sorted(json.loads(cropplan.DATA.read_text())["crops"])
+    return render(request, "impact.html", crops=crops, active_page="impact")
+
+
 @router.get("/assistant", response_class=HTMLResponse)
 def assistant_page(request: Request, user: User = Depends(get_visitor)):
     """KrishiMitra, full page. The floating button on other pages links here."""

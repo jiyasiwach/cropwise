@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>The problem · CropWise</title>
+<meta name="description" content="Why CropWise exists: India's small farmers, the decisions they make each season, and what a better mandi choice is worth. Every figure linked to its source.">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#0f3b2a;--leaf:#2f8f4e;--soft-leaf:#e3f0e2;--amber:#f2b33d;--soft-amber:#fff4dc;
+      --ground:#f6f3ea;--card:#fff;--line:#e7e1d1;--ink:#15211a;--muted:#55645a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:'Noto Sans',system-ui,sans-serif;line-height:1.55}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;margin:0}
+.top{background:var(--forest);color:#fff;padding:18px 24px}
+.top a{color:var(--soft-leaf);font-size:14px;text-decoration:none}
+.top h1{color:#fff;font-size:28px;margin-top:8px}
+.top p{color:#b9d3c3;margin:6px 0 0;max-width:62ch}
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin-bottom:18px}
+.card h2{font-size:22px;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:18px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.fact .n{font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;display:block;color:var(--forest)}
+.fact h3{font-size:17px;margin:4px 0 6px}
+.fact p{margin:0 0 8px;font-size:14px}
+.src{color:var(--muted);font-size:13px}
+.src a,.card a{color:var(--leaf)}
+.tag{display:inline-block;background:var(--soft-amber);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+ul.answers{padding-left:18px;margin:8px 0 0}
+ul.answers li{margin-bottom:6px}
+.limits{background:var(--soft-amber);border-color:#efd9a6}
+form.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end}
+label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff}
+button{padding:11px 16px;border:0;border-radius:12px;background:var(--forest);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.result{margin-top:16px;display:none}
+.result.show{display:block}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0}
+.mk{border:1px solid var(--line);border-radius:16px;padding:14px}
+.mk.win{background:var(--soft-leaf);border-color:#c8e0c6}
+.big{font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;color:var(--forest)}
+.warn{background:var(--soft-amber);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
+.err{color:#9b2c1c;font-size:14px;margin-top:10px}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="/">← CropWise</a>
+  <h1>The problem CropWise works on</h1>
+  <p>Four decisions a small farmer makes every season, usually without data. Every figure below links
+     to its public source; where we could not find one we could check, we say so.</p>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <h2>Who it is for</h2>
+    <p><strong>About 86% of India's farm holdings are small or marginal</strong> (under 2 hectares), and
+       the average holding is <strong>1.08 hectares</strong>, down from 1.15 in 2010-11. On a farm that
+       size one wrong crop, one extra bag of urea or one bad sale is a large share of the year's income.</p>
+    <p class="src">Sources: Agriculture Census 2015-16, as cited by the Ministry of Agriculture in
+       <a href="https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=1906888" target="_blank" rel="noopener">PIB, Lok Sabha reply</a>
+       and <a href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=2246182" target="_blank" rel="noopener">PIB, 27 Mar 2026</a>.
+       2015-16 is the latest census with published all-India results.</p>
+  </section>
+
+  <div class="grid">
+    <div class="fact">
+      <span class="n">Once in 3 years</span>
+      <h3>Choosing a crop the soil suits</h3>
+      <p>A Soil Health Card is a printed lab report, issued once every three years per holding. Over 25
+         crore have been distributed. Between cards, the choice of crop rests on habit and memory.</p>
+      <p class="src"><a href="https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/aug/doc2025816613501.pdf" target="_blank" rel="noopener">PIB factsheet, Aug 2025</a></p>
+    </div>
+    <div class="fact">
+      <span class="n">8.2 : 3.2 : 1</span>
+      <h3>Fertiliser by guesswork</h3>
+      <p>India's nitrogen : phosphorus : potassium use in 2012-13, against the officially recommended
+         4 : 2 : 1 — heavily skewed to nitrogen (urea). The same paper argues the norm itself needs
+         updating, which is why CropWise works from the crop's own dose, not the ratio.</p>
+      <p class="src">Chand &amp; Pavithra, EPW 2015, <a href="https://niti.gov.in/sites/default/files/2023-02/4_EPW_Article_Fertiliser_Use_and_Imbalance_in_India.pdf" target="_blank" rel="noopener">hosted by NITI Aayog</a></p>
+    </div>
+    <div class="fact">
+      <span class="n">Not measured</span>
+      <h3>Selling at the nearest mandi</h3>
+      <p>The highest headline price is not the money a farmer keeps once the lorry is paid. We did not
+         find a national figure we could verify for how much this costs farmers, so we quote none —
+         work it out for one farm with the calculator below.</p>
+      <p class="src"><span class="tag">no public figure found</span></p>
+    </div>
+    <div class="fact">
+      <span class="n">43.6%</span>
+      <h3>Advice in the wrong language</h3>
+      <p>Hindi is the mother tongue of 43.6% of Indians — the largest single language, and still less
+         than half. Advice written only in Hindi or English misses most farmers.</p>
+      <p class="src">Census of India 2011, Paper 1 of 2018 (Language), Statement 4 —
+         <a href="https://cdn.downtoearth.org.in/library/0.58521300_1530794876_census-of-india-2011.pdf" target="_blank" rel="noopener">copy hosted by Down To Earth</a>
+         (the census site's original link has moved).</p>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>How CropWise answers each</h2>
+    <ul class="answers">
+      <li><strong>Crop:</strong> soil estimated for any town from ISRIC SoilGrids plus live weather → three crops, each with the reasons behind it. <a href="/soil">Get a crop plan</a></li>
+      <li><strong>Fertiliser:</strong> the crop's recommended dose turned into bags of urea, DAP and MOP for your acres, with nearby shops from OpenStreetMap. <a href="/plan/rice?city=Hyderabad&amp;state=Telangana">See a sample plan</a></li>
+      <li><strong>Mandi:</strong> markets ranked by what you keep after transport, not by headline price. <a href="#calculator">Try the calculator</a></li>
+      <li><strong>Language:</strong> KrishiMitra answers in six languages, by voice or text, with the source of every answer shown. <a href="/assistant">Ask KrishiMitra</a></li>
+      <li><strong>Trust:</strong> accuracy, retrieval and guardrail results are measured and published. <a href="/eval">How well it works</a></li>
+    </ul>
+  </section>
+
+  <section class="card" id="calculator">
+    <h2>What a better mandi is worth on your farm</h2>
+    <p class="src">Typical yield for your acres × (best net price − nearest mandi's net price). An estimate,
+       not a promise.</p>
+    <form class="calc" id="calc">
+      <div><label for="crop">Crop</label>
+        <select id="crop" name="crop">
+          {% for c in crops %}<option value="{{ c }}" {% if c == 'rice' %}selected{% endif %}>{{ c|capitalize }}</option>{% endfor %}
+        </select></div>
+      <div><label for="acres">Acres</label><input id="acres" name="acres" type="number" min="0.1" max="1000" step="0.1" value="2"></div>
+      <div><label for="town">Town</label><input id="town" name="town" value="Hyderabad" autocomplete="address-level2"></div>
+      <div><button type="submit" id="go">Work it out</button></div>
+    </form>
+    <div class="err" id="err" role="alert"></div>
+    <div class="result" id="result" aria-live="polite">
+      <div class="compare">
+        <div class="mk"><div class="src">Nearest mandi</div><strong id="nName"></strong><div id="nLine" class="src"></div></div>
+        <div class="mk win"><div class="src">Best mandi after transport</div><strong id="bName"></strong><div id="bLine" class="src"></div></div>
+      </div>
+      <div><span class="big" id="gain"></span> <span id="gainNote"></span></div>
+      <div class="warn" id="mock" hidden></div>
+      <p class="src" id="method"></p>
+    </div>
+  </section>
+
+  <section class="card limits">
+    <h2>What it does not do yet</h2>
+    <ul class="answers">
+      <li>It is a working prototype. It has <strong>not been field-tested with farmers</strong>, and it has no user numbers to report.</li>
+      <li>The crop model is trained on a public Kaggle teaching dataset, not on Indian field trials.</li>
+      <li>Soil comes from SoilGrids, a ~250 m satellite-and-model estimate. A Soil Health Card is more accurate, and CropWise uses one when you enter it.</li>
+      <li>Mandi prices are placeholders, clearly labelled, until a data.gov.in key is configured.</li>
+      <li>For anything that matters — pests, disease, a costly input — confirm with your Krishi Vigyan Kendra or the Kisan Call Centre, <a href="tel:18001801551">1800-180-1551</a>.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const rupee = n => '₹' + Math.round(n).toLocaleString('en-IN');
+document.getElementById('calc').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const go = document.getElementById('go'), err = document.getElementById('err'), out = document.getElementById('result');
+  err.textContent = ''; go.disabled = true; go.textContent = 'Working…';
+  const q = new URLSearchParams({
+    crop: document.getElementById('crop').value,
+    acres: document.getElementById('acres').value,
+    town: document.getElementById('town').value.trim(),
+  });
+  try {
+    const r = await fetch('/api/v1/impact/mandi-gain?' + q);
+    const d = await r.json();
+    if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Please check the crop, acres and town.');
+    if (!d.nearest || !d.best) throw new Error('No priced mandis found for this crop near ' + (d.town || 'that town') + '.');
+    const line = m => `${m.distance_km} km · ${rupee(m.modal_price)}/q − ${rupee(m.transport_per_quintal)} transport = <strong>${rupee(m.net_per_quintal)}/q</strong>`;
+    document.getElementById('nName').textContent = d.nearest.market;
+    document.getElementById('nLine').innerHTML = line(d.nearest);
+    document.getElementById('bName').textContent = d.best.market;
+    document.getElementById('bLine').innerHTML = line(d.best);
+    if (d.gain_total > 0) {
+      document.getElementById('gain').textContent = '+' + rupee(d.gain_total);
+      document.getElementById('gainNote').textContent = `more on about ${d.yield_quintals} quintals of ${d.crop} from ${d.acres} acres near ${d.town}, ${d.state} — an estimate.`;
+    } else {
+      document.getElementById('gain').textContent = rupee(0);
+      document.getElementById('gainNote').textContent = 'Your nearest mandi is already the best after transport.';
+    }
+    const mock = document.getElementById('mock');
+    mock.hidden = !d.is_mock;
+    mock.textContent = d.is_mock ? 'Sample prices: ' + d.source + ' The sum is real; the prices are not yet.' : '';
+    document.getElementById('method').textContent = 'How: ' + d.method + ' ' + d.assumptions.join(' ');
+    out.classList.add('show');
+  } catch (ex) {
+    err.textContent = ex.message || 'Something went wrong. Try again in a moment.';
+  } finally {
+    go.disabled = false; go.textContent = 'Work it out';
+  }
+});
+</script>
+</body>
+</html>

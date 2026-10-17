@@ -81,6 +81,30 @@ with TestClient(main.app) as client:
     check("the furthest mandi is not automatically best",
           best["best"][0]["distance_km"] < max(m["distance_km"] for m in best["best"]) + 1)
 
+    # --- the impact calculator: nearest mandi versus best mandi, on one farm ---
+    gain = client.get("/api/v1/impact/mandi-gain?crop=rice&acres=2&state=Telangana&latitude=17.4&longitude=78.5").json()
+    check("impact calculator compares nearest and best", gain["nearest"] and gain["best"], gain)
+    check("the best mandi keeps at least as much as the nearest",
+          gain["best"]["net_per_quintal"] >= gain["nearest"]["net_per_quintal"], gain)
+    check("the gain is per-quintal gain times the farm's yield",
+          abs(gain["gain_total"] - gain["gain_per_quintal"] * gain["yield_quintals"]) <= 1, gain)
+    check("the nearest mandi really is the closest", gain["nearest"]["distance_km"] <= gain["best"]["distance_km"], gain)
+    check("the impact sum is labelled an estimate, mock prices flagged", gain["is_estimate"] and gain["is_mock"], gain)
+    check("double the acres, double the gain (within rounding)",
+          abs(client.get("/api/v1/impact/mandi-gain?crop=rice&acres=4&state=Telangana&latitude=17.4&longitude=78.5")
+          .json()["gain_total"] / gain["gain_total"] - 2) < 0.02)
+    check("unknown crop in calculator is a 404",
+          client.get("/api/v1/impact/mandi-gain?crop=dragonfruit&acres=1&state=Telangana&latitude=17.4&longitude=78.5").status_code == 404)
+    check("calculator rejects nonsense acres",
+          client.get("/api/v1/impact/mandi-gain?crop=rice&acres=-3&state=Telangana&latitude=17.4&longitude=78.5").status_code == 422)
+    check("calculator needs a place", client.get("/api/v1/impact/mandi-gain?crop=rice&acres=1").status_code == 422)
+    impact_page = client.get("/impact")
+    check("impact page renders", impact_page.status_code == 200 and "What it does not do yet" in impact_page.text)
+    check("every statistic on the impact page links a source",
+          all(s in impact_page.text for s in ["pib.gov.in", "niti.gov.in", "census-of-india-2011"]))
+    check("the impact page admits what it has not measured", "Not measured" in impact_page.text)
+    check("the landing page links the impact page", 'href="/impact"' in client.get("/").text)
+
     page = client.get("/plan/rice?city=Hyderabad&state=Telangana")
     check("plan page renders", page.status_code == 200 and "Timeline" in page.text, page.status_code)
     check("plan page shows the verification warning", "Krishi Vigyan Kendra" in page.text)
