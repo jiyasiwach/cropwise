@@ -159,6 +159,6 @@
 - `/eval` printed "<built-in method items of dict object>" instead of the number of gold items.
 
 ### Measured
-- 163 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+- 167 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
   MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
 

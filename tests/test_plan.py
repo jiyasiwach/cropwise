@@ -59,6 +59,41 @@ check("quantities scale with the land",
 check("DAP's own nitrogen is deducted from the urea",
       plain["buy"]["urea"]["kg"] < plain["to_apply_kg_for_your_land"]["N"] / 0.46)
 
+# --- a slow soil service: the nearest real prefetched reading, labelled, or an honest error ---
+import asyncio as _asyncio  # noqa: E402
+from cropwise.services import lookup as _lk  # noqa: E402
+
+_saved = (_lk._soil_for_city, _lk.geocode, _lk.SOIL_BUDGET_SECONDS)
+_ref = _lk._prefetched()["aurangabad"]
+
+
+async def _slow(city):
+    await _asyncio.sleep(5)
+
+
+async def _near(city):  # about 30 km north of Aurangabad
+    return {"name": "Testpur", "latitude": _ref["latitude"] + 0.27, "longitude": _ref["longitude"]}
+
+
+async def _far(city):  # the middle of the Bay of Bengal
+    return {"name": "Farpur", "latitude": 15.0, "longitude": 88.0}
+
+_lk._soil_for_city, _lk.SOIL_BUDGET_SECONDS = _slow, 0.2
+_lk.geocode = _near
+nearby = _asyncio.run(_lk.soil_for_city("Testpur"))
+check("a slow service falls back to the nearest real reading",
+      nearby["from_nearby_town"] == _ref["city"] and nearby["nitrogen"] == _ref["nitrogen"], nearby)
+check("the fallback says where the reading is from and how far",
+      _ref["city"] in nearby["sample_note"] and "km" in nearby["sample_note"] and nearby["sampled_offset_km"] > 25, nearby)
+check("the fallback is not cached as the town's own reading", "testpur" not in _lk._SOIL_CACHE)
+_lk.geocode = _far
+try:
+    _asyncio.run(_lk.soil_for_city("Farpur"))
+    check("a town far from any cached reading gets an honest error", False)
+except _lk.LookupError as exc:
+    check("a town far from any cached reading gets an honest error", "taking too long" in str(exc), str(exc))
+_lk._soil_for_city, _lk.geocode, _lk.SOIL_BUDGET_SECONDS = _saved
+
 # --- the API and the page ---
 with TestClient(main.app) as client:
     check("plan API opens without a sign-in", client.get("/api/v1/plan/rice").status_code == 200)

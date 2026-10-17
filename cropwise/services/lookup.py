@@ -116,6 +116,9 @@ async def soil_for_city(city: str, db=None) -> dict:
     try:
         result = await asyncio.wait_for(_soil_for_city(city), timeout=SOIL_BUDGET_SECONDS)
     except asyncio.TimeoutError as exc:
+        nearby = await _nearest_prefetched(city)
+        if nearby:
+            return nearby  # not cached under this town: the next request tries the real service
         raise LookupError(
             "The soil service (ISRIC SoilGrids) is taking too long right now. Try again in a "
             "minute, or type your Soil Health Card values in by hand."
@@ -130,6 +133,49 @@ async def soil_for_city(city: str, db=None) -> dict:
         except Exception:
             db.rollback()  # a duplicate from a parallel request is harmless
     return result
+
+
+NEARBY_LIMIT_KM = 80.0
+
+
+async def _nearest_prefetched(city: str) -> dict | None:
+    """When SoilGrids is too slow: the real reading of the nearest prefetched town, if close.
+
+    This is a genuine SoilGrids measurement from a named place at a stated distance — the same
+    honesty rule as the sampling ring — never an average and never presented as this town's own.
+    """
+    shipped = _prefetched()
+    if not shipped:
+        return None
+    try:
+        place = await asyncio.wait_for(geocode(city), timeout=4.0)
+    except (LookupError, asyncio.TimeoutError, httpx.HTTPError):
+        return None
+    lat, lon = place["latitude"], place["longitude"]
+
+    def km(row: dict) -> float:
+        dlat = math.radians(row["latitude"] - lat)
+        dlon = math.radians(row["longitude"] - lon)
+        a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat)) * math.cos(math.radians(row["latitude"])) * math.sin(dlon / 2) ** 2
+        return 6371.0 * 2 * math.asin(math.sqrt(a))
+
+    distance, row = min(((km(r), r) for r in shipped.values()), key=lambda pair: pair[0])
+    if distance > NEARBY_LIMIT_KM:
+        return None
+    name = place.get("name", city)
+    return {
+        **row,
+        "city": name,
+        "latitude": lat,
+        "longitude": lon,
+        "sampled_offset_km": round(distance + (row.get("sampled_offset_km") or 0.0), 1),
+        "from_nearby_town": row["city"],
+        "sample_note": (
+            f"The soil service is slow right now, so these are the real SoilGrids readings for "
+            f"{row['city']}, about {distance:.0f} km from {name}. Try auto-detect again later for "
+            f"{name} itself, or enter your Soil Health Card values."
+        ),
+    }
 
 
 async def _soil_for_city(city: str) -> dict:
