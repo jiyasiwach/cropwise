@@ -1,0 +1,169 @@
+{
+ "summary": "Leaf photos: 15 from the PlantVillage dataset (Mohanty et al. 2016, doi:10.3389/fpls.2016.01419), licence CC BY-SA 3.0 as declared in the dataset card; 3 of them with instructions written on them for the injection test, shared under the same licence. Non-plant photos: 5 CC0 images from Wikimedia Commons. PlantVillage photos are single leaves on plain backgrounds, easier than field photos, so these numbers are an upper bound for real use.",
+ "images": [
+  {
+   "file": "apple_scab_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Apple___Apple_scab/453b09e4-6469-47f9-8599-f87e1d6eddf3___FREC_Scab%203048.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "apple_scab_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Apple___Apple_scab/80894f41-f887-4d0c-8b09-0a7cd24fbe18___FREC_Scab%203526.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "apple_scab_3.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Apple___Apple_scab/bceb695a-e877-4b2b-bf05-241661d511d4___FREC_Scab%203240.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_common_rust_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Common_rust_/RS_Rust%201815.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_common_rust_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Common_rust_/RS_Rust%202070.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_common_rust_3.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Common_rust_/RS_Rust%202322.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_northern_leaf_blight_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Northern_Leaf_Blight/59b2c9f9-6a26-4870-aaf9-a613d960efe8___RS_NLB%203875.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_northern_leaf_blight_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Northern_Leaf_Blight/ac42d899-17ee-4807-a822-dbb105fd88eb___RS_NLB%203965.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "orange_huanglongbing_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Orange___Haunglongbing_(Citrus_greening)/0f12e9bf-8ad3-4368-8c45-f1919a584431___CREC_HLB%206437.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "orange_huanglongbing_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Orange___Haunglongbing_(Citrus_greening)/200f0aac-3f42-4259-adb4-f2b37abfc25f___CREC_HLB%205367.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "grape_black_rot_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Grape___Black_rot/4c2cf28e-6bec-4105-bdaf-b36fb046ab3e___FAM_B.Rot%203024.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "grape_black_rot_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Grape___Black_rot/91d6b325-610c-4a72-952f-f996581f7809___FAM_B.Rot%200391.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "apple_healthy_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Apple___healthy/47c9915d-7fb5-4426-a1b8-5928c3b20666___RS_HL%207565.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "corn_healthy_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___healthy/689e24f2-7175-49a7-9721-7461e1b977d9___R.S_HL%200649%20copy%203.jpg",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "grape_healthy_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Grape___healthy/7dcbe0fa-4dc1-4234-97d4-9c19391fbe21___Mt.N.V_HL%209114.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419"
+  },
+  {
+   "file": "nonplant_bicycle.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Bike_on_a_snowy_street_in_Quebec_City_at_night.jpg",
+   "licence": "CC0",
+   "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "author": "Wilfredor"
+  },
+  {
+   "file": "nonplant_cup.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Cup_of_coffee_in_Caf%C3%A9_Butter_-_Prenzlauer_Berg,_Berlin.jpg",
+   "licence": "CC0",
+   "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "author": "Edward"
+  },
+  {
+   "file": "nonplant_street.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Snowy_Sainte-Famille_Street_in_Quebec_City.jpg",
+   "licence": "CC0",
+   "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "author": "Wilfredor"
+  },
+  {
+   "file": "nonplant_dog.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Dog_in_Chacachacare.jpg",
+   "licence": "CC0",
+   "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "author": "Wilfredor"
+  },
+  {
+   "file": "nonplant_keyboard.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Black_Computer_keyboard.jpg",
+   "licence": "CC0",
+   "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "author": "Samiknoov"
+  },
+  {
+   "file": "injection_1.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Corn_(maize)___Common_rust_/RS_Rust%202322.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419",
+   "note": "corn_common_rust_3.jpg with an instruction written across it by eval/make_injection.swift (same licence, CC BY-SA 3.0)"
+  },
+  {
+   "file": "injection_2.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Apple___Apple_scab/bceb695a-e877-4b2b-bf05-241661d511d4___FREC_Scab%203240.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419",
+   "note": "apple_scab_3.jpg with an instruction written across it by eval/make_injection.swift (same licence, CC BY-SA 3.0)"
+  },
+  {
+   "file": "injection_3.jpg",
+   "source_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/raw/color/Orange___Haunglongbing_(Citrus_greening)/200f0aac-3f42-4259-adb4-f2b37abfc25f___CREC_HLB%205367.JPG",
+   "licence": "CC BY-SA 3.0 (as declared in dataset metadata)",
+   "licence_url": "https://github.com/spMohanty/PlantVillage-Dataset/blob/master/README_HF.md",
+   "author": "PlantVillage Dataset (github.com/spMohanty/PlantVillage-Dataset); cite Mohanty et al. (2016), Frontiers in Plant Science, doi:10.3389/fpls.2016.01419",
+   "note": "orange_huanglongbing_2.jpg with an instruction written across it by eval/make_injection.swift (same licence, CC BY-SA 3.0)"
+  }
+ ]
+}

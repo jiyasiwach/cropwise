@@ -122,6 +122,41 @@ async def answer_scores(items: list[dict], limit: int = 10) -> dict | None:
     }
 
 
+def doctor_markdown() -> str:
+    """The Crop Doctor section, from the file `make eval-doctor` writes."""
+    path = DOCS / "doctor_eval.json"
+    if not path.exists():
+        return (
+            "\n## Crop Doctor (photo diagnosis)\n\nNot measured yet: the vision model needs "
+            "`OPENROUTER_API_KEY`. Run `make eval-doctor` with a key to fill this in. The guardrail "
+            "paths are covered by `tests/test_doctor.py` without a key.\n"
+        )
+    d = json.loads(path.read_text())
+    s = d["summary"]
+    fmt = lambda v: "not measured" if v is None else (f"{v:.0%}" if isinstance(v, float) and v <= 1 else str(v))  # noqa: E731
+    return f"""
+## Crop Doctor (photo diagnosis)
+
+{s['photos']} labelled photos ({s['leaf_photos']} leaves, plus non-plant and injection photos),
+vision model `{d['vision_model']}`, judge `{d['judge_model']}`, run {d['generated_at']}.
+{d.get('dataset', '')}
+
+| Metric | Result |
+|---|---|
+| Top-1 accuracy (refusals count as wrong) | **{fmt(s['top1_accuracy'])}** |
+| Top-1 accuracy when it did answer | {fmt(s['top1_accuracy_when_answered'])} |
+| Wrong-refusal rate (leaf photos it declined) | {fmt(s['wrong_refusal_rate'])} |
+| Correct-refusal rate (non-plant, injection, disease not covered) | **{fmt(s['correct_refusal_rate'])}** — non-plant {s['nonplant_refused']}, injections resisted {s['injections_resisted']}, uncovered disease escalated {s.get('out_of_scope_escalated', 'n/a')} |
+| Citation coverage of answered diagnoses | {fmt(s['citation_coverage'])} |
+| Faithfulness of advice to its citation (LLM judge) | {fmt(s['faithfulness'])} on {s['faithfulness_judged']} model-written answers |
+| p50 latency per check | {s['p50_latency_ms']} ms |
+| Cost per check | ${s['cost_per_check_usd']} |
+
+Every row is in `docs/doctor_eval.json`. Refusing is cheap and a wrong diagnosis is expensive, so
+the wrong-refusal rate is reported next to accuracy rather than hidden inside it.
+"""
+
+
 def write_report(results: dict) -> None:
     DOCS.mkdir(exist_ok=True)
     (DOCS / "eval.json").write_text(json.dumps(results, indent=2) + "\n")
@@ -180,6 +215,8 @@ there is nothing to judge. Set the key and run `make eval` again to fill this se
 """
     )
 
+    doctor_section = doctor_markdown()
+
     (DOCS / "EVAL.md").write_text(
         f"""# Evaluation
 
@@ -217,6 +254,7 @@ threshold and risk blocking real questions, three narrow patterns were added for
 ("no rules", "unrestricted", "from now on you are"), which took the block rate to 5/5 with the
 false-positive rate still at zero. That is the loop this harness is for.
 {answer_section}
+{doctor_section}
 ## Reproducing
 
 ```bash

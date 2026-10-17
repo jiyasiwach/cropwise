@@ -6,17 +6,23 @@
     {
       "mode": "bm25",
       "questions": 30,
-      "hit_at_5": 1.0,
-      "mrr": 0.9278,
-      "median_latency_ms": 2.0,
-      "misses": []
+      "hit_at_5": 0.9667,
+      "mrr": 0.8639,
+      "median_latency_ms": 1.78,
+      "misses": [
+        {
+          "id": "q02",
+          "rank": null,
+          "top": "disease_cotton_leaf_curl.md"
+        }
+      ]
     },
     {
       "mode": "vector",
       "questions": 30,
       "hit_at_5": 0.9667,
-      "mrr": 0.9278,
-      "median_latency_ms": 3.85,
+      "mrr": 0.9028,
+      "median_latency_ms": 3.23,
       "misses": [
         {
           "id": "q09",
@@ -29,8 +35,8 @@
       "mode": "hybrid",
       "questions": 30,
       "hit_at_5": 1.0,
-      "mrr": 0.9278,
-      "median_latency_ms": 4.47,
+      "mrr": 0.9444,
+      "median_latency_ms": 3.44,
       "misses": []
     }
   ],
@@ -44,5 +50,5 @@
     "false_positive_details": []
   },
   "answers": null,
-  "generated_at": "2026-10-15"
+  "generated_at": "2026-10-17"
 }

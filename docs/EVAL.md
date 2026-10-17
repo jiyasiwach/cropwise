@@ -9,11 +9,11 @@ labelled by hand in `eval/gold.jsonl`.
 
 | Configuration | Hit@5 | MRR | Median latency |
 |---|---|---|---|
-| bm25 | 1.000 | 0.928 | 2.0 ms |
-| vector | 0.967 | 0.928 | 3.9 ms |
-| hybrid | 1.000 | 0.928 | 4.5 ms |
+| bm25 | 0.967 | 0.864 | 1.8 ms |
+| vector | 0.967 | 0.903 | 3.2 ms |
+| hybrid | 1.000 | 0.944 | 3.4 ms |
 
-**Hybrid and BM25 tie on this set** (MRR 0.928), and that is the honest reading: with 29 short, well-titled documents, lexical search is already at the ceiling. Hybrid earns its place on robustness rather than on this number — vectors alone still reach 0.967 Hit@5 on paraphrased questions such as "government money every four months", where BM25 has little term overlap to work with, and the gap would widen on a larger, noisier corpus. Reciprocal Rank Fusion is used because it needs no score calibration between the three arms.
+**hybrid** wins on MRR. Hybrid fuses BM25, latent-semantic vectors and an exact-name boost with Reciprocal Rank Fusion: BM25 handles "PMFBY" and "urea", the vectors handle "government money every four months", and neither alone handles both.
 
 ### Where retrieval still misses
 
@@ -40,6 +40,11 @@ false-positive rate still at zero. That is the loop this harness is for.
 
 Not run: `OPENROUTER_API_KEY` is not set, so the assistant returns extractive MOCK answers and
 there is nothing to judge. Set the key and run `make eval` again to fill this section.
+
+
+## Crop Doctor (photo diagnosis)
+
+Not measured yet: the vision model needs `OPENROUTER_API_KEY`. Run `make eval-doctor` with a key to fill this in. The guardrail paths are covered by `tests/test_doctor.py` without a key.
 
 ## Reproducing
 
