@@ -9,9 +9,9 @@ labelled by hand in `eval/gold.jsonl`.
 
 | Configuration | Hit@5 | MRR | Median latency |
 |---|---|---|---|
-| bm25 | 0.967 | 0.859 | 2.9 ms |
-| vector | 0.967 | 0.903 | 3.9 ms |
-| hybrid | 1.000 | 0.944 | 4.0 ms |
+| bm25 | 0.967 | 0.859 | 4.9 ms |
+| vector | 0.967 | 0.903 | 8.1 ms |
+| hybrid | 1.000 | 0.944 | 8.1 ms |
 
 **hybrid** wins on MRR. Hybrid fuses BM25, latent-semantic vectors and an exact-name boost with Reciprocal Rank Fusion: BM25 handles "PMFBY" and "urea", the vectors handle "government money every four months", and neither alone handles both.
 
@@ -40,9 +40,9 @@ false-positive rate still at zero. That is the loop this harness is for.
 
 | Metric | Score |
 |---|---|
-| Faithfulness — every claim supported by a passage or tool result | **0.87** (runs ranged 0.80–0.90) |
-| Citation accuracy — cites only passages or tools it was given | **0.97** (runs ranged 0.90–1.00) |
-| Median end-to-end latency | 1446 ms |
+| Faithfulness — every claim supported by a passage or tool result | **0.97** (runs ranged 0.90–1.00) |
+| Citation accuracy — cites only passages or tools it was given | **1.00** (runs ranged 1.00–1.00) |
+| Median end-to-end latency | 932 ms |
 
 Judged on 10 questions, asked 3 times each, by `google/gemini-2.5-flash-lite`.
 
@@ -54,10 +54,12 @@ was real: asked for urea *per hectare*, the assistant quoted the calculator's *p
 which would under-fertilise by 2.5x. Telling the model the unit did not stop it, so the tool now
 returns per-acre and per-hectare figures itself and the model never converts; a test pins it.
 The judge was also told to check units. One later single run scored 1.00, which is why answers
-are now asked three times and averaged. What still fails: "What month do I plant rice?" is
-sometimes met with a question about the farmer's town instead of "June–July", and chickpea's
-nitrogen answer can drop the source's caveat that it fixes its own nitrogen. Ten questions is a
-small sample.
+are now asked three times and averaged — that average then read 0.87. The remaining misses were
+"What month do I plant rice?" answered with a question about the farmer's town, chickpea's
+nitrogen answer dropping the source's caveat, and fertiliser sums done by the model instead of
+the calculator. Two answering rules (answer from the documents first; keep their caveats) and
+running the calculator before the model on every fertiliser question took it to the figure
+above. Ten questions is a small sample.
 
 
 ## Crop Doctor (photo diagnosis)

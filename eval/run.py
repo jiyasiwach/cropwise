@@ -247,10 +247,12 @@ was real: asked for urea *per hectare*, the assistant quoted the calculator's *p
 which would under-fertilise by 2.5x. Telling the model the unit did not stop it, so the tool now
 returns per-acre and per-hectare figures itself and the model never converts; a test pins it.
 The judge was also told to check units. One later single run scored 1.00, which is why answers
-are now asked three times and averaged. What still fails: "What month do I plant rice?" is
-sometimes met with a question about the farmer's town instead of "June–July", and chickpea's
-nitrogen answer can drop the source's caveat that it fixes its own nitrogen. Ten questions is a
-small sample.
+are now asked three times and averaged — that average then read 0.87. The remaining misses were
+"What month do I plant rice?" answered with a question about the farmer's town, chickpea's
+nitrogen answer dropping the source's caveat, and fertiliser sums done by the model instead of
+the calculator. Two answering rules (answer from the documents first; keep their caveats) and
+running the calculator before the model on every fertiliser question took it to the figure
+above. Ten questions is a small sample.
 """
         if answers
         else """

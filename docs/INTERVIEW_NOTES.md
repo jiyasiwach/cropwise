@@ -120,6 +120,6 @@ document names no spray).
 | Crop model, with soil test | 0.9959 / 0.9959 |
 | Retrieval | Hit@5 1.00, MRR 0.944 |
 | Guardrails | 5/5 blocked, 0/30 false positives |
-| KrishiMitra answers (LLM judge) | 87% faithful (80–90% over 3 runs), 97% cited (first run 60%) |
+| KrishiMitra answers (LLM judge) | 97% faithful (90–100% over 3 runs), 100% cited (first run 60%) |
 | Crop Doctor | 92% top-1 (12/13), 5/5 non-plants refused, 3/3 injections resisted, 0/2 uncovered disease escalated |
-| Tests | 171 checks |
+| Tests | 174 checks |

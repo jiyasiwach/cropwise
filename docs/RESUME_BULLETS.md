@@ -11,9 +11,10 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
   vectors + exact-name boost, fused with Reciprocal Rank Fusion) over a 39-document ICAR/KVK, TNAU and
   government-scheme knowledge base, reaching **Hit@5 1.00 and MRR 0.94** on a hand-labelled
   30-question gold set, with every answer citing its source and refusing when the base does not
-  cover the question. An LLM judge rates **87% of answers faithful and 97% correctly cited** (10 questions ×
+  cover the question. An LLM judge rates **97% of answers faithful and 100% correctly cited** (10 questions ×
   3 runs), up from 60% after the first run exposed a unit bug (per-acre figures quoted as
-  per-hectare) and an unfair judge.
+  per-hectare), an unfair judge, and fertiliser sums the model did itself instead of calling
+  the calculator.
 - Shipped a **two-layer prompt-injection guardrail** (weighted heuristics, then an LLM classifier
   on the uncertain band) measured at **5/5 attacks blocked with 0 false positives** on 30 real
   questions; raised from 3/5 by adding three patterns after the first evaluation run rather than
@@ -46,7 +47,7 @@ https://cropwise-six.vercel.app · https://github.com/jiyasiwach/cropwise
   users.
 - Rebuilt a prototype Flask app into **FastAPI with typed Pydantic schemas, JWT sessions in
   httpOnly cookies and a database layer portable between SQLite and Postgres**, behind
-  **171 automated checks** covering auth, validation, model behaviour and every guardrail path.
+  **174 automated checks** covering auth, validation, model behaviour and every guardrail path.
 
 ## Not yet built (do not claim these)
 

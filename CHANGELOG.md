@@ -159,7 +159,7 @@
 - `/eval` printed "<built-in method items of dict object>" instead of the number of gold items.
 
 ### Measured
-- 171 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
+- 174 automated checks pass. Retrieval re-measured with the new documents: Hit@5 1.00,
   MRR 0.944 (was 0.928), 5/5 attacks blocked, 0/30 false positives.
 
 ## AI switched on — measured with a real model (17 Oct 2026)
@@ -177,9 +177,12 @@
   assistant saw, and checks units.
 
 ### Measured
-- KrishiMitra, LLM judge on 10 questions asked 3 times: faithfulness 0.87 (0.80–0.90) and citation
-  accuracy 0.97 (first run 0.60 / 0.80, before the fixes above). One single run scored 1.00; the
-  repeated measurement replaced it, because one lucky run is not a result.
+- KrishiMitra, LLM judge on 10 questions asked 3 times: faithfulness 0.97 (0.90–1.00) and citation
+  accuracy 1.00 (first run 0.60 / 0.80; 0.87 / 0.97 before the last fixes). One single run had
+  scored 1.00 earlier; the repeated measurement replaced it, because one lucky run is not a result.
+- Answers come back in the farmer's language (named in words, not a code — Hindi questions were
+  sometimes answered in English), fertiliser questions run the calculator before the model, and
+  local crop names (paddy, chana, arhar, moong…) are recognised.
 - Crop Doctor, 23 photos: 92% top-1 accuracy (12/13), 0% wrong refusals, 5/5 non-plants refused,
   3/3 photo injections resisted, 13/13 judged faithful, $0.0002 and 2.6 s per check. Known
   failure: 0/2 grape black-rot photos escalated (called downy mildew), unchanged by two prompt fixes.

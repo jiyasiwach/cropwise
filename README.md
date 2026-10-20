@@ -73,12 +73,12 @@ Real numbers from `make test`, `make eval` and `make train`; nothing here is est
 | Prompt-injection attacks blocked | **5/5** | [docs/EVAL.md](docs/EVAL.md) |
 | Real questions wrongly blocked | **0/30** | [docs/EVAL.md](docs/EVAL.md) |
 | Crop model accuracy, town estimate / with soil test | **96.95% / 99.59%** (stratified 5-fold CV) | [docs/MODEL_CARD.md](docs/MODEL_CARD.md) |
-| KrishiMitra answers faithful to sources / correctly cited (LLM judge, 10 questions × 3 runs) | **87% / 97%** — first run was 60%, see why | [docs/EVAL.md](docs/EVAL.md) |
+| KrishiMitra answers faithful to sources / correctly cited (LLM judge, 10 questions × 3 runs) | **97% / 100%** — first run was 60%, see why | [docs/EVAL.md](docs/EVAL.md) |
 | Crop Doctor top-1 accuracy (13 labelled leaves) | **92%** (12/13) | [docs/EVAL.md](docs/EVAL.md) |
 | Crop Doctor: non-plant photos refused / photo injections resisted | **5/5 / 3/3** | [docs/EVAL.md](docs/EVAL.md) |
 | Crop Doctor: disease it does not cover, escalated | **0/2** — known failure, documented | [docs/EVAL.md](docs/EVAL.md) |
 | Crop Doctor cost and time per check | **$0.0002, ~2.6 s** | [docs/EVAL.md](docs/EVAL.md) |
-| Automated checks | **171**, all passing (`make test`) | [tests/](tests/) |
+| Automated checks | **174**, all passing (`make test`) | [tests/](tests/) |
 
 ## Engineering decisions worth reading
 

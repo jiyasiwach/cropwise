@@ -125,6 +125,12 @@ _cal = _aio.run(_ag.run_tool("crop_calendar", {"crop": "rice", "acres": 3}, None
 check("fertiliser tool gives per-hectare figures", abs(_cal["per_hectare"]["urea"]["kg"] - 2.47 * _cal["per_acre"]["urea"]["kg"]) < 2, _cal)
 check("fertiliser tool gives the farmer's own acres", abs(_cal["for_your_3_acres"]["urea"]["kg"] - 3 * _cal["per_acre"]["urea"]["kg"]) < 1, _cal)
 
+_pre = _aio.run(_ag.prefetch_fertiliser("how much dap for 2 acres of chana?", None))
+check("fertiliser questions run the calculator, with local crop names", _pre and _pre.arguments == {"crop": "chickpea", "acres": 2.0}, _pre and _pre.arguments)
+_pre = _aio.run(_ag.prefetch_fertiliser("how much urea for 1 hectare of paddy", None))
+check("a size in hectares becomes acres for the calculator", _pre and abs(_pre.arguments["acres"] - 2.47) < 0.01, _pre and _pre.arguments)
+check("a non-fertiliser question does not run the calculator", _aio.run(_ag.prefetch_fertiliser("when should i sow rice", None)) is None)
+
 # --- the model service failing (no credit, rate limit, outage) is never a 500 ---
 import asyncio as _asyncio  # noqa: E402
 import httpx as _httpx  # noqa: E402
