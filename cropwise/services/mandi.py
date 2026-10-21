@@ -211,6 +211,16 @@ async def prices(
     for row in rows:
         markets.setdefault(row.market, row)  # newest row per market, because of the ordering
 
+    # Placeholder mandis are positioned around whoever is asking. They are cached per crop and
+    # state, so a row stored by a caller with no location (the profit estimate) must not place
+    # them hundreds of kilometres from this farm. Real Agmarknet rows keep their own positions.
+    offsets = {m["market"]: m for m in MOCK_MARKETS}
+    def position(row):
+        mock = offsets.get(row.market) if row.is_mock else None
+        if mock and latitude is not None and longitude is not None:
+            return round(latitude + mock["d_lat"], 4), round(longitude + mock["d_lon"], 4)
+        return row.latitude, row.longitude
+
     trend: dict[str, list[float]] = {}
     for row in rows:
         if row.modal_price:
@@ -235,8 +245,8 @@ async def prices(
                 "max_price": row.max_price,
                 "modal_price": row.modal_price,
                 "price_date": row.price_date,
-                "latitude": row.latitude,
-                "longitude": row.longitude,
+                "latitude": position(row)[0],
+                "longitude": position(row)[1],
                 "is_mock": row.is_mock,
             }
             for row in markets.values()

@@ -6,6 +6,7 @@ All of it is documented at /docs, which is the OpenAPI schema generated from the
 from __future__ import annotations
 
 import json
+import pathlib
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import desc
@@ -229,6 +230,25 @@ async def mandi_gain(
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
     except (lookup.LookupError, LookupError) as exc:  # lookup has its own LookupError
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+
+
+@router.get("/place")
+async def place(city: str, _: User = Depends(get_visitor)) -> dict:
+    """A town's name, state and position, for the screens that need a state (mandi prices)."""
+    try:
+        found = await lookup.geocode(city[:80])
+    except (lookup.LookupError, LookupError) as exc:  # lookup has its own LookupError
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    return {"city": found.get("name", city), "state": found.get("admin1"), "district": found.get("admin2"),
+            "country": found.get("country"), "latitude": found["latitude"], "longitude": found["longitude"]}
+
+
+@router.get("/eval")
+def evaluation(_: User = Depends(get_visitor)) -> dict:
+    """The measured numbers the /eval screen shows, exactly as `make eval` / `make eval-doctor` wrote them."""
+    docs = pathlib.Path(__file__).resolve().parents[2] / "docs"
+    read = lambda name: json.loads((docs / name).read_text()) if (docs / name).exists() else None  # noqa: E731
+    return {"assistant": read("eval.json"), "doctor": read("doctor_eval.json")}
 
 
 @router.get("/profit")

@@ -11,3 +11,6 @@ docs/screenshots/*.tmp
 *.pkl
 .vercel
 .env*
+
+# React app dependencies
+web/node_modules/

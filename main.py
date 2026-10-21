@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from cropwise import __version__
 from cropwise.database import init_db
 from cropwise.visitor import COOKIE_MAX_AGE, COOKIE_NAME, _new_id
-from cropwise.routers import api, assistant, doctor, pages
+from cropwise.routers import api, assistant, doctor, pages, spa
 
 app = FastAPI(
     title="CropWise API",
@@ -42,7 +42,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(api.router)
 app.include_router(assistant.router)
 app.include_router(doctor.router)
-app.include_router(pages.router)
+app.include_router(spa.router)
+# The previous server-rendered pages, kept reachable while the new UI reaches parity.
+app.include_router(pages.router, prefix="/classic")
 
 
 @app.middleware("http")
@@ -84,3 +86,7 @@ def healthz() -> dict:
         "soil_cache_exists": lookup.PREFETCHED.exists(),
         "knowledge_base_chunks": len(rag.load_chunks()),
     }
+
+
+# Last: unknown non-API GETs get the app (its router shows "page not found").
+app.include_router(spa.fallback)

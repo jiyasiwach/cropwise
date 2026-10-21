@@ -15,3 +15,6 @@ docs/AUDIT.md
 docs/DECISIONS.md
 docs/INTERVIEW_NOTES.md
 docs/RESUME_BULLETS.md
+
+# React source and its tooling are not needed at runtime (the built app is in static/app/)
+web/

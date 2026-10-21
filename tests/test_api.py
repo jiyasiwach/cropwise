@@ -30,11 +30,17 @@ with TestClient(main.app) as client:
     check("OpenAPI documents the API", "/api/v1/predict" in spec["paths"])
 
     # --- no sign-in: every page opens straight away ---
-    for path in ["/", "/dashboard", "/soil", "/history", "/profile", "/settings", "/assistant"]:
+    from ui import is_app_shell, ui_text
+    for path in ["/", "/grow", "/results", "/plan/rice", "/doctor", "/ask", "/history", "/impact", "/eval", "/settings"]:
         r = client.get(path)
-        check(f"{path} opens without a login", r.status_code == 200, r.status_code)
-    check("the landing page offers a way in", "Start with my location" in client.get("/").text)
-    check("no login form remains", "password" not in client.get("/").text.lower())
+        check(f"{path} opens without a login", is_app_shell(r), r.status_code)
+    check("the home screen offers a way in", "Read my soil and weather" in ui_text())
+    check("no login form exists", 'type:"password"' not in ui_text() and "password" not in client.get("/").text.lower())
+    check("an unknown page gets the app's own not-found screen", client.get("/no-such-page").status_code == 404
+          and is_app_shell(type("R", (), {"status_code": 200, "text": client.get("/no-such-page").text})()))
+    check("an unknown API path stays a JSON 404", client.get("/api/v1/no-such").status_code == 404
+          and client.get("/api/v1/no-such").headers["content-type"].startswith("application/json"))
+    check("the offline worker is served from the root", client.get("/sw.js").status_code == 200)
 
     # --- no accounts: a browser is identified by a cookie ---
     me = client.get("/api/v1/me").json()
@@ -65,11 +71,11 @@ with TestClient(main.app) as client:
     check("history lists this user's predictions", len(rows) == 2, len(rows))
     check("history is newest first", rows[0]["created_at"] >= rows[1]["created_at"])
 
-    # --- the pages still render ---
+    # --- the previous server-rendered pages, kept under /classic during the switch ---
     for path in ["/dashboard", "/soil", "/history", "/profile", "/settings"]:
-        r = client.get(path)
-        check(f"page {path} renders", r.status_code == 200 and "<html" in r.text.lower(), r.status_code)
-    r = client.post("/predict", data={"temperature": 20.9, "humidity": 82, "rainfall": 202.9,
+        r = client.get("/classic" + path)
+        check(f"classic page {path} renders", r.status_code == 200 and "<html" in r.text.lower(), r.status_code)
+    r = client.post("/classic/predict", data={"temperature": 20.9, "humidity": 82, "rainfall": 202.9,
                                       "nitrogen": 1.69, "ph": 6.5, "clay": 32.8, "organic_carbon": 20.6,
                                       "city": "Hyderabad"})
     check("wizard result page renders", "rice" in r.text.lower() and "suits this crop" in r.text, r.status_code)

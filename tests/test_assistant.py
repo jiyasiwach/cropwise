@@ -112,11 +112,13 @@ with TestClient(main.app) as client:
     check("a disease question can still use the disease documents",
           any(c["doc"].startswith("disease_rice") for c in sick["citations"]), [c["doc"] for c in sick["citations"]])
 
-    check("assistant page renders", "KrishiMitra" in client.get("/assistant").text)
-    page = client.get("/eval")
-    check("eval page renders the measured numbers", "Hit@5" in page.text, page.status_code)
-    check("eval page shows how many gold items, not a Python object", "built-in method" not in page.text
-          and "Measured on 35 gold items" in page.text)
+    from ui import is_app_shell, ui_text
+    app = ui_text()
+    check("assistant page renders", is_app_shell(client.get("/ask")) and "KrishiMitra" in app)
+    measured = client.get("/api/v1/eval").json()
+    check("eval page renders the measured numbers", is_app_shell(client.get("/eval")) and "Hit@5" in app
+          and measured["assistant"]["retrieval"], measured.keys())
+    check("eval data reports how many gold items", measured["assistant"]["items"] == 35 and "gold items" in app)
 
 # --- the fertiliser tool states per-acre and per-hectare itself; the model never converts ---
 import asyncio as _aio  # noqa: E402

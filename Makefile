@@ -1,4 +1,4 @@
-.PHONY: install run test train eval eval-doctor kb fmt
+.PHONY: install run test train eval eval-doctor kb fmt ui ui-dev ui-test
 
 install:
 	python3.11 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
@@ -22,3 +22,13 @@ eval-doctor:
 
 kb:
 	./.venv/bin/python scripts/build_kb.py
+
+ui:
+	cd web && npm ci && npm run build
+
+ui-dev:
+	cd web && npm run dev
+
+ui-test:
+	cd web && npm test
+

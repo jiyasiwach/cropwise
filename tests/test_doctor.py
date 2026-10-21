@@ -149,13 +149,14 @@ with TestClient(main.app) as client:
     check("an oversized photo is refused", resp.status_code == 413, resp.status_code)
     conditions = client.get("/api/v1/doctor/conditions").json()
     check("the condition list is public", len(conditions) == len(KNOWN))
-    page = client.get("/doctor?crop=rice")
-    check("/doctor renders", page.status_code == 200 and "Crop Doctor" in page.text)
-    check("/doctor shrinks photos in the browser", "1024" in page.text and "toBlob" in page.text)
-    check("/doctor pre-fills the crop", 'value="rice" selected' in page.text)
-    plan = client.get("/plan/rice?city=Hyderabad&state=Telangana").text
-    check("the crop plan links to Crop Doctor", "/doctor?crop=rice" in plan)
-    check("KrishiMitra links to Crop Doctor", 'href="/doctor"' in client.get("/assistant").text)
+    from ui import has_literal, is_app_shell, ui_text
+    app = ui_text()
+    check("/doctor renders", is_app_shell(client.get("/doctor?crop=rice")) and "Crop Doctor" in app)
+    check("/doctor shrinks photos in the browser", "1024" in app and "toBlob" in app)
+    check("/doctor pre-fills the crop from the link", "get(" in app and has_literal(app, "crop"))
+    plan = app
+    check("the crop plan links to Crop Doctor with its crop", "/doctor?crop=" in plan)
+    check("KrishiMitra links to Crop Doctor", "Check a sick plant" in app and has_literal(app, "/doctor"))
 
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)

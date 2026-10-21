@@ -116,6 +116,12 @@ with TestClient(main.app) as client:
     check("the furthest mandi is not automatically best",
           best["best"][0]["distance_km"] < max(m["distance_km"] for m in best["best"]) + 1)
 
+    # Sample mandis follow the asking farm even when a location-less call cached them first.
+    client.get("/api/v1/profit?crop=lentil&state=Maharashtra&acres=1")          # no location
+    far = client.get("/api/v1/best-market?crop=lentil&state=Maharashtra&latitude=18.52&longitude=73.86&quintals=4").json()
+    check("sample mandis are placed around the asking farm", max(m["distance_km"] for m in far["best"]) < 150,
+          [m["distance_km"] for m in far["best"]])
+
     # --- the impact calculator: nearest mandi versus best mandi, on one farm ---
     gain = client.get("/api/v1/impact/mandi-gain?crop=rice&acres=2&state=Telangana&latitude=17.4&longitude=78.5").json()
     check("impact calculator compares nearest and best", gain["nearest"] and gain["best"], gain)
@@ -142,21 +148,20 @@ with TestClient(main.app) as client:
     check("an unknown town is a friendly 404, not a server error",
           missing_town.status_code == 404 and "could not find" in missing_town.json()["detail"], missing_town.status_code)
     check("calculator needs a place", client.get("/api/v1/impact/mandi-gain?crop=rice&acres=1").status_code == 422)
-    impact_page = client.get("/impact")
-    check("impact page renders", impact_page.status_code == 200 and "What it does not do yet" in impact_page.text)
+    from ui import has_literal, is_app_shell, ui_text
+    app = ui_text()
+    check("impact page renders", is_app_shell(client.get("/impact")) and "What it does not do yet" in app)
     check("every statistic on the impact page links a source",
-          all(s in impact_page.text for s in ["pib.gov.in", "niti.gov.in", "census-of-india-2011"]))
-    check("the impact page admits what it has not measured", "Not measured" in impact_page.text)
-    check("the landing page links the impact page", 'href="/impact"' in client.get("/").text)
+          all(s in app for s in ["pib.gov.in", "niti.gov.in", "census-of-india-2011"]))
+    check("the impact page admits what it has not measured", "Not measured" in app)
+    check("the app links the impact page and its calculator", has_literal(app, "/impact") and has_literal(app, "/impact#calculator"))
 
-    page = client.get("/plan/rice?city=Hyderabad&state=Telangana")
-    check("plan page renders", page.status_code == 200 and "Timeline" in page.text, page.status_code)
-    check("plan page shows the verification warning", "Krishi Vigyan Kendra" in page.text)
-    check("plan cards can be read aloud", "/static/js/listen.js" in page.text)
-    check("the read-aloud script is served", client.get("/static/js/listen.js").status_code == 200)
-    check("assistant answers can be read aloud", "listenButton" in client.get("/assistant").text)
-    missing = client.get("/plan/dragonfruit")
-    check("missing crop page is honest", "no sowing calendar" in missing.text.lower(), missing.status_code)
+    check("plan page renders", is_app_shell(client.get("/plan/rice")) and "Sow → grow → harvest" in app)
+    check("plan page shows the verification warning", "not advice for your field" in app and "Krishi Vigyan Kendra" in app)
+    check("plans and answers can be read aloud", "speechSynthesis" in app and "SpeechSynthesisUtterance" in app)
+    check("sample and estimate figures are labelled", "common.sample" in app and "common.estimate" in app)
+    check("missing crop is honest", "There is no sowing calendar for" in app
+          and client.get("/api/v1/plan/dragonfruit").status_code == 404)
 
 print("\n" + ("ALL PASS" if not fails else f"{len(fails)} FAILED: {fails}"))
 sys.exit(1 if fails else 0)

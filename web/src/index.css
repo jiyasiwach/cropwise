@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* `dark:` follows the in-app theme switch, and the phone's setting when the switch is on "system". */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+/* Design tokens. Colours are CSS variables so light/dark switch without rebuilding classes. */
+:root {
+  --bg: #f7f5ef;
+  --surface: #ffffff;
+  --surface-2: #f1eee5;
+  --ink: #15211a;
+  --muted: #5a6a5f;
+  --line: #e6e1d4;
+  --leaf: #1f7a4d;
+  --leaf-strong: #0f3b2a;
+  --leaf-soft: #e3f0e6;
+  --on-leaf: #ffffff;
+  --amber: #e9a520;
+  --amber-soft: #fff3d6;
+  --amber-ink: #6b4500;
+  --danger: #b42318;
+  --danger-soft: #fdeceb;
+  --shadow: 0 1px 2px rgb(21 33 26 / 0.06), 0 6px 20px rgb(21 33 26 / 0.06);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1511;
+    --surface: #152019;
+    --surface-2: #1b2a21;
+    --ink: #e9f1eb;
+    --muted: #9fb3a6;
+    --line: #26362c;
+    --leaf: #4cc38a;
+    --leaf-strong: #b9f0d2;
+    --leaf-soft: #17352a;
+    --on-leaf: #06140d;
+    --amber: #f2b33d;
+    --amber-soft: #3a2c0c;
+    --amber-ink: #ffd88a;
+    --danger: #ff8a80;
+    --danger-soft: #3a1714;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d1511;
+  --surface: #152019;
+  --surface-2: #1b2a21;
+  --ink: #e9f1eb;
+  --muted: #9fb3a6;
+  --line: #26362c;
+  --leaf: #4cc38a;
+  --leaf-strong: #b9f0d2;
+  --leaf-soft: #17352a;
+  --on-leaf: #06140d;
+  --amber: #f2b33d;
+  --amber-soft: #3a2c0c;
+  --amber-ink: #ffd88a;
+  --danger: #ff8a80;
+  --danger-soft: #3a1714;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-leaf: var(--leaf);
+  --color-leaf-strong: var(--leaf-strong);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-on-leaf: var(--on-leaf);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-display: "Bricolage Grotesque", "Noto Sans", system-ui, sans-serif;
+  --font-sans: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans Tamil", "Noto Sans Malayalam",
+    "Noto Sans Kannada", system-ui, sans-serif;
+  --shadow-card: var(--shadow);
+  --radius-card: 1.25rem;
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
