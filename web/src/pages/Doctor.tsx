@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Camera, ImagePlus, RotateCcw } from 'lucide-react'
+import { Camera, Hand, ImagePlus, Leaf, RotateCcw, ShieldCheck, Sun } from 'lucide-react'
 import { api, ApiError, type Condition, type DoctorResult } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Stepper } from '../components/charts'
-import { Button, Card, Chip, CROPS, cropName, ErrorBox, HelplineButton, ListenButton, Note, PageTitle, SectionTitle, SourceChip, cx } from '../components/ui'
+import { Button, Card, Chip, CROPS, cropName, ErrorBox, HelplineButton, ListenButton, Note, PageTitle, SectionTitle, SourceChip, cx, inputCls } from '../components/ui'
+import { ArtDoctor } from '../components/art'
 
 
 /** Shrink in the browser: ≤1024 px JPEG keeps uploads small on 2G and far under the 4.5 MB limit. */
@@ -121,7 +122,7 @@ export default function Doctor() {
 
   return (
     <div className="space-y-5">
-      <PageTitle title="Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
+      <PageTitle art={<ArtDoctor />} tone="clay" title="Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
 
       <Card>
         <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => choose(e.target.files?.[0])} />
@@ -129,8 +130,8 @@ export default function Doctor() {
           type="button"
           onClick={() => input.current?.click()}
           className={cx(
-            'flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-leaf/35 bg-leaf-soft/40 p-5 text-center transition hover:border-leaf',
-            preview ? 'min-h-0' : 'min-h-52',
+            'group flex w-full flex-col items-center justify-center gap-3 rounded-[1.4rem] border-2 border-dashed border-clay/40 bg-clay-soft/50 p-5 text-center transition hover:border-clay hover:bg-clay-soft/80',
+            preview ? 'min-h-0' : 'min-h-60',
           )}
         >
           {preview ? (
@@ -142,11 +143,25 @@ export default function Doctor() {
             </>
           ) : (
             <>
-              <span className="grid size-16 place-items-center rounded-full bg-leaf text-on-leaf">
-                <Camera className="size-8" aria-hidden />
+              <span className="relative">
+                <span className="absolute inset-0 animate-ping rounded-full bg-clay/20 [animation-duration:2.4s]" aria-hidden />
+                <span className="relative grid size-16 place-items-center rounded-full bg-clay text-white shadow-card transition group-hover:scale-105">
+                  <Camera className="size-8" aria-hidden />
+                </span>
               </span>
-              <span className="font-display text-lg font-bold">Take or choose a photo</span>
-              <span className="text-sm text-muted">One leaf, filling the frame · daylight · hold steady</span>
+              <span className="font-display text-[1.35rem] font-bold text-ink">Take or choose a photo</span>
+              <span className="grid w-full max-w-md grid-cols-3 gap-2 pt-1 text-xs text-ink/75">
+                {[
+                  { icon: Leaf, t: 'One leaf fills the frame' },
+                  { icon: Sun, t: 'Daylight, no flash' },
+                  { icon: Hand, t: 'Hold steady' },
+                ].map(({ icon: Icon, t }) => (
+                  <span key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-surface/70 px-2 py-2.5">
+                    <Icon className="size-4 text-clay" aria-hidden />
+                    {t}
+                  </span>
+                ))}
+              </span>
             </>
           )}
         </button>
@@ -154,7 +169,7 @@ export default function Doctor() {
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="block" htmlFor="crop">
             <span className="mb-1 block text-sm font-semibold">Crop</span>
-            <select id="crop" value={crop} onChange={(e) => setCrop(e.target.value)} className="h-12 w-full rounded-xl border border-line bg-surface px-3 text-[17px]">
+            <select id="crop" value={crop} onChange={(e) => setCrop(e.target.value)} className={inputCls}>
               <option value="">Not sure</option>
               {CROPS.map((c) => (
                 <option key={c} value={c}>
@@ -167,7 +182,9 @@ export default function Doctor() {
             <ImagePlus className="size-5" aria-hidden /> Check this plant
           </Button>
         </div>
-        <p className="mt-3 text-xs text-muted">Your photo is shrunk on your phone, checked once and discarded — never stored, never logged. No sign-up.</p>
+        <p className="mt-3 flex items-start gap-1.5 text-xs text-muted">
+          <ShieldCheck className="mt-px size-3.5 shrink-0 text-leaf" aria-hidden /> Your photo is shrunk on your phone, checked once and discarded — never stored, never logged. No sign-up.
+        </p>
       </Card>
 
       {error && <ErrorBox message={error} />}
@@ -218,7 +235,7 @@ export default function Doctor() {
                 No vision model key is set on this server, so the photo was not analysed. Choose a condition to play the classifier — every later step (safety check, source, advice) runs for real.
               </p>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                <select value={demo} onChange={(e) => setDemo(e.target.value)} className="h-12 flex-1 rounded-xl border border-line bg-surface px-3" aria-label="Demo condition">
+                <select value={demo} onChange={(e) => setDemo(e.target.value)} className={cx(inputCls, 'flex-1')} aria-label="Demo condition">
                   <option value="">Choose a condition…</option>
                   {conditions.map((c) => (
                     <option key={c.key} value={c.key}>

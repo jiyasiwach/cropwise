@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Camera, FileText, Send, ShieldCheck, Wrench } from 'lucide-react'
+import { ArrowRight, CalendarDays, Camera, FileText, IndianRupee, Send, ShieldCheck, Sprout, Umbrella, Wrench } from 'lucide-react'
 import { askStream, type AssistantEvent, type Citation } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { useListener } from '../lib/speech'
-import { Chip, HelplineButton, ListenButton, MicButton, PageTitle, cx } from '../components/ui'
+import { Chip, HelplineButton, ListenButton, MicButton, PageTitle, TONE_BG, cx, type Tone } from '../components/ui'
+import { LogoMark } from '../components/Logo'
+import { ArtAsk } from '../components/art'
 
 interface Message {
   id: string
@@ -19,12 +21,12 @@ interface Message {
   error?: boolean
 }
 
-const SUGGESTIONS = [
-  'When should I sow chickpea?',
-  'How much urea does rice need per acre?',
-  'My crop was damaged by flood — can I claim insurance?',
-  'Which mandi pays best for rice in Telangana?',
-  'How do I get a Soil Health Card?',
+const SUGGESTIONS: { q: string; icon: typeof Sprout; tone: Tone; topic: string }[] = [
+  { q: 'When should I sow chickpea?', icon: CalendarDays, tone: 'sky', topic: 'Sowing' },
+  { q: 'How much urea does rice need per acre?', icon: Sprout, tone: 'leaf', topic: 'Fertiliser' },
+  { q: 'My crop was damaged by flood — can I claim insurance?', icon: Umbrella, tone: 'clay', topic: 'Insurance' },
+  { q: 'Which mandi pays best for rice in Telangana?', icon: IndianRupee, tone: 'amber', topic: 'Selling' },
+  { q: 'How do I get a Soil Health Card?', icon: FileText, tone: 'leaf', topic: 'Schemes' },
 ]
 
 const BLOCKED: Record<string, string> = {
@@ -106,36 +108,56 @@ export default function Ask() {
 
   return (
     <div className="flex min-h-[calc(100dvh-12rem)] flex-col">
-      <PageTitle title="KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
+      <PageTitle art={<ArtAsk />} tone="amber" title="KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
 
       <div className="flex-1 space-y-4" aria-live="polite">
         {messages.length === 0 && (
-          <div className="space-y-2">
-            <Link to="/doctor" className="mb-3 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 no-underline hover:border-leaf/50">
-              <span className="grid size-10 place-items-center rounded-xl bg-leaf-soft text-leaf">
+          <div className="space-y-4">
+            <Link
+              to="/doctor"
+              className="group flex items-center gap-3 rounded-[var(--radius-card)] border border-clay/30 bg-clay-soft/60 px-4 py-3.5 no-underline transition hover:border-clay/60"
+            >
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-clay text-white">
                 <Camera className="size-5" aria-hidden />
               </span>
-              <span>
+              <span className="min-w-0 flex-1">
                 <span className="block font-semibold text-ink">Check a sick plant</span>
-                <span className="block text-sm text-muted">Spots, rust or curl? A photo works better than words.</span>
+                <span className="block text-sm text-ink/70">Spots, rust or curl? A photo works better than words.</span>
               </span>
+              <ArrowRight className="size-4 text-clay transition group-hover:translate-x-0.5" aria-hidden />
             </Link>
-            <p className="text-sm font-semibold text-muted">Try asking</p>
-            {SUGGESTIONS.map((s) => (
-              <button key={s} onClick={() => ask(s)} className="block w-full rounded-2xl border border-line bg-surface px-4 py-3 text-left font-medium hover:border-leaf/50">
-                {s}
-              </button>
-            ))}
+            <div>
+              <p className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.12em] text-muted">Try asking</p>
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {SUGGESTIONS.map(({ q, icon: Icon, tone, topic }) => (
+                  <button
+                    key={q}
+                    onClick={() => ask(q)}
+                    className="group flex items-start gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-3.5 text-left shadow-card transition hover:-translate-y-0.5 hover:border-leaf/40"
+                  >
+                    <span className={cx('grid size-10 shrink-0 place-items-center rounded-xl', TONE_BG[tone])}>
+                      <Icon className="size-5 text-ink/75" aria-hidden />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[11px] font-bold uppercase tracking-wider text-muted">{topic}</span>
+                      <span className="block font-semibold leading-snug text-ink">{q}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
         {messages.map((m) =>
           m.role === 'user' ? (
-            <div key={m.id} className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-leaf px-4 py-2.5 text-on-leaf">
+            <div key={m.id} className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-md bg-leaf px-4 py-2.5 text-on-leaf shadow-card">
               {m.text}
             </div>
           ) : (
-            <div key={m.id} className="max-w-[92%]">
+            <div key={m.id} className="flex max-w-[94%] gap-2.5">
+              <LogoMark className="mt-1 size-8" />
+              <div className="min-w-0 flex-1">
               {m.blocked ? (
                 <div className="flex gap-3 rounded-2xl rounded-bl-md border border-amber/40 bg-amber-soft px-4 py-3 text-amber-ink">
                   <ShieldCheck className="mt-0.5 size-5 shrink-0" aria-hidden />
@@ -145,7 +167,7 @@ export default function Ask() {
                   </div>
                 </div>
               ) : (
-                <div className={cx('whitespace-pre-wrap rounded-2xl rounded-bl-md border px-4 py-3', m.error ? 'border-danger/40 bg-danger-soft text-danger' : 'border-line bg-surface')}>
+                <div className={cx('whitespace-pre-wrap rounded-2xl rounded-tl-md border px-4 py-3 leading-relaxed shadow-card', m.error ? 'border-danger/40 bg-danger-soft text-danger' : 'border-line bg-surface')}>
                   {m.text || (m.pending ? <span className="inline-flex gap-1 text-muted" aria-label="Thinking">●<span className="animate-pulse">●</span>●</span> : '')}
                 </div>
               )}
@@ -166,13 +188,14 @@ export default function Ask() {
                   {m.latency != null && <span className="text-xs text-muted">{(m.latency / 1000).toFixed(1)} s</span>}
                 </div>
               )}
+              </div>
             </div>
           ),
         )}
         <div ref={end} />
       </div>
 
-      <form onSubmit={submit} className="sticky bottom-20 mt-5 flex items-center gap-2 rounded-2xl border border-line bg-surface p-2 shadow-card lg:bottom-4">
+      <form onSubmit={submit} className="sticky bottom-24 mt-5 flex items-center gap-2 rounded-[1.4rem] border border-line bg-surface p-2 shadow-card focus-within:border-leaf focus-within:ring-4 focus-within:ring-leaf/15 lg:bottom-4">
         <MicButton listening={listening} supported={supported} onClick={toggle} />
         <label htmlFor="ask-input" className="sr-only">
           Your question

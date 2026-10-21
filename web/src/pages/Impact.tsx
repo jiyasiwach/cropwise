@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { api, ApiError, type MandiGain } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { CompareBars } from '../components/charts'
-import { Button, Card, Chip, CROPS, cropName, ErrorBox, HonestyBadge, Note, PageTitle, rupee, SectionTitle } from '../components/ui'
+import { Button, Card, Chip, CROPS, cropName, ErrorBox, HonestyBadge, Note, PageTitle, rupee, SectionTitle, inputCls } from '../components/ui'
+import { ArtIdea } from '../components/art'
 
 const A = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <a href={href} target="_blank" rel="noopener noreferrer">
@@ -80,7 +81,7 @@ function Calculator() {
       <form onSubmit={submit} className="grid gap-3 sm:grid-cols-4 sm:items-end">
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Crop</span>
-          <select value={crop} onChange={(e) => setCrop(e.target.value)} className="h-12 w-full rounded-xl border border-line bg-surface px-3">
+          <select value={crop} onChange={(e) => setCrop(e.target.value)} className={inputCls}>
             {CROPS.map((c) => (
                 <option key={c} value={c}>
                   {cropName(c)}
@@ -90,11 +91,11 @@ function Calculator() {
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Acres</span>
-          <input type="number" min={0.1} max={1000} step={0.1} inputMode="decimal" value={acres} onChange={(e) => setAcres(e.target.value)} className="h-12 w-full rounded-xl border border-line bg-surface px-3" />
+          <input type="number" min={0.1} max={1000} step={0.1} inputMode="decimal" value={acres} onChange={(e) => setAcres(e.target.value)} className={inputCls} />
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Town</span>
-          <input value={town} onChange={(e) => setTown(e.target.value)} className="h-12 w-full rounded-xl border border-line bg-surface px-3" />
+          <input value={town} onChange={(e) => setTown(e.target.value)} className={inputCls} />
         </label>
         <Button type="submit" busy={busy} className="h-12">
           Work it out
@@ -143,7 +144,7 @@ export default function Impact() {
 
   return (
     <div className="space-y-5">
-      <PageTitle
+      <PageTitle art={<ArtIdea />} tone="amber"
         title="The problem CropWise works on"
         subtitle="Four decisions a small farmer makes every season, usually without data. Every figure below links to its public source; where we could not find one we could check, we say so."
       />

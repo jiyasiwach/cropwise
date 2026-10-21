@@ -3,7 +3,8 @@ import { ArrowRight, Check, TriangleAlert } from 'lucide-react'
 import type { PredictIn, PredictOut, Place } from '../lib/api'
 import { load, usePrefs } from '../lib/prefs'
 import { ConfidenceRing } from '../components/charts'
-import { ButtonLink, Card, Chip, CropIcon, cropName, ListenButton, Note, PageTitle } from '../components/ui'
+import { ButtonLink, Chip, CropIcon, cropName, cx, ListenButton, Note, PageTitle } from '../components/ui'
+import { ArtGrow } from '../components/art'
 
 interface Saved {
   result: PredictOut
@@ -19,7 +20,7 @@ export default function Results() {
   if (!saved) {
     return (
       <div className="space-y-5">
-        <PageTitle title={t('results.title')} subtitle="Tell us where your farm is first — it takes about a minute." />
+        <PageTitle art={<ArtGrow />} tone="amber" title={t('results.title')} subtitle="Tell us where your farm is first — it takes about a minute." />
         <ButtonLink to="/grow">{t('tile.grow')} →</ButtonLink>
       </div>
     )
@@ -29,7 +30,7 @@ export default function Results() {
   const lab = result.model_source === 'lab'
   return (
     <div className="space-y-5">
-      <PageTitle
+      <PageTitle art={<ArtGrow />} tone="amber"
         title={t('results.title')}
         subtitle={
           <>
@@ -52,31 +53,45 @@ export default function Results() {
         {result.crops.map((c, i) => {
           const speech = `${cropName(c.crop)}, ${Math.round(c.confidence)} percent match. ${c.reasons.map((r) => r.text).join('. ')}`
           return (
-            <Card key={c.crop} as="article" className={i === 0 ? 'border-leaf/50' : undefined}>
-              <div className="flex items-center gap-4">
-                <CropIcon crop={c.crop} size="lg" />
+            <article
+              key={c.crop}
+              className={cx(
+                'overflow-hidden rounded-[var(--radius-card)] border bg-surface shadow-card',
+                i === 0 ? 'border-leaf/50' : 'border-line',
+              )}
+            >
+              <div className={cx('flex items-center gap-4 px-4 py-4 sm:px-5', i === 0 ? 'bg-leaf-soft' : 'bg-surface-2/50')}>
+                <span className="relative">
+                  <CropIcon crop={c.crop} size="lg" />
+                  <span className={cx('absolute -left-1.5 -top-1.5 grid size-6 place-items-center rounded-full border-2 border-surface text-xs font-bold', i === 0 ? 'bg-amber text-[#2a1c00]' : 'bg-surface text-muted')}>
+                    {i + 1}
+                  </span>
+                </span>
                 <div className="min-w-0 flex-1">
-                  {i === 0 && <div className="text-xs font-bold uppercase tracking-wider text-leaf">Best match</div>}
-                  <h2 className="text-xl font-bold">{cropName(c.crop)}</h2>
+                  {i === 0 && <div className="text-xs font-bold uppercase tracking-[0.12em] text-leaf">Best match for your field</div>}
+                  <h2 className="text-[1.6rem] text-ink">{cropName(c.crop)}</h2>
                 </div>
                 <ConfidenceRing value={c.confidence} />
               </div>
-              <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Why">
-                {c.reasons.map((r) => (
-                  <li key={r.text}>
-                    <Chip tone={r.good ? 'good' : 'warn'}>
-                      {r.good ? <Check className="size-3.5" aria-hidden /> : <TriangleAlert className="size-3.5" aria-hidden />} {r.text}
-                    </Chip>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <ListenButton id={`crop-${c.crop}`} text={speech} />
-                <ButtonLink to={`/plan/${c.crop}`} variant={i === 0 ? 'primary' : 'secondary'}>
-                  {t('results.plan')} <ArrowRight className="size-4" aria-hidden />
-                </ButtonLink>
+              <div className="px-4 pb-4 pt-3 sm:px-5">
+                <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">Why</div>
+                <ul className="flex flex-wrap gap-1.5" aria-label="Why">
+                  {c.reasons.map((r) => (
+                    <li key={r.text}>
+                      <Chip tone={r.good ? 'good' : 'warn'}>
+                        {r.good ? <Check className="size-3.5" aria-hidden /> : <TriangleAlert className="size-3.5" aria-hidden />} {r.text}
+                      </Chip>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <ListenButton id={`crop-${c.crop}`} text={speech} />
+                  <ButtonLink to={`/plan/${c.crop}`} variant={i === 0 ? 'primary' : 'secondary'}>
+                    {t('results.plan')} <ArrowRight className="size-4" aria-hidden />
+                  </ButtonLink>
+                </div>
               </div>
-            </Card>
+            </article>
           )
         })}
       </div>

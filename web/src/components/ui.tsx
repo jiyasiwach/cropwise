@@ -12,12 +12,42 @@ export function Card({ children, className, as: As = 'section' }: { children: Re
   return <As className={cx('rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card', className)}>{children}</As>
 }
 
-export function PageTitle({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children?: ReactNode }) {
+/** One look for every text/number input and select: warm fill, green focus ring. */
+export const inputCls =
+  'h-12 w-full rounded-xl border border-line bg-surface-2/50 px-3.5 text-[17px] text-ink transition placeholder:text-muted/70 hover:border-ink/20 focus:border-leaf focus:bg-surface focus:outline-none focus:ring-4 focus:ring-leaf/15 disabled:opacity-60'
+
+export type Tone = 'leaf' | 'clay' | 'amber' | 'sky'
+
+export const TONE_BG: Record<Tone, string> = {
+  leaf: 'bg-leaf-soft',
+  clay: 'bg-clay-soft',
+  amber: 'bg-amber-soft',
+  sky: 'bg-sky-soft',
+}
+
+/** Page header. With `art` it becomes a warm illustrated banner; without, a plain title. */
+export function PageTitle({ title, subtitle, children, art, tone = 'leaf', eyebrow }: { title: string; subtitle?: ReactNode; children?: ReactNode; art?: ReactNode; tone?: Tone; eyebrow?: ReactNode }) {
+  if (!art)
+    return (
+      <header className="mb-5">
+        {eyebrow && <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-leaf">{eyebrow}</div>}
+        <h1 className="text-[1.9rem] text-ink sm:text-[2.3rem]">{title}</h1>
+        {subtitle && <p className="mt-1.5 max-w-[60ch] text-muted">{subtitle}</p>}
+        {children}
+      </header>
+    )
   return (
-    <header className="mb-5">
-      <h1 className="text-[1.75rem] font-extrabold text-ink sm:text-[2.1rem]">{title}</h1>
-      {subtitle && <p className="mt-1.5 max-w-[60ch] text-muted">{subtitle}</p>}
-      {children}
+    <header className={cx('relative mb-5 overflow-hidden rounded-[1.6rem] border border-line/70 px-5 py-5 sm:px-7 sm:py-6', TONE_BG[tone])}>
+      <div className="pointer-events-none absolute -bottom-16 -right-10 size-56 rounded-full bg-surface/50 blur-2xl" aria-hidden />
+      <div className="relative flex items-center gap-4 sm:gap-6">
+        <div className="min-w-0 flex-1">
+          {eyebrow && <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-ink/60">{eyebrow}</div>}
+          <h1 className="text-[1.75rem] text-ink sm:text-[2.3rem]">{title}</h1>
+          {subtitle && <p className="mt-1.5 max-w-[56ch] text-[15px] text-ink/70 sm:text-base">{subtitle}</p>}
+          {children}
+        </div>
+        <div className="w-24 shrink-0 self-end sm:w-36 lg:w-40">{art}</div>
+      </div>
     </header>
   )
 }

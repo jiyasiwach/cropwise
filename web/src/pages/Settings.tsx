@@ -3,6 +3,7 @@ import { BarChart3, ChevronRight, Code2, History, Info, Landmark, Lightbulb, Map
 import { LANGUAGES, type Lang } from '../lib/i18n'
 import { usePrefs, type Theme } from '../lib/prefs'
 import { Card, HelplineButton, PageTitle, SectionTitle, cx } from '../components/ui'
+import { ArtSettings } from '../components/art'
 
 function Row({ to, icon, label, hint, external }: { to: string; icon: React.ReactNode; label: string; hint?: string; external?: boolean }) {
   const body = (
@@ -31,7 +32,7 @@ export default function Settings() {
   const { lang, setLang, theme, setTheme, place, setPlace, t } = usePrefs()
   return (
     <div className="space-y-5">
-      <PageTitle title="More" />
+      <PageTitle art={<ArtSettings />} tone="sky" title="More" />
 
       <Card>
         <Row to="/yield" icon={<Scale className="size-5" />} label="Yield forecast" hint="Expected quintal per acre for your district" />

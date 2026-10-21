@@ -251,26 +251,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      {/* Phone bottom navigation */}
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 backdrop-blur lg:hidden" aria-label="Main">
-        <ul className="mx-auto grid max-w-lg grid-cols-5">
+      {/* Phone bottom navigation: a floating dock */}
+      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 px-3 pt-2 lg:hidden" aria-label="Main">
+        <ul className="mx-auto grid max-w-lg grid-cols-5 rounded-[1.4rem] border border-line bg-surface/95 p-1.5 shadow-[0_10px_30px_-10px_rgb(40_30_10/0.35)] backdrop-blur">
           {NAV.map(({ to, key, icon: Icon, ...rest }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={'end' in rest}
                 className={({ isActive }) =>
-                  cx('flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold no-underline', isActive ? 'text-leaf' : 'text-muted')
+                  cx(
+                    'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-semibold no-underline transition-colors',
+                    isActive ? 'bg-leaf text-on-leaf' : 'text-muted hover:text-ink',
+                  )
                 }
               >
-                {({ isActive }) => (
-                  <>
-                    <span className={cx('grid h-7 w-12 place-items-center rounded-full', isActive && 'bg-leaf-soft')}>
-                      <Icon className="size-5" aria-hidden />
-                    </span>
-                    {t(key)}
-                  </>
-                )}
+                <Icon className="size-5" strokeWidth={2} aria-hidden />
+                {t(key)}
               </NavLink>
             </li>
           ))}

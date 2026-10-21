@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { BarChart3, CalendarRange, Database, MapPin, Scale, Target } from 'lucide-react'
 import { api, type YieldForecast, type YieldOptions } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
-import { Button, Card, Chip, CropIcon, ErrorBox, ListenButton, Loading, Note, PageTitle, SectionTitle } from '../components/ui'
+import { Button, Card, Chip, CropIcon, ErrorBox, ListenButton, Loading, Note, PageTitle, SectionTitle, inputCls } from '../components/ui'
+import { ArtYield } from '../components/art'
 
 const SEASON_LABEL: Record<string, string> = {
   Kharif: 'Kharif (monsoon, Jun–Oct)',
@@ -29,7 +30,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
-const selectCls = 'h-12 w-full rounded-xl border border-line bg-surface px-3 text-[16px] text-ink disabled:opacity-60'
+const selectCls = inputCls
 
 function RangeBar({ low, likely, high, min, max }: { low: number; likely: number; high: number; min: number; max: number }) {
   const span = max - min || 1
@@ -140,7 +141,7 @@ export default function Yield() {
 
   return (
     <div className="space-y-5">
-      <PageTitle
+      <PageTitle art={<ArtYield />} tone="leaf"
         title={t('tile.yield')}
         subtitle="How much your crop is likely to give next season, per acre and for your whole field — learned from 25+ years of Government of India district crop records."
       />
@@ -208,7 +209,7 @@ export default function Yield() {
                 step="any"
                 value={acres}
                 onChange={(e) => setAcres(Number(e.target.value))}
-                className="h-12 w-full rounded-xl border border-line bg-surface px-3 text-[17px]"
+                className={inputCls}
               />
             </Field>
             <div className="flex items-end">

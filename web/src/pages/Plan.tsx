@@ -1,37 +1,21 @@
 import { lazy, Suspense, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Camera, Leaf, MapPin, Phone } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Camera, IndianRupee, Leaf, LineChart, MapPin, Phone, Sprout, Store, Trophy } from 'lucide-react'
 import { api, ApiError, type BestMarket, type Mandi, type Plan, type Profit, type Stores } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { CompareBars, MoneyBar, SeasonTimeline, Sparkline } from '../components/charts'
-import {
-  Button,
-  ButtonLink,
-  Card,
-  Chip,
-  CropIcon,
-  cropName,
-  cx,
-  ErrorBox,
-  HelplineButton,
-  HonestyBadge,
-  ListenButton,
-  Loading,
-  Note,
-  rupee,
-  SectionTitle,
-  SourceChip,
-} from '../components/ui'
+import { Button, ButtonLink, Card, Chip, CropIcon, cropName, cx, ErrorBox, HelplineButton, HonestyBadge, ListenButton, Loading, Note, PageTitle, rupee, SectionTitle, SourceChip, inputCls } from '../components/ui'
+import { ArtPlan } from '../components/art'
 
 const ShopsMap = lazy(() => import('../components/ShopsMap'))
 
 const TABS = [
-  { id: 'when', label: 'When' },
-  { id: 'fertiliser', label: 'Fertiliser' },
-  { id: 'shops', label: 'Shops' },
-  { id: 'prices', label: 'Prices' },
-  { id: 'market', label: 'Best mandi' },
-  { id: 'profit', label: 'Profit' },
+  { id: 'when', label: 'When', icon: CalendarDays },
+  { id: 'fertiliser', label: 'Fertiliser', icon: Sprout },
+  { id: 'shops', label: 'Shops', icon: Store },
+  { id: 'prices', label: 'Prices', icon: LineChart },
+  { id: 'market', label: 'Best mandi', icon: Trophy },
+  { id: 'profit', label: 'Profit', icon: IndianRupee },
 ] as const
 type Tab = (typeof TABS)[number]['id']
 
@@ -81,7 +65,7 @@ function PlaceGate({ children }: { children: ReactNode }) {
       </SectionTitle>
       <p className="mb-3 text-sm text-muted">Shops, mandi prices and transport costs depend on where you are.</p>
       <form onSubmit={submit} className="flex gap-2">
-        <input value={town} onChange={(e) => setTown(e.target.value)} placeholder="Town or village" className="h-12 min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 text-[17px]" aria-label="Town or village" />
+        <input value={town} onChange={(e) => setTown(e.target.value)} placeholder="Town or village" className={cx(inputCls, 'min-w-0 flex-1')} aria-label="Town or village" />
         <Button type="submit" busy={busy} disabled={!town.trim()}>
           Set
         </Button>
@@ -355,19 +339,19 @@ export default function PlanPage() {
 
   return (
     <div className="space-y-5">
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-muted">
-            <Link to="/results">← Crops</Link>
-          </p>
-          <h1 className="mt-1 flex items-center gap-2 text-[1.9rem] font-extrabold">
-            <CropIcon crop={crop} /> {cropName(crop)} plan
-          </h1>
+      <Link to="/results" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted no-underline hover:text-ink">
+        <ArrowLeft className="size-4" aria-hidden /> All crops
+      </Link>
+      <PageTitle art={<ArtPlan />} tone="sky" eyebrow="Season plan" title={`${cropName(crop)} plan`} subtitle="When to sow, what to buy, where to sell and what you could earn — for your land.">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-surface/80 py-1 pl-1 pr-3 text-sm font-semibold text-ink">
+            <CropIcon crop={crop} size="sm" /> {cropName(crop)}
+          </span>
+          <ButtonLink to={`/doctor?crop=${crop}`} variant="secondary" className="min-h-9 py-1.5 text-sm">
+            <Camera className="size-4" aria-hidden /> Check a sick plant
+          </ButtonLink>
         </div>
-        <ButtonLink to={`/doctor?crop=${crop}`} variant="secondary" className="shrink-0">
-          <Camera className="size-4" aria-hidden /> <span className="hidden sm:inline">Check a sick plant</span>
-        </ButtonLink>
-      </header>
+      </PageTitle>
 
       {loading && <Loading />}
       {error && (error.includes('No sowing calendar') || error.includes('Unknown') ? <Note tone="warn">There is no sowing calendar for “{crop}” yet. <Link to="/results">Pick another crop</Link>.</Note> : <ErrorBox message={error} onRetry={retry} />)}
@@ -375,20 +359,20 @@ export default function PlanPage() {
       {plan && (
         <>
           <Note tone="warn">These dates and doses are the commonly published all-India figures, not advice for your field. Confirm with your Krishi Vigyan Kendra before buying inputs.</Note>
-          <div className="-mx-4 overflow-x-auto px-4" role="tablist" aria-label="Plan sections">
-            <div className="flex gap-2">
-              {TABS.map((t) => (
+          <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Plan sections">
+            <div className="flex w-max gap-1 rounded-2xl border border-line bg-surface p-1 shadow-card">
+              {TABS.map(({ id, label, icon: Icon }) => (
                 <button
-                  key={t.id}
+                  key={id}
                   role="tab"
-                  aria-selected={tab === t.id}
-                  onClick={() => setTab(t.id)}
+                  aria-selected={tab === id}
+                  onClick={() => setTab(id)}
                   className={cx(
-                    'min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold transition',
-                    tab === t.id ? 'bg-leaf text-on-leaf' : 'border border-line bg-surface text-muted hover:text-ink',
+                    'inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-sm font-semibold transition',
+                    tab === id ? 'bg-leaf text-on-leaf shadow-sm' : 'text-muted hover:bg-surface-2 hover:text-ink',
                   )}
                 >
-                  {t.label}
+                  <Icon className="size-4" aria-hidden /> {label}
                 </button>
               ))}
             </div>
