@@ -1,8 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
-import { Camera, Home, Landmark, MessageCircle, Moon, Menu, Radio, Scale, Sprout, Sun, SunMoon, WifiOff } from 'lucide-react'
+import { BarChart3, Camera, ChevronRight, History, Home, Landmark, Lightbulb, MapPin, MessageCircle, Moon, Menu, Phone, Radio, Scale, Settings, Sprout, Sun, SunMoon, WifiOff, type LucideIcon } from 'lucide-react'
 import { LANGUAGES, type Lang } from '../lib/i18n'
 import { usePrefs, type Theme } from '../lib/prefs'
+import { Logo } from './Logo'
 import { cx } from './ui'
 
 const NAV = [
@@ -20,10 +21,81 @@ const TOOLS = [
 ] as const
 
 const EXTRA = [
-  { to: '/history', label: 'History' },
-  { to: '/impact', label: 'The problem' },
-  { to: '/eval', label: 'How well it works' },
+  { to: '/history', label: 'History', icon: History },
+  { to: '/impact', label: 'The problem', icon: Lightbulb },
+  { to: '/eval', label: 'How well it works', icon: BarChart3 },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ]
+
+/** One sidebar link: an icon tile and a label; the tile fills in when the page is open. */
+function SideLink({ to, label, icon: Icon, end, small, badge }: { to: string; label: string; icon: LucideIcon; end?: boolean; small?: boolean; badge?: ReactNode }) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        cx(
+          'group relative flex items-center gap-3 rounded-xl px-2 no-underline transition-colors',
+          small ? 'min-h-10 text-[13.5px]' : 'min-h-11 text-[15px]',
+          isActive ? 'bg-leaf-soft font-bold text-leaf' : 'font-semibold text-muted hover:bg-surface-2 hover:text-ink',
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && <span className="absolute -left-4 top-2 bottom-2 w-1 rounded-r-full bg-leaf" aria-hidden />}
+          <span
+            className={cx(
+              'grid shrink-0 place-items-center rounded-lg transition-colors',
+              small ? 'size-7' : 'size-8',
+              isActive ? 'bg-leaf text-on-leaf shadow-sm' : 'bg-surface-2 text-muted group-hover:text-ink',
+            )}
+          >
+            <Icon className={small ? 'size-[15px]' : 'size-[17px]'} strokeWidth={2} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1 truncate">{label}</span>
+          {badge}
+        </>
+      )}
+    </NavLink>
+  )
+}
+
+function FarmCard() {
+  const { place, acres } = usePrefs()
+  return (
+    <Link
+      to="/grow"
+      className="group mb-5 flex items-center gap-3 rounded-2xl border border-line bg-surface-2/60 px-3 py-2.5 no-underline transition hover:border-leaf/40"
+    >
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-amber-soft text-amber-ink">
+        <MapPin className="size-[18px]" aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-bold uppercase tracking-[0.12em] text-muted/80">My farm</span>
+        {place ? (
+          <>
+            <span className="block truncate text-sm font-bold text-ink">{place.city}</span>
+            <span className="block truncate text-xs text-muted">
+              {place.state ? `${place.state} · ` : ''}
+              {acres} {acres === 1 ? 'acre' : 'acres'}
+            </span>
+          </>
+        ) : (
+          <span className="block text-sm font-semibold text-leaf">Set my town</span>
+        )}
+      </span>
+      <ChevronRight className="size-4 shrink-0 text-muted transition group-hover:translate-x-0.5" aria-hidden />
+    </Link>
+  )
+}
+
+const Heading = ({ children }: { children: ReactNode }) => (
+  <div className="mb-1.5 mt-5 flex items-center gap-2 px-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted/80">
+    {children}
+    <span className="h-px flex-1 bg-line" aria-hidden />
+  </div>
+)
 
 function useOnline() {
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
@@ -96,69 +168,68 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
 
       {/* Desktop side navigation */}
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-line bg-surface px-4 py-5 lg:flex">
-        <Link to="/" className="mb-7 flex items-center gap-2.5 px-2 no-underline">
-          <span className="grid size-9 place-items-center rounded-xl bg-leaf text-on-leaf" aria-hidden>
-            <Sprout className="size-5" strokeWidth={2} />
-          </span>
-          <span className="font-display text-xl font-extrabold text-ink">CropWise</span>
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col overflow-y-auto border-r border-line bg-surface px-4 pb-4 pt-5 lg:flex">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-leaf-soft/70 to-transparent" aria-hidden />
+        <Link to="/" className="relative mb-5 px-1 no-underline" aria-label="CropWise home">
+          <Logo tagline />
         </Link>
-        <nav className="flex flex-col gap-1" aria-label="Main">
-          {NAV.slice(0, 4).map(({ to, key, icon: Icon, ...rest }) => (
-            <NavLink
+
+        <div className="relative">
+          <FarmCard />
+        </div>
+
+        <nav className="relative flex flex-col gap-0.5" aria-label="Main">
+          {NAV.slice(0, 4).map(({ to, key, icon, ...rest }) => (
+            <SideLink key={to} to={to} label={t(key)} icon={icon} end={'end' in rest} />
+          ))}
+
+          <Heading>Farm tools</Heading>
+          {TOOLS.map(({ to, key, icon }) => (
+            <SideLink
               key={to}
               to={to}
-              end={'end' in rest}
-              className={({ isActive }) =>
-                cx('flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold no-underline', isActive ? 'bg-leaf-soft text-leaf' : 'text-muted hover:bg-surface-2 hover:text-ink')
+              label={t(key)}
+              icon={icon}
+              badge={
+                to === '/schemes' ? (
+                  <span className="flex items-center gap-1 rounded-full bg-leaf-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-leaf" title="Official announcements, fetched live">
+                    <span className="size-1.5 animate-pulse rounded-full bg-leaf" aria-hidden /> Live
+                  </span>
+                ) : undefined
               }
-            >
-              <Icon className="size-5" aria-hidden /> {t(key)}
-            </NavLink>
+            />
           ))}
-          <div className="mt-4 mb-1 px-3 text-xs font-bold uppercase tracking-wider text-muted">Farm tools</div>
-          {TOOLS.map(({ to, key, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                cx('flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold no-underline', isActive ? 'bg-leaf-soft text-leaf' : 'text-muted hover:bg-surface-2 hover:text-ink')
-              }
-            >
-              <Icon className="size-5" aria-hidden /> {t(key)}
-            </NavLink>
-          ))}
-          <div className="mt-4 mb-1 px-3 text-xs font-bold uppercase tracking-wider text-muted">More</div>
-          {[...EXTRA, { to: '/settings', label: 'Settings' }].map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cx('flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold no-underline', isActive ? 'bg-leaf-soft text-leaf' : 'text-muted hover:bg-surface-2 hover:text-ink')
-              }
-            >
-              {item.label}
-            </NavLink>
+
+          <Heading>More</Heading>
+          {EXTRA.map((item) => (
+            <SideLink key={item.to} to={item.to} label={item.label} icon={item.icon} small />
           ))}
         </nav>
-        <div className="mt-auto rounded-2xl bg-amber-soft p-4 text-sm text-amber-ink">
-          <div className="font-semibold">Kisan Call Centre</div>
-          <a href="tel:18001801551" className="text-lg font-bold text-amber-ink">
-            1800-180-1551
-          </a>
-          <div className="text-xs">Free · 6 am–10 pm · 22 languages</div>
-        </div>
+
+        <a
+          href="tel:18001801551"
+          className="group relative mt-auto block overflow-hidden rounded-2xl border border-amber/30 bg-amber-soft p-4 no-underline"
+          aria-label="Call the Kisan Call Centre, 1800-180-1551, free"
+        >
+          <span className="relative flex items-center gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-amber text-[#2a1c00] shadow-sm transition group-hover:scale-105">
+              <Phone className="size-[18px]" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xs font-semibold text-amber-ink/80">Kisan Call Centre · free</span>
+              <span className="block font-display text-lg font-extrabold tabular-nums tracking-tight text-amber-ink">1800-180-1551</span>
+            </span>
+          </span>
+          <span className="relative mt-2.5 block text-[11px] leading-snug text-amber-ink/75">Talk to an expert · 6 am–10 pm · 22 languages</span>
+        </a>
       </aside>
 
       <div className="lg:pl-64">
         {/* Top bar */}
         <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/90 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4">
-            <Link to="/" className="flex items-center gap-2 no-underline lg:invisible">
-              <span className="grid size-9 place-items-center rounded-xl bg-leaf text-on-leaf" aria-hidden>
-                <Sprout className="size-5" strokeWidth={2} />
-              </span>
-              <span className="font-display text-xl font-extrabold text-ink">CropWise</span>
+            <Link to="/" className="no-underline lg:invisible" aria-label="CropWise home">
+              <Logo size="sm" />
             </Link>
             <div className="flex items-center gap-2">
               <LanguageSelect />
