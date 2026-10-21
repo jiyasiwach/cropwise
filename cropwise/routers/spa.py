@@ -3,10 +3,11 @@ browser router takes over; /api, /docs, /static and /healthz are untouched."""
 
 from __future__ import annotations
 
+import hashlib
 import pathlib
 
 from fastapi import APIRouter, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 
 INDEX = pathlib.Path(__file__).resolve().parents[2] / "static" / "app" / "index.html"
 UI_ROUTES = ["/", "/grow", "/results", "/plan/{crop}", "/doctor", "/ask", "/history", "/impact",
@@ -15,20 +16,35 @@ UI_ROUTES = ["/", "/grow", "/results", "/plan/{crop}", "/doctor", "/ask", "/hist
 router = APIRouter(include_in_schema=False)
 
 
+def _revalidated(path: pathlib.Path, media_type: str, request: Request) -> Response:
+    """Serve a small file that must be re-checked on every visit, with an ETag from its CONTENT.
+
+    A file-time-and-size ETag is not enough: on the server every file has the same time, and a
+    new build's index.html is often exactly as long as the last one (only the asset hashes
+    change), so browsers were told "not modified" and kept a page whose scripts no longer exist.
+    """
+    body = path.read_bytes()
+    etag = '"' + hashlib.sha256(body).hexdigest()[:32] + '"'
+    headers = {"Cache-Control": "no-cache", "ETag": etag}
+    if etag in request.headers.get("if-none-match", ""):
+        return Response(status_code=304, headers=headers)
+    return Response(body, media_type=media_type, headers=headers)
+
+
 def app_shell(request: Request):
     if not INDEX.exists():
         return HTMLResponse("The app has not been built yet. Run <code>make ui</code>.", status_code=503)
     # Never cache the shell: a new deploy must show up on the next visit. Hashed assets cache forever.
-    return FileResponse(INDEX, media_type="text/html", headers={"Cache-Control": "no-cache"})
+    return _revalidated(INDEX, "text/html; charset=utf-8", request)
 
 
 @router.get("/sw.js", response_model=None)
-def service_worker():
+def service_worker(request: Request):
     """The offline worker must be served from the root to control every page."""
     worker = INDEX.parent / "sw.js"
     if not worker.exists():
         return HTMLResponse("", status_code=404)
-    return FileResponse(worker, media_type="text/javascript", headers={"Cache-Control": "no-cache"})
+    return _revalidated(worker, "text/javascript; charset=utf-8", request)
 
 
 for path in UI_ROUTES:

@@ -28,6 +28,25 @@
         if (l) document.documentElement.lang = l;
       } catch (e) {}
     </script>
+    <script>
+      // After a deploy, an old page can ask for script files that no longer exist. Reload once to
+      // fetch the new page instead of showing a blank screen (at most once a minute).
+      (function () {
+        function retry() {
+          try {
+            var last = Number(sessionStorage.getItem('cw.reloaded') || 0)
+            if (Date.now() - last < 60000) return
+            sessionStorage.setItem('cw.reloaded', String(Date.now()))
+          } catch (e) {}
+          location.reload()
+        }
+        window.addEventListener('error', function (e) {
+          var t = e.target
+          if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK') && /\/static\/app\/assets\//.test(t.src || t.href || '')) retry()
+        }, true)
+        window.addEventListener('vite:preloadError', function (e) { e.preventDefault(); retry() })
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,7 +1,7 @@
 // CropWise offline support: the app shell and built assets are cached so the app opens with no
 // signal; API answers are network-first with the last good copy kept for read-only GETs.
-const SHELL = 'cw-shell-v2'
-const DATA = 'cw-data-v2'
+const SHELL = 'cw-shell-v3'
+const DATA = 'cw-data-v3'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/static/app/manifest.webmanifest'])))

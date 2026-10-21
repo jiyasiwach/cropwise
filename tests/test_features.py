@@ -32,6 +32,19 @@ with TestClient(main.app) as client:
 
     for path in ["/yield", "/schemes", "/community"]:
         check(f"{path} opens in the app", is_app_shell(client.get(path)))
+    # A new deploy must never be hidden by "304 Not Modified" (that showed a blank page once).
+    first = client.get("/")
+    etag = first.headers.get("etag", "")
+    import hashlib
+    check("the app page's ETag comes from its content",
+          etag.strip('"') == hashlib.sha256(first.content).hexdigest()[:32], etag)
+    check("an unchanged page answers 304", client.get("/", headers={"If-None-Match": etag}).status_code == 304)
+    check("a page from an older build gets the new one in full",
+          client.get("/", headers={"If-None-Match": '"older-build"'}).status_code == 200)
+    check("the offline worker is revalidated by content too",
+          client.get("/sw.js", headers={"If-None-Match": '"older-build"'}).status_code == 200
+          and client.get("/sw.js").headers.get("cache-control") == "no-cache")
+    check("an old page that cannot find its scripts reloads itself once", "cw.reloaded" in first.text)
     check("the app bundle has the yield page", "Forecast my yield" in ui_text())
     check("the app bundle has the schemes page", "Kisan Yojana" in ui_text())
 
