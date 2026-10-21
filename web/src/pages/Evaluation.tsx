@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, type EvalData } from '../lib/api'
+import { api, type EvalData, type YieldEval } from '../lib/api'
 import { Card, Chip, ErrorBox, Loading, Note, PageTitle, SectionTitle, cx } from '../components/ui'
 
 const pct = (v: number | null | undefined) => (v == null ? 'not measured' : `${Math.round(v * 100)}%`)
@@ -31,6 +31,70 @@ function RetrievalBars({ rows }: { rows: { mode: string; hit_at_5: number; mrr: 
         </div>
       ))}
     </div>
+  )
+}
+
+function YieldSection({ y }: { y: YieldEval }) {
+  const o = y.overall
+  const crops = Object.entries(y.per_crop).sort((a, b) => a[1].model_median_error_pct - b[1].model_median_error_pct)
+  return (
+    <Card>
+      <div id="yield" className="scroll-mt-24" />
+      <SectionTitle aside={<Chip>{o.rows.toLocaleString('en-IN')} district-seasons</Chip>}>Yield forecast</SectionTitle>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <Stat value={`${o.model_median_error_pct}%`} label="Typical error (median)" />
+        <Stat value={`${o.baseline_last_year_median_error_pct}%`} label="Last season as the guess" tone="amber" />
+        <Stat value={`${o.baseline_5yr_mean_median_error_pct}%`} label="5-year average as the guess" tone="amber" />
+        <Stat value={`${Math.round(o.range_coverage_p10_p90 * 100)}%`} label="Real yield inside the range (aim 80%)" />
+      </div>
+      <p className="mt-3 text-sm text-muted">
+        {y.split} {y.selection} {y.model}
+      </p>
+      <div className="mt-3">
+        <Note tone="warn">
+          Honest reading: the model beats both simple guesses overall, but only just beats last season&apos;s yield (by {(o.baseline_last_year_median_error_pct - o.model_median_error_pct).toFixed(1)} points).
+          For some crops last season alone is still better — shown in amber below.
+        </Note>
+      </div>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-[30rem] text-sm">
+          <thead>
+            <tr className="border-b border-line text-left text-muted">
+              <th className="py-2 pr-2 font-semibold">Crop</th>
+              <th className="py-2 pr-2 text-right font-semibold">Seasons tested</th>
+              <th className="py-2 pr-2 text-right font-semibold">Model</th>
+              <th className="py-2 pr-2 text-right font-semibold">Last season</th>
+              <th className="py-2 text-right font-semibold">5-yr avg</th>
+            </tr>
+          </thead>
+          <tbody className="tabular-nums">
+            {crops.map(([crop, r]) => {
+              const loses = r.model_median_error_pct > r.baseline_last_year_median_error_pct
+              return (
+                <tr key={crop} className="border-b border-line/60">
+                  <td className="py-1.5 pr-2 capitalize">{crop}</td>
+                  <td className="py-1.5 pr-2 text-right">{r.rows.toLocaleString('en-IN')}</td>
+                  <td className={cx('py-1.5 pr-2 text-right font-semibold', loses && 'text-amber-ink')}>{r.model_median_error_pct}%</td>
+                  <td className="py-1.5 pr-2 text-right">{r.baseline_last_year_median_error_pct}%</td>
+                  <td className="py-1.5 text-right">{r.baseline_5yr_mean_median_error_pct}%</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">
+        {y.limits.map((l) => (
+          <li key={l}>{l}</li>
+        ))}
+      </ul>
+      <p className="mt-2 text-xs text-muted">
+        {y.data.attribution} Seasons {y.data.seasons}.{' '}
+        <a href={y.data.catalog_url} target="_blank" rel="noopener noreferrer">
+          Dataset
+        </a>
+      </p>
+    </Card>
   )
 }
 
@@ -116,8 +180,10 @@ export default function Evaluation() {
         )}
       </Card>
 
+      {data?.yield && <YieldSection y={data.yield} />}
+
       <p className="text-sm text-muted">
-        Reproduce with <code>make eval</code> and <code>make eval-doctor</code>. Full write-up: docs/EVAL.md in the{' '}
+        Reproduce with <code>make eval</code>, <code>make eval-doctor</code> and <code>make train-yield</code>. Full write-up: docs/EVAL.md in the{' '}
         <a href="https://github.com/jiyasiwach/cropwise" target="_blank" rel="noopener noreferrer">
           source code
         </a>

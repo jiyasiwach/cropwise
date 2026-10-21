@@ -3,7 +3,7 @@ import { ArrowRight, Check, TriangleAlert } from 'lucide-react'
 import type { PredictIn, PredictOut, Place } from '../lib/api'
 import { load, usePrefs } from '../lib/prefs'
 import { ConfidenceRing } from '../components/charts'
-import { ButtonLink, Card, Chip, CROP_ICONS, cropName, ListenButton, Note, PageTitle } from '../components/ui'
+import { ButtonLink, Card, Chip, CropIcon, cropName, ListenButton, Note, PageTitle } from '../components/ui'
 
 interface Saved {
   result: PredictOut
@@ -54,9 +54,7 @@ export default function Results() {
           return (
             <Card key={c.crop} as="article" className={i === 0 ? 'border-leaf/50' : undefined}>
               <div className="flex items-center gap-4">
-                <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-leaf-soft text-3xl" aria-hidden>
-                  {CROP_ICONS[c.crop] ?? '🌱'}
-                </div>
+                <CropIcon crop={c.crop} size="lg" />
                 <div className="min-w-0 flex-1">
                   {i === 0 && <div className="text-xs font-bold uppercase tracking-wider text-leaf">Best match</div>}
                   <h2 className="text-xl font-bold">{cropName(c.crop)}</h2>

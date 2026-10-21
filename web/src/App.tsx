@@ -14,6 +14,9 @@ const History = lazy(() => import('./pages/History'))
 const Impact = lazy(() => import('./pages/Impact'))
 const Evaluation = lazy(() => import('./pages/Evaluation'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Yield = lazy(() => import('./pages/Yield'))
+const Schemes = lazy(() => import('./pages/Schemes'))
+const Community = lazy(() => import('./pages/Community'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
@@ -32,6 +35,9 @@ export default function App() {
               <Route path="/history" element={<History />} />
               <Route path="/impact" element={<Impact />} />
               <Route path="/eval" element={<Evaluation />} />
+              <Route path="/yield" element={<Yield />} />
+              <Route path="/schemes" element={<Schemes />} />
+              <Route path="/community" element={<Community />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

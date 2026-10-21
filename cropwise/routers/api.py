@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from ..database import Prediction, User, get_db
 from ..schemas import HistoryItem, PredictIn, PredictOut, SoilOut, UserOut, WeatherOut
 from ..visitor import get_visitor
-from ..services import cropplan, impact, lookup, mandi, market, profit, season, stores
+from ..services import cropplan, impact, lookup, mandi, market, profit, schemes, season, stores, yield_model
 from ..services.predictor import recommend
 
 router = APIRouter(prefix="/api/v1")
@@ -243,12 +243,52 @@ async def place(city: str, _: User = Depends(get_visitor)) -> dict:
             "country": found.get("country"), "latitude": found["latitude"], "longitude": found["longitude"]}
 
 
+@router.get("/schemes")
+def scheme_list(state: str | None = None, _: User = Depends(get_visitor)) -> dict:
+    """Central farmer schemes plus the farmer's state schemes, each with its official source."""
+    return schemes.schemes(state)
+
+
+@router.get("/schemes/updates")
+async def scheme_updates(limit: int = 12, _: User = Depends(get_visitor)) -> dict:
+    """Recent official agriculture announcements (cached for an hour)."""
+    return await schemes.updates(max(1, min(limit, 30)))
+
+
+@router.get("/channels")
+def official_channels(state: str | None = None, _: User = Depends(get_visitor)) -> dict:
+    """Official WhatsApp/Telegram/helpline channels published by government bodies."""
+    return schemes.channels(state)
+
+
+@router.get("/yield/options")
+def yield_options(state: str | None = None, district: str | None = None, _: User = Depends(get_visitor)) -> dict:
+    """States, districts and crops the yield forecast has government records for."""
+    return yield_model.options(state, district)
+
+
+@router.get("/yield")
+def yield_forecast(
+    crop: str, state: str, district: str, season: str = "Kharif", acres: float | None = None,
+    _: User = Depends(get_visitor),
+) -> dict:
+    """Next season's expected district yield per acre (low/likely/high), and for this many acres."""
+    if season not in yield_model.SEASONS:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Season must be Kharif, Rabi or Summer.")
+    if acres is not None and not 0 < acres <= 1000:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Acres must be between 0 and 1000.")
+    try:
+        return yield_model.forecast(crop.lower(), state, district, season, acres)
+    except LookupError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+
+
 @router.get("/eval")
 def evaluation(_: User = Depends(get_visitor)) -> dict:
     """The measured numbers the /eval screen shows, exactly as `make eval` / `make eval-doctor` wrote them."""
     docs = pathlib.Path(__file__).resolve().parents[2] / "docs"
     read = lambda name: json.loads((docs / name).read_text()) if (docs / name).exists() else None  # noqa: E731
-    return {"assistant": read("eval.json"), "doctor": read("doctor_eval.json")}
+    return {"assistant": read("eval.json"), "doctor": read("doctor_eval.json"), "yield": read("yield_eval.json")}
 
 
 @router.get("/profit")

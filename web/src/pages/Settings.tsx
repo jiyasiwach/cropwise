@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BarChart3, ChevronRight, Code2, History, Info, Lightbulb, MapPin } from 'lucide-react'
+import { BarChart3, ChevronRight, Code2, History, Info, Landmark, Lightbulb, MapPin, Radio, Scale } from 'lucide-react'
 import { LANGUAGES, type Lang } from '../lib/i18n'
 import { usePrefs, type Theme } from '../lib/prefs'
 import { Card, HelplineButton, PageTitle, SectionTitle, cx } from '../components/ui'
@@ -34,6 +34,9 @@ export default function Settings() {
       <PageTitle title="More" />
 
       <Card>
+        <Row to="/yield" icon={<Scale className="size-5" />} label="Yield forecast" hint="Expected quintal per acre for your district" />
+        <Row to="/schemes" icon={<Landmark className="size-5" />} label="Kisan Yojana" hint="Government schemes and the latest announcements" />
+        <Row to="/community" icon={<Radio className="size-5" />} label="Official channels" hint="Government WhatsApp, Telegram and helplines" />
         <Row to="/history" icon={<History className="size-5" />} label="History" hint="Your past recommendations" />
         <Row to="/impact" icon={<Lightbulb className="size-5" />} label="The problem" hint="Why CropWise exists, with sources and a calculator" />
         <Row to="/eval" icon={<BarChart3 className="size-5" />} label="How well it works" hint="Measured accuracy and safety" />

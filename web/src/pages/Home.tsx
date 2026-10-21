@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Camera, IndianRupee, MapPin, Send, ShieldCheck, Sprout, CalendarDays } from 'lucide-react'
+import { ArrowRight, Camera, IndianRupee, Landmark, MapPin, Radio, Scale, Send, ShieldCheck, Sprout, CalendarDays } from 'lucide-react'
 import { api, type EvalData, type Season } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { useListener } from '../lib/speech'
-import { Card, Chip, CROP_ICONS, cropName, MicButton, SectionTitle, Skeleton, cx } from '../components/ui'
+import { Card, Chip, CropIcon, cropName, MicButton, SectionTitle, Skeleton, cx } from '../components/ui'
 
 function Tile({ to, icon, title, hint, tone }: { to: string; icon: React.ReactNode; title: string; hint: string; tone: string }) {
   return (
@@ -85,7 +85,7 @@ function SeasonCard() {
                     to={`/plan/${s.crop}`}
                     className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-semibold text-ink no-underline hover:border-leaf/50"
                   >
-                    <span aria-hidden>{CROP_ICONS[s.crop] ?? '🌱'}</span> {cropName(s.crop)}
+                    <CropIcon crop={s.crop} size="sm" /> {cropName(s.crop)}
                     <Chip>{s.days_left} days left</Chip>
                   </Link>
                 ))}
@@ -148,7 +148,9 @@ export default function Home() {
   return (
     <div className="space-y-6">
       <section className="rounded-[1.75rem] bg-leaf-strong px-5 pb-5 pt-6 text-white dark:bg-leaf-soft">
-        <p className="text-sm font-semibold text-white/75 dark:text-leaf">🙏 Namaste</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70 dark:text-leaf">
+          {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </p>
         <h1 className="mt-1 text-[1.65rem] font-extrabold leading-tight text-white sm:text-3xl dark:text-ink">{t('home.title')}</h1>
         <form onSubmit={submit} className="mt-4 flex items-center gap-2">
           <MicButton listening={listening} supported={supported} onClick={toggle} large />
@@ -171,9 +173,32 @@ export default function Home() {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Tile to="/grow" title={t('tile.grow')} hint={t('hint.grow')} icon={<Sprout className="size-6 text-leaf" />} tone="bg-leaf-soft" />
-        <Tile to="/doctor" title={t('tile.doctor')} hint={t('hint.doctor')} icon={<Camera className="size-6 text-[#b5481e]" />} tone="bg-[#fde7dc] dark:bg-[#3a2016]" />
-        <Tile to="/impact#calculator" title={t('tile.sell')} hint={t('hint.sell')} icon={<IndianRupee className="size-6 text-amber-ink" />} tone="bg-amber-soft" />
-        <Tile to="/results" title={t('tile.plan')} hint={t('hint.plan')} icon={<CalendarDays className="size-6 text-[#2f5fb3]" />} tone="bg-[#e3ecfb] dark:bg-[#18263f]" />
+        <Tile to="/doctor" title={t('tile.doctor')} hint={t('hint.doctor')} icon={<Camera className="size-6 text-leaf" />} tone="bg-leaf-soft" />
+        <Tile to="/impact#calculator" title={t('tile.sell')} hint={t('hint.sell')} icon={<IndianRupee className="size-6 text-leaf" />} tone="bg-leaf-soft" />
+        <Tile to="/results" title={t('tile.plan')} hint={t('hint.plan')} icon={<CalendarDays className="size-6 text-leaf" />} tone="bg-leaf-soft" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {[
+          { to: '/yield', icon: Scale, title: t('tile.yield'), hint: t('hint.yield') },
+          { to: '/schemes', icon: Landmark, title: t('tile.schemes'), hint: t('hint.schemes') },
+          { to: '/community', icon: Radio, title: t('tile.community'), hint: t('hint.community') },
+        ].map(({ to, icon: Icon, title, hint }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 no-underline shadow-card transition hover:border-leaf/40"
+          >
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-leaf-soft text-leaf">
+              <Icon className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-display font-bold text-ink">{title}</span>
+              <span className="block text-sm text-muted">{hint}</span>
+            </span>
+            <ArrowRight className="size-4 text-muted transition group-hover:translate-x-0.5" aria-hidden />
+          </Link>
+        ))}
       </div>
 
       <SeasonCard />

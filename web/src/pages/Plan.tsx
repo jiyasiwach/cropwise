@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Camera, MapPin, Phone } from 'lucide-react'
+import { Camera, Leaf, MapPin, Phone } from 'lucide-react'
 import { api, ApiError, type BestMarket, type Mandi, type Plan, type Profit, type Stores } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { CompareBars, MoneyBar, SeasonTimeline, Sparkline } from '../components/charts'
@@ -9,7 +9,7 @@ import {
   ButtonLink,
   Card,
   Chip,
-  CROP_ICONS,
+  CropIcon,
   cropName,
   cx,
   ErrorBox,
@@ -145,8 +145,9 @@ function FertiliserTab({ plan }: { plan: Plan }) {
           ))}
         </ol>
         {f.organic_option && (
-          <p className="mt-3 rounded-2xl bg-leaf-soft p-3 text-sm">
-            🌿 Organic option: about {f.organic_option.farmyard_manure_tonnes} t farmyard manure or {f.organic_option.vermicompost_tonnes} t vermicompost. {f.organic_option.note}
+          <p className="mt-3 flex gap-2 rounded-2xl bg-leaf-soft p-3 text-sm">
+            <Leaf className="mt-0.5 size-4 shrink-0 text-leaf" aria-hidden />
+            <span>Organic option: about {f.organic_option.farmyard_manure_tonnes} t farmyard manure or {f.organic_option.vermicompost_tonnes} t vermicompost. {f.organic_option.note}</span>
           </p>
         )}
       </Card>
@@ -360,7 +361,7 @@ export default function PlanPage() {
             <Link to="/results">← Crops</Link>
           </p>
           <h1 className="mt-1 flex items-center gap-2 text-[1.9rem] font-extrabold">
-            <span aria-hidden>{CROP_ICONS[crop] ?? '🌱'}</span> {cropName(crop)} plan
+            <CropIcon crop={crop} /> {cropName(crop)} plan
           </h1>
         </div>
         <ButtonLink to={`/doctor?crop=${crop}`} variant="secondary" className="shrink-0">

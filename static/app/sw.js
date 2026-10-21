@@ -1,7 +1,7 @@
 // CropWise offline support: the app shell and built assets are cached so the app opens with no
 // signal; API answers are network-first with the last good copy kept for read-only GETs.
-const SHELL = 'cw-shell-v1'
-const DATA = 'cw-data-v1'
+const SHELL = 'cw-shell-v2'
+const DATA = 'cw-data-v2'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/static/app/manifest.webmanifest'])))
@@ -50,6 +50,17 @@ self.addEventListener('fetch', (event) => {
 
   // Page navigations: network first, cached shell when offline (the router renders the page).
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => caches.match('/')))
+    // Each online visit refreshes the offline copy, so offline never shows an old version.
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok && url.pathname === '/') {
+            const copy = res.clone()
+            caches.open(SHELL).then((c) => c.put('/', copy))
+          }
+          return res
+        })
+        .catch(() => caches.match('/')),
+    )
   }
 })

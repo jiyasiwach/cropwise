@@ -1,0 +1,388 @@
+[
+ {
+  "state": "Telangana",
+  "key": "telangana_rythu_bharosa",
+  "name": "Rythu Bharosa (crop investment support)",
+  "hindi_name": "రైతు భరోసా (Telugu)",
+  "status": "active",
+  "what_you_get": "Crop investment support of ₹12,000 per acre per year, credited to the farmer's bank account by DBT. The state releases it season by season (for example, the Vanakalam/kharif 2026 release in June–July 2026).",
+  "who_can_apply": [
+   "Pattadars (land-owning farmers) for cultivable land recorded on the Bhu Bharati (Dharani) portal",
+   "RoFR (forest rights) patta holders",
+   "Non-cultivable land is excluded"
+  ],
+  "how_to_apply": [
+   "No separate application form is described in the GO: assistance is paid by DBT based on land records in Bhu Bharati",
+   "Make sure your land record and bank account details are correct",
+   "For problems, contact your Agriculture Extension Officer (AEO) or Mandal Agriculture Officer (MAO); contact lists are on rythubharosa.telangana.gov.in"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://rythubharosa.telangana.gov.in/",
+  "source_url": "https://rythubharosa.telangana.gov.in/assets/files/GO%20Rt%20No.%2018_%20Rythu%20Bharosa%20Scheme%202025.pdf",
+  "source_title": "G.O.Rt.No.18, Agriculture & Cooperation (Agri-II) Dept, Govt of Telangana, dated 10-01-2025 – Rythu Bharosa Scheme 2025 guidelines",
+  "additional_sources": [
+   "https://www.telangana.gov.in/news/press-releases/2026/06/honble-chief-minister-sri-a-revanth-reddy-releases-rythu-bharosa-addresses-farmers-at-shilpakala-vedika-hyderabad/",
+   "https://www.telangana.gov.in/news/press-releases/2026/07/honble-cm-sri-a-revanth-reddy-participated-in-rythu-ashirvada-sabha-releases-rythu-bharosa-funds-to-farmers-issues-e-pattadar-passbooks-addresses-gathering-at-jagannadhapuram-chintakani/"
+  ],
+  "as_of": "GO dated 2025-01-10; latest release confirmed 2026-07-10 (Vanakalam 2026)",
+  "verified": true,
+  "verification_note": "GO (Telugu, scanned) says scheme runs from 26 Jan 2025 at ₹12,000/acre/year, for cultivable land on Bhu Bharati, incl. RoFR pattadars, via DBT. Telangana govt press releases of 30 Jun 2026 and 10 Jul 2026 confirm ₹9,000 crore credited to 73.30 lakh farmers in the 2026 round. Replaces Rythu Bandhu. Per-season split not stated in the GO."
+ },
+ {
+  "state": "Andhra Pradesh",
+  "key": "ap_annadatha_sukhibhava",
+  "name": "Annadatha Sukhibhava – PM-KISAN",
+  "hindi_name": "అన్నదాత సుఖీభవ (Telugu)",
+  "status": "active",
+  "what_you_get": "₹20,000 per year per eligible farmer family, which includes the ₹6,000 paid by the Government of India under PM-KISAN. It is paid in instalments (e.g. ₹7,000 per farmer as the first instalment for Kharif 2026, released 20 June 2026).",
+  "who_can_apply": [
+   "Landholder farmer families who collectively own cultivable land in Andhra Pradesh",
+   "Landless cultivators (the state budget says they will also get ₹20,000 per year from state funds)"
+  ],
+  "how_to_apply": [
+   "No separate application process is described in the budget document",
+   "Check your eligibility and payment status with Aadhaar on annadathasukhibhava.ap.gov.in (\"Know Your Status\")",
+   "For problems, contact your village agriculture staff / local agriculture office"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://annadathasukhibhava.ap.gov.in/",
+  "source_url": "https://apfinance.gov.in/...Bud@et26-27/documents/Volume-VII-2.pdf",
+  "source_title": "Andhra Pradesh Budget 2026-27, Volume VII/2 (Scheduled Tribes Component) – Agriculture Department, 1.1 Annadatha Sukhibhava Scheme",
+  "additional_sources": [
+   "https://apfinance.gov.in/...Bud@et26-27/documents/SpeechEnglish.pdf",
+   "https://newsonair.gov.in/andhra-pradesh-3125-crore-rupees-credited-to-46-85-lakh-farmers-under-pm-kisan-annadata-sukhibhava-scheme/"
+  ],
+  "as_of": "Budget 2026-27; Kharif 2026 first instalment 20 Jun 2026 (AIR)",
+  "verified": true,
+  "verification_note": "Official AP budget 2026-27 states ₹20,000/yr incl. ₹6,000 PM-KISAN; launched 02.08.2025. Budget speech: 2025-26 paid ₹6,660 crore to 46.86 lakh families. AIR (20 Jun 2026) reports ₹7,000/farmer Kharif 2026 instalment. Replaced YSR Rythu Bharosa. Landless-cultivator payment is stated as a commitment; actual payout not confirmed."
+ },
+ {
+  "state": "Andhra Pradesh",
+  "key": "ap_crop_insurance_pmfby_voluntary",
+  "name": "Crop insurance – PMFBY / RWBCIS (voluntary enrolment)",
+  "hindi_name": null,
+  "status": "active",
+  "what_you_get": "Insurance against crop loss from natural calamities, pests and diseases in Kharif and Rabi. Since Rabi 2024-25 enrolment is voluntary and the farmer pays a small premium; the State and Centre pay the rest of the premium equally.",
+  "who_can_apply": [
+   "Farmers in Andhra Pradesh growing notified crops (enrolment is voluntary)"
+  ],
+  "how_to_apply": [
+   "Enrol through your bank or a Common Service Centre (CSC) before the season's cut-off date",
+   "Pay the farmer's share of the premium at enrolment"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://pmfby.gov.in/",
+  "source_url": "https://apfinance.gov.in/...Bud@et26-27/documents/Volume-VII-2.pdf",
+  "source_title": "Andhra Pradesh Budget 2026-27, Volume VII/2 – Agriculture Department, 1.2 Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+  "as_of": "Budget 2026-27",
+  "verified": true,
+  "verification_note": "Official AP budget confirms PMFBY and RWBCIS implemented with voluntary enrolment from Rabi 2024-25, farmer pays nominal premium. Premium rates and cut-off dates not given in this source. This replaced AP's earlier free (state-paid) crop insurance."
+ },
+ {
+  "state": "Karnataka",
+  "key": "karnataka_zero_interest_crop_loans",
+  "name": "Zero-interest agricultural loans through co-operatives",
+  "hindi_name": null,
+  "status": "active",
+  "what_you_get": "Agricultural loans at zero percent interest through co-operative credit institutions. For 2026-27 the state targets ₹30,000 crore of such loans to 38 lakh farmers.",
+  "who_can_apply": [
+   "Farmers in Karnataka who borrow from co-operative credit societies/banks (e.g. PACS)"
+  ],
+  "how_to_apply": [
+   "Apply for a crop loan at your Primary Agricultural Co-operative Society (PACS) or co-operative bank",
+   "Ask the society for the current loan limit and repayment terms"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://finance.karnataka.gov.in/",
+  "source_url": "https://finance.karnataka.gov.in/uploads/Eng%20Final%20BS%202026-27_1772786310.pdf",
+  "source_title": "Karnataka Budget Speech 2026-27 (English), para 80 – Co-operation",
+  "as_of": "Budget 2026-27 (presented 6 Mar 2026)",
+  "verified": true,
+  "verification_note": "Official budget speech confirms zero-interest agricultural loans target for 2026-27, and ₹22,000 crore disbursed to 25 lakh farmers in 2025-26 (as of Feb 2026). Per-farmer loan limit is not stated in this source."
+ },
+ {
+  "state": "Karnataka",
+  "key": "karnataka_krishi_bhagya",
+  "name": "Krishi Bhagya (farm ponds)",
+  "hindi_name": "ಕೃಷಿ ಭಾಗ್ಯ (Kannada)",
+  "status": "active",
+  "what_you_get": "Government support to build farm ponds so rain-fed farmers can store water for protective irrigation. 12,000 more farm ponds were planned for 2025-26.",
+  "who_can_apply": [
+   "Farmers in Karnataka, especially in rain-fed/dry areas (exact eligibility not stated in the budget source)"
+  ],
+  "how_to_apply": [
+   "Contact your nearest Raitha Samparka Kendra or taluk Assistant Director of Agriculture"
+  ],
+  "documents": [],
+  "helpline": "1800 425 3553 / 8277003553 (Raitha Call Center, Karnataka Agriculture Department)",
+  "official_url": "https://raitamitra.karnataka.gov.in/52/krishi-bhagya-scheme/en",
+  "source_url": "https://finance.karnataka.gov.in/uploads/media_to_upload1741332694.pdf",
+  "source_title": "Karnataka Budget Speech 2025-26 (English), para 33",
+  "additional_sources": [
+   "https://finance.karnataka.gov.in/uploads/Eng%20Final%20BS%202026-27_1772786310.pdf"
+  ],
+  "as_of": "Budget 2025-26 (7 Mar 2025); Budget 2026-27 (6 Mar 2026)",
+  "verified": true,
+  "verification_note": "Budget 2025-26 confirms 12,000 more ponds in 2025-26; Budget 2026-27 reports 32,138 farm ponds built at ₹363 crore. Subsidy rate per pond is not stated in these sources. Helpline is the department's Raitha Call Center listed on raitamitra.karnataka.gov.in."
+ },
+ {
+  "state": "Karnataka",
+  "key": "karnataka_raitha_suraksha_pmfby",
+  "name": "Karnataka Raitha Suraksha – Pradhan Mantri Fasal Bima Yojana (crop insurance)",
+  "hindi_name": "ಕರ್ನಾಟಕ ರೈತ ಸುರಕ್ಷಾ ಪ್ರಧಾನ ಮಂತ್ರಿ ಫಸಲ್ ಭೀಮಾ ಯೋಜನೆ (Kannada)",
+  "status": "active",
+  "what_you_get": "Crop insurance against crop loss under PMFBY, run in Karnataka through the Samrakshane portal. The state reports crop insurance claims of ₹6,213 crore settled for 51 lakh farmers.",
+  "who_can_apply": [
+   "Farmers in Karnataka growing notified crops in notified areas"
+  ],
+  "how_to_apply": [
+   "Enrol for the season on the Samrakshane portal (samrakshane.karnataka.gov.in) or through your bank before the cut-off date",
+   "Check application/claim status on the same portal"
+  ],
+  "documents": [],
+  "helpline": "1800 425 3553 / 8277003553 (Raitha Call Center, Karnataka Agriculture Department)",
+  "official_url": "https://samrakshane.karnataka.gov.in/",
+  "source_url": "https://finance.karnataka.gov.in/uploads/Eng%20Final%20BS%202026-27_1772786310.pdf",
+  "source_title": "Karnataka Budget Speech 2026-27 (English), para 36 – Agriculture",
+  "additional_sources": [
+   "https://samrakshane.karnataka.gov.in/",
+   "https://raitamitra.karnataka.gov.in/88/karnataka-raitha-suraksha-pradhana-mantri-fasal-bima-yojana/en"
+  ],
+  "as_of": "Budget 2026-27; Samrakshane portal showed 'Enrolment for Khariff 2026 is OPEN' (checked 2026-10-21)",
+  "verified": true,
+  "verification_note": "Budget speech confirms claims settled; Samrakshane portal lists 2025-26 and 2026-27 seasons. Premium rates and cut-off dates not given in these sources. Claims figure is cumulative over the government's term, not one year."
+ },
+ {
+  "state": "Tamil Nadu",
+  "key": "tn_kuruvai_special_package_2026",
+  "name": "Kuruvai Special Package 2026 (delta and non-delta districts)",
+  "hindi_name": "குறுவை சிறப்புத் தொகுப்புத் திட்டம் (Tamil)",
+  "status": "active",
+  "what_you_get": "Input support for Kuruvai/Kar/Sornavari paddy (total ₹134.83 crore): ₹4,000 per acre back-end subsidy for machine transplanting or direct-seeded rice; paddy micronutrient mixture at 50% subsidy or ₹147.6/acre; liquid bio-fertiliser at 50% or ₹60/acre; seed paddy at 50% or ₹10/kg (older varieties) / ₹20/kg (newer varieties), whichever is less.",
+  "who_can_apply": [
+   "Delta package: all farmers of Thanjavur, Thiruvarur, Cuddalore, Nagapattinam, Mayiladuthurai, Trichy and Ariyalur districts",
+   "Non-delta package: paddy farmers in other districts in the Kar/Kuruvai/Sornavari season"
+  ],
+  "how_to_apply": [
+   "Contact your block Agriculture office / Assistant Director of Agriculture",
+   "Check components on the TN Agriculture Department 'Schemes 2026-27' page (tnagrisnet.tn.gov.in) and register through the department"
+  ],
+  "documents": [
+   "Aadhaar card",
+   "Chitta",
+   "Adangal"
+  ],
+  "helpline": null,
+  "official_url": "https://www.tnagrisnet.tn.gov.in/home/schemes/en",
+  "source_url": "https://www.tnagrisnet.tn.gov.in/home/schemes/en",
+  "source_title": "TN Agriculture–Farmers Welfare Dept, Schemes 2026-27: Kuruvai Special Package scheme for Delta Districts 2026-27 (tnagrisnet)",
+  "additional_sources": [
+   "https://www.tnagrisnet.tn.gov.in/assets/uploads/press_release/DIPR---P-R-NO-218---Honble-CM-Press-Release---Agri-Dept---Kuruvai-Special-Package-Scheme---Date---12-6-2026.pdf",
+   "https://newsonair.gov.in/tamil-nadu-government-presents-revised-agriculture-budget-for-2026-27-in-the-state-assembly/"
+  ],
+  "as_of": "Kuruvai 2026 season; announced 2026-06-12",
+  "verified": true,
+  "verification_note": "Announced by CM C. Joseph Vijay (TVK govt) in DIPR press release 218 of 12.06.2026: ₹77.50 cr delta + ₹57.33 cr non-delta. Rates and documents from the department's 2026-27 scheme data. Seasonal (June–Sept); news (PMK, Aug 2026) reported delays in benefits reaching farmers."
+ },
+ {
+  "state": "Tamil Nadu",
+  "key": "tn_cm_mannuyir_kaathu_2026_27",
+  "name": "Chief Minister's Mannuyir Kaathu Mannuyir Kaappom Scheme 2026-27 (soil health)",
+  "hindi_name": "முதலமைச்சரின் மண்ணுயிர் காத்து மன்னுயிர் காப்போம் திட்டம் (Tamil)",
+  "status": "active",
+  "what_you_get": "Subsidised green manure seeds to improve soil health: Rs.70 per kg or 50% of the actual cost, whichever is lower.",
+  "who_can_apply": [
+   "Farmers of all districts except Chennai, the Nilgiris, Coimbatore and Kanyakumari"
+  ],
+  "how_to_apply": [
+   "Contact your block Agriculture office / Agriculture Extension Centre",
+   "Details on the TN Agriculture Department 'Schemes 2026-27' page (tnagrisnet.tn.gov.in)"
+  ],
+  "documents": [
+   "Aadhaar card",
+   "Chitta",
+   "Adangal"
+  ],
+  "helpline": null,
+  "official_url": "https://www.tnagrisnet.tn.gov.in/home/schemes/en",
+  "source_url": "https://www.tnagrisnet.tn.gov.in/home/schemes/en",
+  "source_title": "TN Agriculture–Farmers Welfare Dept, Schemes 2026-27: Chief Minister's Mannuyir Kaathu Mannuyir Kaappom Scheme 2026-27 (tnagrisnet)",
+  "as_of": "2026-27 (checked 2026-10-21)",
+  "verified": true,
+  "verification_note": "DMK-era scheme still listed under 2026-27 by the TVK government's Agriculture Department; only the green-manure component is listed there now. TVK revised agri budget (6 Aug 2026, AIR) also announced a Soil Fertility Mission (₹122 crore) – details not verified."
+ },
+ {
+  "state": "Maharashtra",
+  "key": "mh_namo_shetkari_mahasanman_nidhi",
+  "name": "Namo Shetkari Mahasanman Nidhi Yojana (NSMNY)",
+  "hindi_name": "नमो शेतकरी महासन्मान निधी योजना",
+  "what_you_get": "Rs. 6,000 a year from the Maharashtra government, paid in three equal instalments of Rs. 2,000 by DBT to an Aadhaar-linked bank account. This is on top of PM-KISAN, so an eligible farmer family gets Rs. 12,000 a year from both schemes.",
+  "who_can_apply": [
+   "Farmer families in Maharashtra that are eligible for and receiving PM-KISAN (myScheme: cultivable land holding as on 01.02.2019)",
+   "Same exclusions as PM-KISAN apply (e.g. income-tax payers, serving/retired government employees, pensioners with Rs. 10,000+/month pension, constitutional post holders, registered professionals, NRIs)"
+  ],
+  "how_to_apply": [
+   "No separate NSMNY registration: register on the PM-KISAN portal (pmkisan.gov.in); eligible PM-KISAN beneficiaries automatically get NSMNY",
+   "Keep the bank account Aadhaar-linked and DBT-enabled",
+   "Check beneficiary status on nsmny.mahait.org"
+  ],
+  "documents": [],
+  "helpline": "020-25538755 (Commissionerate of Agriculture, Pune; email pmkisan-mh@gov.in)",
+  "official_url": "https://nsmny.mahait.org/",
+  "source_url": "https://www.myscheme.gov.in/schemes/namo-shetkari-mahasanman-nidhi-yojana",
+  "source_title": "myScheme: Namo Shetkari Mahasanman Nidhi Yojana (Commissionerate of Agriculture, Maharashtra)",
+  "as_of": "GR dated 03 Sep 2025 (7th instalment, Apr-Jul 2025); checked 2026-10-21",
+  "verified": true,
+  "verification_note": "myScheme (content read via its public API; page is JS-rendered) gives Rs. 6,000/yr in 3 instalments on top of PM-KISAN. Official NSMNY portal hosts GRs for instalments 1-7; the 7th-instalment GR (03 Sep 2025) released Rs. 1932.72 crore for Apr-Jul 2025, confirming it ran in 2025-26. Later instalments not checked. Helpline and email are from the NSMNY portal Contact Us.",
+  "status": "active"
+ },
+ {
+  "state": "Rajasthan",
+  "key": "rj_mukhyamantri_kisan_samman_nidhi",
+  "name": "Mukhyamantri (Chief Minister) Kisan Samman Nidhi Yojana",
+  "hindi_name": "मुख्यमंत्री किसान सम्मान निधि योजना",
+  "what_you_get": "Extra Rs. 3,000 a year from the Rajasthan government (raised from Rs. 2,000 in Budget 2025-26), paid by DBT at Rs. 1,000 per instalment. This is on top of PM-KISAN's Rs. 6,000.",
+  "who_can_apply": [
+   "Farmers in Rajasthan who are beneficiaries of PM-KISAN"
+  ],
+  "how_to_apply": [
+   "No separate application is described in the official source; the top-up goes by DBT to farmers benefiting under PM-KISAN",
+   "Check status via 'Mukhyamantri Kisan Samman Nidhi Yojana Status' on the Jan Soochna Portal (jansoochna.rajasthan.gov.in)"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://jansoochna.rajasthan.gov.in/Scheme",
+  "source_url": "https://finance.rajasthan.gov.in/docs/budget/statebudget/2026-2027/EconomicReviewE.pdf",
+  "source_title": "Government of Rajasthan, Economic Review 2025-26 (Finance Department, Budget 2026-27 documents)",
+  "as_of": "Economic Review 2025-26 (data up to Dec 2025); checked 2026-10-21",
+  "verified": true,
+  "verification_note": "Official Economic Review 2025-26 states the annual top-up was raised from Rs. 2,000 to Rs. 3,000 in Budget 2025-26, paid at Rs. 1,000 per farmer; 4th instalment Rs. 717.96 crore to 71.79 lakh farmers. Eligibility (PM-KISAN beneficiaries) is from the Economic Review 2024-25 (finance.rajasthan.gov.in/docs/budget/statebudget/2025-2026/EconomicReviewE.pdf). DD News (16 Aug 2026) reports another Rs. 1,000-per-farmer instalment to ~67 lakh farmers, so it is still running. Note: some news counts Rs. 9,000 as Centre+State combined.",
+  "status": "active"
+ },
+ {
+  "state": "Rajasthan",
+  "key": "rj_small_marginal_older_farmer_samman_pension",
+  "name": "Small and Marginal Older Farmers' Samman Pension Scheme (Laghu evam Seemant Vriddhajan Krishak Samman Pension Yojana)",
+  "hindi_name": "लघु एवं सीमांत वृद्धजन कृषक सम्मान पेंशन योजना",
+  "what_you_get": "A monthly pension of Rs. 1,250 for older small and marginal farmers. This is a state pension, not a PM-KISAN top-up.",
+  "who_can_apply": [
+   "Small and marginal farmers resident in Rajasthan",
+   "Women aged 55 years or more; men aged 58 years or more"
+  ],
+  "how_to_apply": [
+   "Apply online through Rajasthan SSO (sso.rajasthan.gov.in) using Jan Aadhaar, as described on myScheme (Social Justice and Empowerment Department scheme)",
+   "Pension stops if the farmer leaves the small/marginal category or migrates out of Rajasthan"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://ssp.rajasthan.gov.in/",
+  "source_url": "https://finance.rajasthan.gov.in/docs/budget/statebudget/2026-2027/EconomicReviewE.pdf",
+  "source_title": "Government of Rajasthan, Economic Review 2025-26 (Finance Department, Budget 2026-27 documents)",
+  "as_of": "Economic Review 2025-26 (data up to Dec 2025)",
+  "verified": true,
+  "verification_note": "Economic Review 2025-26 gives Rs. 1,250/month, 1.97 lakh beneficiaries, Rs. 234.89 crore spent up to Dec 2025 (2024-25 Review gave Rs. 1,150). Text is from a two-column infographic, read carefully. myScheme page (myscheme.gov.in/schemes/slesvkspy) still shows older amounts (Rs. 750/1,000) - do not use those; application steps taken from myScheme.",
+  "status": "active"
+ },
+ {
+  "state": "Madhya Pradesh",
+  "key": "mp_mukhyamantri_kisan_kalyan_yojana",
+  "name": "Mukhyamantri Kisan Kalyan Yojana",
+  "hindi_name": "मुख्यमंत्री किसान कल्याण योजना",
+  "what_you_get": "Rs. 6,000 a year from the Madhya Pradesh government, in addition to PM-KISAN (so Rs. 12,000 a year together). In July 2026 two instalments were paid together, Rs. 4,000 per farmer.",
+  "who_can_apply": [
+   "Farmers of Madhya Pradesh who are beneficiaries of the scheme (it runs alongside PM-KISAN)",
+   "Farmers who burn crop stubble (narwai) are denied the benefit (state decision effective 1 May 2025)"
+  ],
+  "how_to_apply": [
+   "Official releases do not describe a separate current application; payment is made directly to beneficiary bank accounts",
+   "Check beneficiary status under 'CM Kisan Kalyan Yojna Beneficiary Status' on the SAARA portal (saara.mp.gov.in)"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://saara.mp.gov.in/",
+  "source_url": "https://www.mpinfo.org/Home/TodaysNews?newsid=%C2%B2%C2%B0%C2%B2%C2%B5%C2%B0%C2%B8%C2%B1%C2%B2%C3%8E%C2%B5%C2%B2%C2%B7&fontname=Mangal&LocID=32&pubdate=08%2F12%2F2025",
+  "source_title": "MP Jansampark (mpinfo.org) release, 12 Aug 2025: CM to transfer 2025-26 second instalment of Mukhyamantri Kisan Kalyan Yojana",
+  "as_of": "2025-08-12; latest payment 2026-07-27",
+  "verified": true,
+  "verification_note": "Official MP Public Relations Dept release (12 Aug 2025) states Rs. 6,000/yr in addition to PM-KISAN. Release of 27 Jul 2026 (https://www.mpinfo.org/Home/TodaysNews?newsid=%C2%B2%C2%B0%C2%B2%C2%B6%C2%B0%C2%B7%C2%B2%C2%B7%C3%8E%C2%B1%C2%B6%C2%B3&fontname=Mangal&LocID=32&pubdate=07%2F27%2F2026) confirms Rs. 3,308 crore to 82.70 lakh+ farmers, Rs. 4,000 each in one go. Release of 24 Apr 2025 (https://www.mpinfo.org/Home/TodaysNews?newsid=%C2%B2%C2%B0%C2%B2%C2%B5%C2%B0%C2%B4%C2%B2%C2%B4%C3%8E%C2%B4%C2%B2%C2%B9&fontname=Mangal&LocID=32&pubdate=04%2F24%2F2025) says stubble burners lose the benefit from 1 May 2025. mpinfo pages load text by script; content read via the site's own news API. Older 2020 releases show Rs. 4,000/yr - outdated.",
+  "status": "active"
+ },
+ {
+  "state": "Gujarat",
+  "key": "gj_cop34_crop_loan_interest_subvention",
+  "name": "COP-34 Financial Assistance to Farmers for Interest Subvention (Kisan Credit Card crop-loan interest help)",
+  "hindi_name": "COP-34 વ્યાજ સહાય માટે ખેડૂતોને નાણાકીય સહાય",
+  "what_you_get": "The Gujarat government pays 4% interest subvention on short-term crop loans up to Rs. 3,00,000 when the farmer repays on time (once in a financial year).",
+  "who_can_apply": [
+   "Farmers in Gujarat who took a short-term Kharif crop loan (1 April - 30 September) from a Primary Agricultural Credit Cooperative Society, District Central Cooperative Bank, nationalised, Gramin or private bank",
+   "The loan must be repaid on time"
+  ],
+  "how_to_apply": [
+   "No individual application: the lending bank submits the combined interest-subvention proposal to the Registrar, Co-operative Societies, Gujarat, Gandhinagar",
+   "Repay the crop loan on time to qualify"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://agri.gujarat.gov.in/",
+  "source_url": "https://www.myscheme.gov.in/schemes/fafiskc",
+  "source_title": "myScheme: COP-34 Financial Assistance to Farmer for Interest Subvention (Agriculture, Farmers Welfare and Cooperation Dept, Gujarat)",
+  "as_of": "checked 2026-10-21; Budget Estimates 2026-27",
+  "verified": true,
+  "verification_note": "Amount and process from myScheme (read via its API). Running in 2026-27: the department's official Budget Book 2026-27 (agri.gujarat.gov.in/Home/main/BudgetBook202627) has head 2425-00-107-18 'COP-34 Financial assistance to farmer for subvention of interest' with Rs. 1,450 crore budgeted. Myscheme describes it for Kharif-season loans only.",
+  "status": "active"
+ },
+ {
+  "state": "Gujarat",
+  "key": "gj_natural_farming_indigenous_cow_assistance",
+  "name": "Assistance in Cow Maintenance Expenses to Farmers Practicing Completely Natural Farming Based on Indigenous Cows (AGR-8)",
+  "hindi_name": null,
+  "what_you_get": "Rs. 900 per month (Rs. 10,800 a year) to maintain one indigenous (desi) cow, for farmers doing fully natural farming. The benefit is given only once.",
+  "who_can_apply": [
+   "Farmers in Gujarat practising natural farming on at least 1 acre (40 guntha)",
+   "Must own a native/indigenous cow with an identification tag",
+   "One beneficiary per land account (8-A)"
+  ],
+  "how_to_apply": [
+   "Apply online on the i-Khedut portal (ikhedut.gujarat.gov.in) under the scheme when applications are open",
+   "Print the application and submit it with listed documents to the Gram Sevak / BTM / ATM / Project Director-ATMA",
+   "Track status in the i-Khedut Applicant Corner"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://ikhedut.gujarat.gov.in/",
+  "source_url": "https://www.myscheme.gov.in/schemes/smpacmetf",
+  "source_title": "myScheme: Scheme to Provide Assistance in Cow Maintenance Expenses to Farmers Practicing Completely Natural Farming Based on Indigenous Cows (Gujarat)",
+  "as_of": "checked 2026-10-21; Budget Estimates 2026-27",
+  "verified": true,
+  "verification_note": "Amount, eligibility and steps from myScheme (read via its API). Running in 2026-27: official AFW&CD Budget Book 2026-27 head 2401-00-109-09 'AGR-8 A Scheme to provide assistance to farmers family for natural farming to maintain indigenous cow (100% state)' with Rs. 150 crore budgeted. Application windows on i-Khedut open for limited periods.",
+  "status": "active"
+ },
+ {
+  "state": "Punjab",
+  "key": "pb_crop_residue_management_machinery_subsidy",
+  "name": "Crop Residue Management (CRM) Machinery Subsidy Scheme",
+  "hindi_name": null,
+  "what_you_get": "50% of the machine cost for individual farmers buying crop residue management machines (e.g. Super SMS, Happy Seeder, Super Seeder), and 80% (projects up to Rs. 30 lakh) for cooperative societies, FPOs, panchayats and rural entrepreneurs setting up Custom Hiring Centres.",
+  "who_can_apply": [
+   "Individual farmers in Punjab (50%)",
+   "Cooperative societies of farmers, registered farmer societies, FPOs, panchayats and rural entrepreneurs setting up Custom Hiring Centres (80%)"
+  ],
+  "how_to_apply": [
+   "Apply under 'CRM Machinery Scheme' on the Punjab Agriculture Department subsidy portal agrimachinerypb.com when the state opens applications",
+   "Buy only from approved manufacturers/vendors and approved machine list shown on the portal"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://agrimachinerypb.com/",
+  "source_url": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2112397&reg=48&lang=2",
+  "source_title": "PIB, Ministry of Agriculture & Farmers Welfare: Stubble Burning (18 Mar 2025)",
+  "as_of": "2025-03-18",
+  "verified": true,
+  "verification_note": "Centrally funded scheme (since 2018-19) implemented by Punjab Agriculture Dept; rates from PIB 18 Mar 2025. Portal agrimachinerypb.com (Dept of Agriculture & Farmers Welfare, Punjab) shows 'Apply Under CRM Machinery Scheme'. All India Radio (Feb 2026) reports Rs. 395 crore disbursed in Kharif 2025 with 50-80% subsidies. Application windows are seasonal; exact 2026 window not verified.",
+  "status": "active"
+ }
+]

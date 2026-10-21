@@ -1,0 +1,263 @@
+[
+ {
+  "key": "pm_kisan",
+  "name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+  "hindi_name": "प्रधानमंत्री किसान सम्मान निधि",
+  "status": "active",
+  "what_you_get": "Income support of Rs 6,000 per year, paid in three equal instalments of Rs 2,000 every four months, directly into the farmer family's bank account.",
+  "who_can_apply": [
+   "Land-holding farmer families (husband, wife and minor children) whose names are in State/UT land records",
+   "Not eligible: institutional land holders; families where a member holds/held a constitutional post, is/was a Minister, MP, MLA, MLC, Mayor or District Panchayat chairperson; serving or retired government/PSU employees (except Multi Tasking Staff/Class IV/Group D); pensioners getting Rs 10,000 or more a month (except MTS/Class IV/Group D); anyone who paid income tax in the last assessment year; registered practising doctors, engineers, lawyers, chartered accountants and architects",
+   "The portal notes that farmers who acquired land after 01-02-2019, and cases where more than one family member gets the benefit, are being held back for physical verification"
+  ],
+  "how_to_apply": [
+   "Register yourself on pmkisan.gov.in under Farmers Corner > New Farmer Registration, or apply through your village Patwari/revenue official or a Common Service Centre (CSC)",
+   "The State Nodal Officer verifies your land record, Aadhaar and bank details and uploads approved names",
+   "Complete eKYC (mandatory): OTP on the portal, face authentication on the PM-KISAN app, or biometric at a CSC",
+   "Check your status any time with Know Your Status (KYS) on pmkisan.gov.in, the PM-KISAN app or the Kisan eMitra chatbot"
+  ],
+  "documents": [
+   "Aadhaar number",
+   "Bank account number and IFSC (Aadhaar-seeded account)",
+   "Land ownership record",
+   "Mobile number (advised, not mandatory)"
+  ],
+  "helpline": "Online grievance: https://pmkisan.gov.in/Grievance.aspx. The Ministry's PM-KISAN page tells farmers to call the Kisan Call Centre 1800-180-1551 if an instalment does not come.",
+  "official_url": "https://pmkisan.gov.in/",
+  "source_url": "https://pmkisan.gov.in/",
+  "source_title": "PM-Kisan Samman Nidhi portal (home page: scheme summary, exclusions, latest instalment notice)",
+  "additional_sources": [
+   "https://pmkisan.gov.in/Documents/RevisedFAQ.pdf",
+   "https://agriwelfare.gov.in/schemes/pm-kisan (data: https://agriwelfare.gov.in/api/schemes/pm-kisan, lastReviewed 2026-09-14)"
+  ],
+  "as_of": "2026-10-21 (portal states the 23rd instalment was released on 20 June 2026)",
+  "latest_update": "23rd instalment released on 20 June 2026 from Tarakeswar, Hooghly, West Bengal (per pmkisan.gov.in). 9,44,65,646 farmers benefited in Apr-Jul 2026-27.",
+  "verified": true,
+  "verification_note": "Amount, instalments, exclusions and eKYC requirement read on pmkisan.gov.in and its Revised FAQ PDF. The often-quoted helpline numbers 155261 / 011-24300606 / 1800-115-526 were NOT found on any official page I could open, so they are left out."
+ },
+ {
+  "key": "pmfby",
+  "name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+  "hindi_name": "प्रधानमंत्री फसल बीमा योजना",
+  "status": "active",
+  "what_you_get": "Crop insurance for notified crops in notified areas. The farmer pays a maximum premium of 2% for Kharif and 1.5% for Rabi foodgrain and oilseed crops, and 5% for commercial and horticultural crops; the Centre and State pay the rest (50:50, or 90:10 in North-Eastern and Himalayan States/UTs).",
+  "who_can_apply": [
+   "All farmers growing notified crops in notified areas, including tenant farmers and sharecroppers (subject to State conditions)",
+   "Loanee farmers (with seasonal crop loan/KCC) and non-loanee farmers; enrolment is voluntary for both",
+   "Must apply before the season cut-off date notified by the State"
+  ],
+  "how_to_apply": [
+   "Check that your crop and area are notified for the season on pmfby.gov.in",
+   "Apply online at pmfby.gov.in (Farmer Corner), or through your bank branch/PACS, a Common Service Centre, or the insurance company/its agent",
+   "Pay your premium share and keep the application number to track status",
+   "Report localised or post-harvest losses within 72 hours through the Crop Insurance app, helpline 14447, your bank, CSC or the insurance company"
+  ],
+  "documents": [
+   "Aadhaar number",
+   "AgriStack Farmer ID (for land-owning farmers)",
+   "Bank passbook / Aadhaar-seeded account details",
+   "Land record (Khasra/Khatauni/Record of Rights or State equivalent)",
+   "Tenants/sharecroppers: tenancy or sharing agreement or State-prescribed certificate",
+   "Sowing certificate or self-declaration (non-loanee farmers)"
+  ],
+  "helpline": "Krishi Rakshak Portal & Helpline 14447 (toll-free); PMFBY WhatsApp bot +91-70655-14447",
+  "official_url": "https://pmfby.gov.in/",
+  "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc_9735_20260829_18493301.pdf",
+  "source_title": "PIB backgrounder: Pradhan Mantri Fasal Bima Yojana - Affordable Crop Insurance for Every Farmer (29 Aug 2026)",
+  "additional_sources": [
+   "https://agriwelfare.gov.in/schemes/pmfby (data: https://agriwelfare.gov.in/api/schemes/pmfby, lastReviewed 2026-10-18) - steps, documents, 72-hour loss reporting, WhatsApp bot number"
+  ],
+  "as_of": "2026-08-29",
+  "latest_update": "PIB (29 Aug 2026): implemented by 25 States/UTs in Kharif 2026; West Bengal rejoined from Kharif 2026; Bihar to implement from Rabi 2026-27; Andhra Pradesh and Maharashtra stopped paying the full farmer premium in 2025.",
+  "verified": true,
+  "verification_note": "Premium caps and subsidy sharing quoted from the 29 Aug 2026 PIB backgrounder and match the Ministry's scheme page. Cut-off dates and notified crops differ by State and season."
+ },
+ {
+  "key": "kcc_miss",
+  "name": "Kisan Credit Card (KCC) with Modified Interest Subvention Scheme (MISS)",
+  "hindi_name": "किसान क्रेडिट कार्ड / संशोधित ब्याज अनुदान योजना",
+  "status": "active",
+  "what_you_get": "Short-term crop loans through KCC at 7% interest, with an extra 3% off for repaying on time, so the effective rate is 4%. PIB (11 Mar 2026) says the MISS crop-loan limit has been raised from Rs 3 lakh to Rs 5 lakh and collateral-free credit from Rs 1.6 lakh to Rs 2 lakh per borrower.",
+  "who_can_apply": [
+   "Individual farmers and joint borrowers who are owner-cultivators",
+   "Tenant farmers, oral lessees and sharecroppers",
+   "Self Help Groups and Joint Liability Groups of farmers, including tenant farmers and sharecroppers",
+   "Fishers, fish farmers and animal husbandry farmers (KCC was extended to fishers and fish farmers in 2018-19)"
+  ],
+  "how_to_apply": [
+   "Get the one-page KCC application form from your bank's website, pmkisan.gov.in ('Download KCC Form') or the agriculture department",
+   "Fill it in with your land record copy and the crops you grow; PM-KISAN beneficiaries' basic details are pre-filled from bank records",
+   "Submit at your bank branch (commercial bank, Regional Rural Bank or cooperative bank), or ask a Common Service Centre to fill and send it to the branch"
+  ],
+  "documents": [
+   "Copy of land records",
+   "Details of crops sown/cultivated",
+   "Aadhaar and bank account details"
+  ],
+  "helpline": "Kisan Call Centre 1800-180-1551 (listed on the Ministry's KCC page)",
+  "official_url": "https://agriwelfare.gov.in/schemes/kcc",
+  "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/mar/doc2026311819801.pdf",
+  "source_title": "PIB backgrounder: Kisan Credit Card - Fueling Growth in Agriculture (11 Mar 2026)",
+  "additional_sources": [
+   "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2132139&reg=1&lang=1 (28 May 2025: Cabinet continued MISS for 2025-26 with 1.5% subvention to banks; 4% effective rate with 3% Prompt Repayment Incentive)"
+  ],
+  "as_of": "2026-03-11",
+  "verified": true,
+  "verification_note": "7%/3%/4% rates and the Rs 5 lakh / Rs 2 lakh limits are quoted from PIB. The same PIB document also says 'Short-term agri-loans up to Rs 3 lakh are available at 7% interest', so it is not fully clear whether the 4% rate covers the whole Rs 5 lakh; show this carefully. I did not find a Cabinet decision continuing MISS for 2026-27. The documents list is from PIB (land records, crop details) plus Aadhaar/bank details from the Ministry's KCC page."
+ },
+ {
+  "key": "pm_kusum",
+  "name": "PM-KUSUM (Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan)",
+  "hindi_name": "प्रधानमंत्री किसान ऊर्जा सुरक्षा एवं उत्थान महाभियान (पीएम-कुसुम)",
+  "status": "period_ended_check_state",
+  "what_you_get": "Under Component B, individual farmers in off-grid areas can install standalone solar pumps up to 7.5 HP. The Centre gives 30% of the benchmark or tender cost (whichever is lower), the State gives at least 30%, and the farmer pays at most 40%. Component C solarises grid-connected pumps, and Component A supports 500 kW-2 MW solar plants by farmers/groups.",
+  "who_can_apply": [
+   "Individual farmers in off-grid areas (Component B standalone pumps)",
+   "Individual farmers, groups of farmers, cooperatives, panchayats, FPOs and Water User Associations (Component A solar plants)"
+  ],
+  "how_to_apply": [
+   "Apply through your State's PM-KUSUM implementing agency (State nodal agency / DISCOM / agriculture or renewable energy department), which runs the State scheme and tenders"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://pmkusum.mnre.gov.in/",
+  "source_url": "https://mnre.gov.in/en/pradhan-mantri-kisan-urja-suraksha-evam-utthaan-mahabhiyaan-pm-kusum/",
+  "source_title": "MNRE: Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyaan (PM KUSUM)",
+  "additional_sources": [],
+  "as_of": "checked 2026-10-21 (MNRE page states scheme period 'Till 31.03.2026')",
+  "verified": true,
+  "verification_note": "Subsidy shares are quoted from MNRE. BUT MNRE gives the scheme period as till 31.03.2026. News reports (not official) say MNRE extended timelines only for projects already sanctioned, and that a 'PM-KUSUM 2.0' is being considered. I could not find an official notice either way. Tell farmers to confirm with their State agency before applying. Higher central share for NE/hill States is not shown on the MNRE page I read, so it is left out."
+ },
+ {
+  "key": "soil_health_card",
+  "name": "Soil Health Card (now 'Soil Health & Fertility' under RKVY)",
+  "hindi_name": "मृदा स्वास्थ्य कार्ड",
+  "status": "active",
+  "what_you_get": "A printed report for each landholding that tests 12 soil parameters (N, P, K, S, Zn, Fe, Cu, Mn, B, pH, EC, organic carbon) and recommends the right fertiliser, bio-fertiliser and organic input doses. The Centre gives Rs 190 per sample to cover collection, testing and card generation.",
+  "who_can_apply": [
+   "All farmers (samples are collected field-by-field by the agriculture department in each sampling round)"
+  ],
+  "how_to_apply": [
+   "Soil samples are collected by agriculture department staff or trained personnel after the Rabi/Kharif harvest, when no crop is standing",
+   "Contact your local agriculture office, soil testing lab or Krishi Vigyan Kendra to get your field included",
+   "View and download the card on the Soil Health Card portal (soilhealth.dac.gov.in)"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://soilhealth.dac.gov.in/",
+  "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/aug/doc2025816613501.pdf",
+  "source_title": "PIB backgrounder: Soil Health Card - Swasth Dharaa, Khet Haraa (16 Aug 2025)",
+  "additional_sources": [],
+  "as_of": "2025-08-16",
+  "verified": true,
+  "verification_note": "Parameters, Rs 190/sample and the merger into RKVY from 2022-23 are quoted from PIB. The same PIB document says both 'guidance every 2 years' and 'issued once every 3 years', so how often a card is issued is left out. Step 2 (contact local office/KVK) is general advice, not quoted from the source."
+ },
+ {
+  "key": "pm_kmy",
+  "name": "Pradhan Mantri Kisan Maan-Dhan Yojana (PM-KMY)",
+  "hindi_name": "प्रधानमंत्री किसान मानधन योजना",
+  "status": "active",
+  "what_you_get": "A pension of Rs 3,000 a month from age 60. The farmer pays Rs 55 to Rs 200 a month depending on joining age, and the Central Government adds an equal amount. If the farmer dies after 60, the spouse gets Rs 1,500 a month as family pension.",
+  "who_can_apply": [
+   "Small and marginal farmers with cultivable land up to 2 hectares in State/UT land records (cut-off date for eligibility: 01.08.2019, per the FAQ)",
+   "Age 18 to 40 years at entry (spouses can join separately)",
+   "Not eligible: those covered by NPS, ESIC, EPFO or similar statutory schemes; those enrolled in PM-SYM or PM-LVM; institutional land holders; present/former constitutional post holders, ministers, MPs/MLAs/MLCs, mayors, district panchayat chairpersons; serving/retired government and PSU employees (except MTS/Class IV/Group D); income-tax payers in the last assessment year; registered practising doctors, engineers, lawyers, CAs and architects"
+  ],
+  "how_to_apply": [
+   "Visit your nearest Common Service Centre (CSC) with Aadhaar and bank passbook; enrolment at the CSC is free",
+   "PM-KISAN beneficiaries can choose to pay the contribution from the same bank account where PM-KISAN money arrives"
+  ],
+  "documents": [
+   "Aadhaar number",
+   "Bank passbook / account details (IFSC)"
+  ],
+  "helpline": null,
+  "official_url": "https://pmkmy.gov.in/",
+  "source_url": "https://pmkisan.gov.in/Documents/PM-KMY%20-%20Salient%20Features.pdf",
+  "source_title": "PM-KMY Salient Features (Department of Agriculture & Farmers Welfare, on pmkisan.gov.in)",
+  "additional_sources": [
+   "https://pmkisan.gov.in/Documents/PM-KMY%20-%20FAQs.pdf",
+   "https://agriwelfare.gov.in/schemes/pm-kmy (scheme listed as current, lastReviewed 2026-09-14)"
+  ],
+  "as_of": "checked 2026-10-21 (documents are undated scheme documents)",
+  "verified": true,
+  "verification_note": "Amounts and eligibility are quoted from the official salient-features and FAQ PDFs. pmkmy.gov.in could not be reached from my network on 2026-10-21. The Ministry's new portal still lists the scheme. The FAQ says names must be in land records as on 01.08.2019; check whether that cut-off has changed."
+ },
+ {
+  "key": "e_nam",
+  "name": "National Agriculture Market (e-NAM)",
+  "hindi_name": "राष्ट्रीय कृषि बाजार (ई-नाम)",
+  "status": "active",
+  "what_you_get": "An online trading platform linking 1,656 mandis in 23 States and 4 UTs (March 2026). Farmers can sell to more buyers through online bidding and get paid straight into their bank account. The e-NAM app gives free price information for 247 commodities.",
+  "who_can_apply": [
+   "Farmers, Farmer Producer Organisations and traders selling through e-NAM-linked mandis"
+  ],
+  "how_to_apply": [
+   "Register on enam.gov.in (Registration link) or the e-NAM mobile app, or at your e-NAM-linked mandi",
+   "Bring your produce to the mandi; it gets a lot ID, quality assaying and online bids",
+   "Sale money is paid electronically to your registered bank account"
+  ],
+  "documents": [],
+  "helpline": "1800 270 0224 (toll-free); email nam@sfac.in",
+  "official_url": "https://enam.gov.in/web/",
+  "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/apr/doc2026413845801.pdf",
+  "source_title": "PIB backgrounder: National Agriculture Market (e-NAM) - Digital Transformation of Agricultural Trade in India (13 Apr 2026)",
+  "additional_sources": [],
+  "as_of": "2026-04-13",
+  "verified": true,
+  "verification_note": "Figures and helpline are from PIB. The helpline also appears on enam.gov.in. The registration-documents page on enam.gov.in is a scanned PDF/JS page I could not read, so documents are left empty. 'Register at your mandi' is general guidance."
+ },
+ {
+  "key": "pdmc",
+  "name": "Per Drop More Crop (PDMC) - micro irrigation",
+  "hindi_name": "प्रति बूंद अधिक फसल",
+  "status": "active",
+  "what_you_get": "Financial help to install drip or sprinkler irrigation on up to 5 hectares per beneficiary: 55% for small and marginal farmers and 45% for other farmers. Some States add their own top-up subsidy, and the same land can get help again after seven years.",
+  "who_can_apply": [
+   "All farmers (55% for small and marginal, 45% for others), up to 5 hectares per beneficiary"
+  ],
+  "how_to_apply": [
+   "Apply through your State agriculture/horticulture department or the State's micro-irrigation portal; PDMC is a centrally sponsored scheme run by the States"
+  ],
+  "documents": [],
+  "helpline": null,
+  "official_url": "https://pdmc.da.gov.in/",
+  "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc_9732_20260829_12330401.pdf",
+  "source_title": "PIB backgrounder: Water-Smart Farming with Per Drop More Crop (29 Aug 2026)",
+  "additional_sources": [],
+  "as_of": "2026-08-29",
+  "verified": true,
+  "verification_note": "PDMC was part of PMKSY from 2015-16 to 2021-22. Since 2022-23 it has run under PM-RKVY (per PIB), so it is listed here as PDMC and not as 'PMKSY'. Subsidy rates are quoted from PIB. Application channel and documents differ by State."
+ },
+ {
+  "key": "aif",
+  "name": "Agriculture Infrastructure Fund (AIF)",
+  "hindi_name": "कृषि अवसंरचना कोष",
+  "status": "active",
+  "what_you_get": "Loans for post-harvest and community farm infrastructure (e.g. warehouses, cold storage) with 3% a year interest subvention on up to Rs 2 crore per project location for up to 7 years. Credit guarantee for loans up to Rs 2 crore is available under CGTMSE, with the fee paid by the Government.",
+  "who_can_apply": [
+   "Farmers",
+   "Farmer Producer Organisations and their federations",
+   "Primary Agricultural Credit Societies, marketing and multipurpose cooperatives",
+   "Self Help Groups and their federations, Joint Liability Groups",
+   "Agri-entrepreneurs and start-ups",
+   "APMCs, State agencies, cooperative federations, PPP projects"
+  ],
+  "how_to_apply": [
+   "Register as a beneficiary on agriinfra.dac.gov.in and submit the project/loan application to a participating lending institution (banks, cooperative banks, RRBs, small finance banks, NCDC, NBFCs)",
+   "Prepare a project report (DPR templates are on the portal)"
+  ],
+  "documents": [],
+  "helpline": "support.agriinfra@gov.in (official support email; helpline numbers on the portal's Contact Us page, Mon-Fri office hours)",
+  "official_url": "https://agriinfra.dac.gov.in/",
+  "source_url": "https://agriinfra.dac.gov.in/Home/SchemeOverview",
+  "source_title": "Agriculture Infrastructure Fund portal - Scheme Overview / Who Can Apply / Key Features",
+  "additional_sources": [
+   "https://agriinfra.dac.gov.in/Home/WhoCanApply",
+   "https://agriinfra.dac.gov.in/Home/ContactUs"
+  ],
+  "as_of": "checked 2026-10-21 (scheme period 2020-21 to 2032-33 per portal)",
+  "verified": true,
+  "verification_note": "Interest subvention, credit guarantee, eligible entities and support email are quoted from agriinfra.dac.gov.in. The minimum borrower contribution percentage was seen only on secondary sites, so it is left out."
+ }
+]

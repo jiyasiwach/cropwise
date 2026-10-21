@@ -14,12 +14,12 @@
 
 /* Design tokens. Colours are CSS variables so light/dark switch without rebuilding classes. */
 :root {
-  --bg: #f7f5ef;
+  --bg: #f6f7f4;
   --surface: #ffffff;
-  --surface-2: #f1eee5;
+  --surface-2: #f0f2ee;
   --ink: #15211a;
   --muted: #5a6a5f;
-  --line: #e6e1d4;
+  --line: #e3e7e1;
   --leaf: #1f7a4d;
   --leaf-strong: #0f3b2a;
   --leaf-soft: #e3f0e6;
@@ -29,7 +29,7 @@
   --amber-ink: #6b4500;
   --danger: #b42318;
   --danger-soft: #fdeceb;
-  --shadow: 0 1px 2px rgb(21 33 26 / 0.06), 0 6px 20px rgb(21 33 26 / 0.06);
+  --shadow: 0 1px 2px rgb(21 33 26 / 0.05), 0 2px 8px rgb(21 33 26 / 0.04);
   color-scheme: light;
 }
 
@@ -91,11 +91,11 @@
   --color-amber-ink: var(--amber-ink);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
-  --font-display: "Bricolage Grotesque", "Noto Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Noto Sans", system-ui, sans-serif;
   --font-sans: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans Tamil", "Noto Sans Malayalam",
     "Noto Sans Kannada", system-ui, sans-serif;
   --shadow-card: var(--shadow);
-  --radius-card: 1.25rem;
+  --radius-card: 1rem;
 }
 
 html {
@@ -115,9 +115,11 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
-  line-height: 1.15;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
+
+.tabular { font-variant-numeric: tabular-nums; }
 
 :focus-visible {
   outline: 3px solid var(--amber);

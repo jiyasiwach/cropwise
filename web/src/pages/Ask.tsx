@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Camera, Send, ShieldCheck, Wrench } from 'lucide-react'
+import { Camera, FileText, Send, ShieldCheck, Wrench } from 'lucide-react'
 import { askStream, type AssistantEvent, type Citation } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { useListener } from '../lib/speech'
@@ -106,17 +106,17 @@ export default function Ask() {
 
   return (
     <div className="flex min-h-[calc(100dvh-12rem)] flex-col">
-      <PageTitle title="💬 KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
+      <PageTitle title="KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
 
       <div className="flex-1 space-y-4" aria-live="polite">
         {messages.length === 0 && (
           <div className="space-y-2">
             <Link to="/doctor" className="mb-3 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 no-underline hover:border-leaf/50">
-              <span className="grid size-10 place-items-center rounded-xl bg-[#fde7dc] text-[#b5481e] dark:bg-[#3a2016]">
+              <span className="grid size-10 place-items-center rounded-xl bg-leaf-soft text-leaf">
                 <Camera className="size-5" aria-hidden />
               </span>
               <span>
-                <span className="block font-semibold text-ink">📷 Check a sick plant</span>
+                <span className="block font-semibold text-ink">Check a sick plant</span>
                 <span className="block text-sm text-muted">Spots, rust or curl? A photo works better than words.</span>
               </span>
             </Link>
@@ -159,7 +159,7 @@ export default function Ask() {
                   ))}
                   {(m.citations ?? []).map((c) => (
                     <Chip key={c.title} title={c.source}>
-                      📄 {c.title}
+                      <FileText className="size-3" aria-hidden /> {c.title}
                     </Chip>
                   ))}
                   {m.mock && <Chip tone="warn">Demo — no AI key set</Chip>}

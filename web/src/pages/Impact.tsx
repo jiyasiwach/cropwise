@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { api, ApiError, type MandiGain } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { CompareBars } from '../components/charts'
-import { Button, Card, Chip, CROP_ICONS, cropName, ErrorBox, HonestyBadge, Note, PageTitle, rupee, SectionTitle } from '../components/ui'
+import { Button, Card, Chip, CROPS, cropName, ErrorBox, HonestyBadge, Note, PageTitle, rupee, SectionTitle } from '../components/ui'
 
 const A = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <a href={href} target="_blank" rel="noopener noreferrer">
@@ -81,11 +81,9 @@ function Calculator() {
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Crop</span>
           <select value={crop} onChange={(e) => setCrop(e.target.value)} className="h-12 w-full rounded-xl border border-line bg-surface px-3">
-            {Object.keys(CROP_ICONS)
-              .sort()
-              .map((c) => (
+            {CROPS.map((c) => (
                 <option key={c} value={c}>
-                  {CROP_ICONS[c]} {cropName(c)}
+                  {cropName(c)}
                 </option>
               ))}
           </select>

@@ -4,9 +4,8 @@ import { Camera, ImagePlus, RotateCcw } from 'lucide-react'
 import { api, ApiError, type Condition, type DoctorResult } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Stepper } from '../components/charts'
-import { Button, Card, Chip, CROP_ICONS, cropName, ErrorBox, HelplineButton, ListenButton, Note, PageTitle, SectionTitle, SourceChip, cx } from '../components/ui'
+import { Button, Card, Chip, CROPS, cropName, ErrorBox, HelplineButton, ListenButton, Note, PageTitle, SectionTitle, SourceChip, cx } from '../components/ui'
 
-const CROPS = Object.keys(CROP_ICONS).sort()
 
 /** Shrink in the browser: ≤1024 px JPEG keeps uploads small on 2G and far under the 4.5 MB limit. */
 function shrink(file: File): Promise<Blob> {
@@ -122,7 +121,7 @@ export default function Doctor() {
 
   return (
     <div className="space-y-5">
-      <PageTitle title="📷 Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
+      <PageTitle title="Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
 
       <Card>
         <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => choose(e.target.files?.[0])} />
@@ -159,7 +158,7 @@ export default function Doctor() {
               <option value="">Not sure</option>
               {CROPS.map((c) => (
                 <option key={c} value={c}>
-                  {CROP_ICONS[c]} {cropName(c)}
+                  {cropName(c)}
                 </option>
               ))}
             </select>

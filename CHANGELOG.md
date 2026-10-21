@@ -1,5 +1,29 @@
 # Changelog
 
+## Farm tools: yield forecast, Kisan Yojana, official channels (21 Oct 2026)
+
+### Added
+- **Yield forecast** (`/yield`, `GET /api/v1/yield`): next season's district yield per acre for 20 crops,
+  with a low-high range and the total for the farmer's acres. Trained on Government of India district
+  crop statistics (DES, 1997-98 to 2024-25, 210,058 district-seasons) with
+  `scripts/train_yield.py`. Time split, tested on 2018-19 onwards (53,832 district-seasons): median error
+  10.7% vs 10.9% for last season's yield and 12.5% for the 5-year average;
+  the range holds the real yield 82% of the time. Published per crop on `/eval`, including
+  the crops where last season alone does better.
+- **Kisan Yojana** (`/schemes`): 9 central and 15 state schemes, each checked against an official page
+  with a date; only verified, still-running schemes are served. Live announcements from the
+  Department of Agriculture's own press-release feed (cached an hour, last copy kept when it is down,
+  only https `.gov.in`/`.nic.in` links shown).
+- **Official channels** (`/community`): government WhatsApp channels, X, YouTube and helplines,
+  national and by state, each with where the link is published. No farmer groups are invented;
+  the page explains how to join a real block/tehsil group through the extension officer or KVK.
+- Home tiles, sidebar "Farm tools" and More entries for the three tools; Hindi, Telugu, Tamil,
+  Malayalam and Kannada labels.
+
+### Changed
+- Professional visual pass: Plus Jakarta Sans, calmer surfaces, line icons for crops instead of emoji.
+- The offline copy of the app refreshes on every online visit (service worker v2).
+
 ## Phase 1 — audit and repair (15 Oct 2026)
 
 ### Security

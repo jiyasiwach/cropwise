@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DyZJNswf.js";import{m as t,n}from"./index-DyBFXs4Q.js";var r=e();function i(){return(0,r.jsxs)(`div`,{children:[(0,r.jsx)(t,{title:`Page not found`,subtitle:`That page does not exist. Everything CropWise does starts from Home.`}),(0,r.jsx)(n,{to:`/`,children:`Go home`})]})}export{i as default};

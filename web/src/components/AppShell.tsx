@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
-import { Camera, Home, MessageCircle, Moon, Menu, Sprout, Sun, SunMoon, WifiOff } from 'lucide-react'
+import { Camera, Home, Landmark, MessageCircle, Moon, Menu, Radio, Scale, Sprout, Sun, SunMoon, WifiOff } from 'lucide-react'
 import { LANGUAGES, type Lang } from '../lib/i18n'
 import { usePrefs, type Theme } from '../lib/prefs'
 import { cx } from './ui'
@@ -11,6 +11,12 @@ const NAV = [
   { to: '/doctor', key: 'nav.doctor', icon: Camera },
   { to: '/ask', key: 'nav.ask', icon: MessageCircle },
   { to: '/settings', key: 'nav.more', icon: Menu },
+] as const
+
+const TOOLS = [
+  { to: '/yield', key: 'tile.yield', icon: Scale },
+  { to: '/schemes', key: 'tile.schemes', icon: Landmark },
+  { to: '/community', key: 'tile.community', icon: Radio },
 ] as const
 
 const EXTRA = [
@@ -92,8 +98,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Desktop side navigation */}
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-line bg-surface px-4 py-5 lg:flex">
         <Link to="/" className="mb-7 flex items-center gap-2.5 px-2 no-underline">
-          <span className="grid size-9 place-items-center rounded-xl bg-leaf text-lg text-on-leaf" aria-hidden>
-            🌱
+          <span className="grid size-9 place-items-center rounded-xl bg-leaf text-on-leaf" aria-hidden>
+            <Sprout className="size-5" strokeWidth={2} />
           </span>
           <span className="font-display text-xl font-extrabold text-ink">CropWise</span>
         </Link>
@@ -103,6 +109,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={to}
               to={to}
               end={'end' in rest}
+              className={({ isActive }) =>
+                cx('flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold no-underline', isActive ? 'bg-leaf-soft text-leaf' : 'text-muted hover:bg-surface-2 hover:text-ink')
+              }
+            >
+              <Icon className="size-5" aria-hidden /> {t(key)}
+            </NavLink>
+          ))}
+          <div className="mt-4 mb-1 px-3 text-xs font-bold uppercase tracking-wider text-muted">Farm tools</div>
+          {TOOLS.map(({ to, key, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
               className={({ isActive }) =>
                 cx('flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold no-underline', isActive ? 'bg-leaf-soft text-leaf' : 'text-muted hover:bg-surface-2 hover:text-ink')
               }
@@ -137,8 +155,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/90 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4">
             <Link to="/" className="flex items-center gap-2 no-underline lg:invisible">
-              <span className="grid size-9 place-items-center rounded-xl bg-leaf text-lg text-on-leaf" aria-hidden>
-                🌱
+              <span className="grid size-9 place-items-center rounded-xl bg-leaf text-on-leaf" aria-hidden>
+                <Sprout className="size-5" strokeWidth={2} />
               </span>
               <span className="font-display text-xl font-extrabold text-ink">CropWise</span>
             </Link>

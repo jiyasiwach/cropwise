@@ -338,6 +338,113 @@ export interface EvalData {
       cost_per_check_usd: number | null
     }
   } | null
+  yield?: YieldEval | null
+}
+
+export interface YieldAccuracy {
+  rows: number
+  model_median_error_pct: number
+  baseline_5yr_mean_median_error_pct: number
+  baseline_last_year_median_error_pct: number
+  within_10pct: number
+  within_20pct: number
+  range_coverage_p10_p90: number
+}
+
+export interface YieldEval {
+  what: string
+  model: string
+  split: string
+  selection?: string
+  metric: string
+  overall: YieldAccuracy
+  per_crop: Record<string, YieldAccuracy>
+  data: { publisher: string; licence: string; attribution: string; source_url: string; catalog_url: string; seasons: string; district_seasons: number }
+  limits: string[]
+}
+
+export interface YieldOptions {
+  available: boolean
+  states?: string[]
+  state?: string | null
+  districts?: string[]
+  district?: string | null
+  crops?: { crop: string; name: string; seasons: string[] }[]
+}
+
+export interface Range {
+  low: number
+  likely: number
+  high: number
+}
+
+export interface YieldForecast {
+  crop: string
+  crop_name: string
+  state: string
+  district: string
+  season: string
+  forecast_for: string
+  quintal_per_acre: Range
+  tonne_per_hectare: Range
+  history: { season: string; quintal_per_acre: number }[]
+  district_5yr_avg_quintal_per_acre: number
+  acres: number | null
+  field_quintal: Range | null
+  note: string
+  source: string | null
+  accuracy: YieldAccuracy | null
+}
+
+export interface Scheme {
+  key: string
+  name: string
+  hindi_name?: string | null
+  state?: string
+  what_you_get: string
+  who_can_apply: string[]
+  how_to_apply: string[]
+  documents: string[]
+  helpline?: string | null
+  official_url: string
+  source_url: string
+  source_title?: string
+  as_of: string
+  status?: string
+  latest_update?: string | null
+  verification_note?: string | null
+}
+
+export interface Schemes {
+  central: Scheme[]
+  state: Scheme[]
+  state_name: string | null
+  states_covered: string[]
+  note: string
+}
+
+export interface SchemeUpdates {
+  items: { title: string; link: string; date: string | null }[]
+  source: string | null
+  error: string | null
+  cached_at: number | null
+  feed_url?: string
+}
+
+export interface Channel {
+  name: string
+  owner: string
+  platform: 'whatsapp_channel' | 'telegram' | 'whatsapp_helpline' | 'youtube' | 'x' | string
+  url_or_number: string
+  scope: string
+  source_url: string
+}
+
+export interface Channels {
+  national: Channel[]
+  state: Channel[]
+  state_name: string | null
+  note: string
 }
 
 // ---------- calls ----------
@@ -358,6 +465,12 @@ export const api = {
   mandiGain: (crop: string, acres: number, town: string) => get<MandiGain>('/impact/mandi-gain', { crop, acres, town }),
   conditions: () => request<Condition[]>('/api/v1/doctor/conditions'),
   evaluation: () => get<EvalData>('/eval'),
+  yieldOptions: (state?: string | null, district?: string | null) => get<YieldOptions>('/yield/options', { state, district }),
+  yieldForecast: (crop: string, state: string, district: string, season: string, acres?: number) =>
+    get<YieldForecast>('/yield', { crop, state, district, season, acres }),
+  schemes: (state?: string | null) => get<Schemes>('/schemes', { state }),
+  schemeUpdates: () => get<SchemeUpdates>('/schemes/updates'),
+  channels: (state?: string | null) => get<Channels>('/channels', { state }),
   doctor: async (photo: Blob, crop: string, language: string, demoCondition?: string) => {
     const form = new FormData()
     form.append('photo', photo, 'leaf.jpg')

@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 
 INDEX = pathlib.Path(__file__).resolve().parents[2] / "static" / "app" / "index.html"
 UI_ROUTES = ["/", "/grow", "/results", "/plan/{crop}", "/doctor", "/ask", "/history", "/impact",
-             "/eval", "/settings", "/offline"]
+             "/eval", "/settings", "/offline", "/schemes", "/community", "/yield"]
 
 router = APIRouter(include_in_schema=False)
 

@@ -149,7 +149,7 @@ export default function Grow() {
             {t('grow.detect')}
           </Button>
         </form>
-        {place && <p className="mt-2 text-sm text-muted">📍 {[place.city, place.district, place.state].filter(Boolean).join(', ')}</p>}
+        {place && <p className="mt-2 flex items-center gap-1.5 text-sm text-muted"><MapPin className="size-3.5" aria-hidden /> {[place.city, place.district, place.state].filter(Boolean).join(', ')}</p>}
         {detectError && (
           <div className="mt-3">
             <Note tone="warn">

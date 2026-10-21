@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, type HistoryItem } from '../lib/api'
-import { ButtonLink, Card, Chip, CROP_ICONS, cropName, ErrorBox, Loading, PageTitle } from '../components/ui'
+import { ButtonLink, Card, Chip, CropIcon, cropName, ErrorBox, Loading, PageTitle } from '../components/ui'
 
 export default function History() {
   const [items, setItems] = useState<HistoryItem[] | null>(null)
@@ -26,9 +26,7 @@ export default function History() {
       <div className="space-y-3">
         {items?.map((h) => (
           <Card key={h.id} as="article" className="flex items-center gap-4 p-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-leaf-soft text-2xl" aria-hidden>
-              {CROP_ICONS[h.crop] ?? '🌱'}
-            </span>
+            <CropIcon crop={h.crop} />
             <div className="min-w-0 flex-1">
               <div className="font-semibold">{cropName(h.crop)}</div>
               <div className="text-sm text-muted">

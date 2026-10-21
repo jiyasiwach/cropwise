@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Info, Loader2, Mic, MicOff, Phone, Square, Volume2 } from 'lucide-react'
+import { AlertTriangle, Apple, Banana, Bean, Cherry, Citrus, Coffee, Flower2, Grape, Info, Leaf, Loader2, Mic, MicOff, Phone, Sprout, Square, TreePalm, Volume2, Wheat, type LucideIcon } from 'lucide-react'
 import { usePrefs } from '../lib/prefs'
 import { useSpeaker } from '../lib/speech'
 
@@ -220,10 +220,29 @@ export function MicButton({ listening, supported, onClick, large }: { listening:
   )
 }
 
-export const CROP_ICONS: Record<string, string> = {
-  rice: '🌾', maize: '🌽', chickpea: '🫘', kidneybeans: '🫘', pigeonpeas: '🫛', mothbeans: '🫘', mungbean: '🫛',
-  blackgram: '🫘', lentil: '🫘', pomegranate: '🍎', banana: '🍌', mango: '🥭', grapes: '🍇', watermelon: '🍉',
-  muskmelon: '🍈', apple: '🍎', orange: '🍊', papaya: '🥭', coconut: '🥥', cotton: '☁️', jute: '🌿', coffee: '☕',
+export const CROPS = [
+  'apple', 'banana', 'blackgram', 'chickpea', 'coconut', 'coffee', 'cotton', 'grapes', 'jute', 'kidneybeans', 'lentil',
+  'maize', 'mango', 'mothbeans', 'mungbean', 'muskmelon', 'orange', 'papaya', 'pigeonpeas', 'pomegranate', 'rice', 'watermelon',
+]
+
+const CROP_ICON: Record<string, LucideIcon> = {
+  rice: Wheat, maize: Wheat, jute: Leaf, cotton: Flower2, coffee: Coffee, coconut: TreePalm,
+  chickpea: Bean, kidneybeans: Bean, pigeonpeas: Bean, mothbeans: Bean, mungbean: Bean, blackgram: Bean, lentil: Bean,
+  apple: Apple, pomegranate: Apple, banana: Banana, grapes: Grape, orange: Citrus, mango: Cherry, papaya: Cherry,
+  watermelon: Citrus, muskmelon: Citrus,
+  wheat: Wheat, bajra: Wheat, jowar: Wheat, sugarcane: Leaf, groundnut: Bean, soybean: Bean, mustard: Flower2,
+}
+
+/** A consistent line icon for a crop, in a soft tile. */
+export function CropIcon({ crop, size = 'md' }: { crop: string; size?: 'sm' | 'md' | 'lg' }) {
+  const Icon = CROP_ICON[crop] ?? Sprout
+  const box = { sm: 'size-8 rounded-lg', md: 'size-12 rounded-xl', lg: 'size-14 rounded-2xl' }[size]
+  const glyph = { sm: 'size-4', md: 'size-6', lg: 'size-7' }[size]
+  return (
+    <span className={cx('grid shrink-0 place-items-center bg-leaf-soft text-leaf', box)} aria-hidden>
+      <Icon className={glyph} strokeWidth={1.75} />
+    </span>
+  )
 }
 
 export function cropName(crop: string) {

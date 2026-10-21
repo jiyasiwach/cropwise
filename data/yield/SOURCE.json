@@ -1,0 +1,49 @@
+{
+  "files": {
+    "idp_crop_wise_apy_1997_2023.csv": {
+      "role": "PRIMARY training data",
+      "bytes": 56222102,
+      "sha256": "b2cc1ed1830fa88a4473ed48177732dd61dbe7a1b41c906a16fc6a44e12f9a60",
+      "rows": 455359,
+      "years": "1997-98 to 2022-23",
+      "source_url": "https://ckan.indiadataportal.com/dataset/5b8f4660-52d2-4edf-824b-1af41d290498/resource/a000ce51-a257-42e3-8ab7-3cd212966f88/download/crop-wise-area-production-yield.csv",
+      "upstream_extraction_page": "https://data.desagri.gov.in/website/crops-apy-report-web"
+    },
+    "idp_upag_apy_2013_2025.csv": {
+      "role": "SECONDARY: newer years (to 2024-25) for 30 field crops; units already standardised to tonnes (cotton/jute converted from bales)",
+      "bytes": 16945448,
+      "sha256": "1318e848ef00bfb7e268930145a779054b8b4b5ea2f9bb2765c538fd5152cf6c",
+      "rows": 156189,
+      "years": "2013-14 to 2024-25",
+      "source_url": "https://ckan.indiadataportal.com/dataset/5b8f4660-52d2-4edf-824b-1af41d290498/resource/9668b3f8-8e23-45a5-b290-4193cbacc670/download/cropwise-area-production-yield-upag.csv",
+      "upstream_extraction_page": "https://upag.gov.in/dash-reports/desdistrictwisecompletedatasetreport?rtab=Area%2C+Production+%26+Yield&rtype=reports"
+    },
+    "idp_ckan_package_metadata.json": {
+      "role": "Saved CKAN package_show response (licence + provenance proof as retrieved 2026-10-21)",
+      "source_url": "https://ckan.indiadataportal.com/api/3/action/package_show?id=area-production-yield-apy"
+    }
+  },
+  "source_url": "https://ckan.indiadataportal.com/dataset/area-production-yield-apy",
+  "catalog_url": "https://www.data.gov.in/catalog/district-wise-season-wise-crop-production-statistics-0",
+  "publisher": "Original data: Directorate of Economics & Statistics (DES), Department of Agriculture & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Government of India. Redistributed (cleaned, LGD-mapped district codes) by India Data Portal (ISB Bharti Institute of Public Policy).",
+  "licence": "Redistribution on India Data Portal: Open Data Commons Attribution License (ODC-By 1.0). Original on data.gov.in: Government Open Data License - India (GODL-India), released under NDSAP. Both permit commercial and non-commercial reuse with attribution.",
+  "licence_url": "https://opendatacommons.org/licenses/by/1-0/",
+  "licence_proof_urls": [
+    "https://ckan.indiadataportal.com/api/3/action/package_show?id=area-production-yield-apy  (field license_id = 'Open Data Commons Attribution License')",
+    "https://www.data.gov.in/catalog/district-wise-season-wise-crop-production-statistics-0  (page footer: content licensed under the Government Open Data License-India; 'Released Under: NDSAP')",
+    "https://www.data.gov.in/Godl  (GODL-India text)"
+  ],
+  "attribution_text": "Source: Directorate of Economics & Statistics, Ministry of Agriculture & Farmers Welfare, Government of India (via India Data Portal, ODC-By; data.gov.in, GODL-India).",
+  "years": "1997-98 to 2022-23 (primary); 2013-14 to 2024-25 (UPAG secondary)",
+  "notes": [
+    "This is the same DES district/season APY series that the widely mirrored Kaggle 'crop_production.csv' (1997-2015, ~246k rows) was taken from (data.gov.in catalog above, published 24/05/2013, updated 06/07/2021); the IDP file extends it to 2022-23 with 455k rows, so the old mirror was not downloaded.",
+    "data.gov.in resource download requires login/API key; data.desagri.gov.in and upag.gov.in are interactive report UIs without a stable no-login bulk CSV, hence the IDP CKAN download.",
+    "Area = hectares. Production column is labelled 'Tonnes' on every row of the 1997-2023 file, but implied yields prove: Cotton(Lint) = bales of 170 kg (ratio to UPAG tonnes = 5.88), Jute/Mesta/Sannhamp = bales of 180 kg, Coconut = number of nuts. Convert (x0.170 / x0.180) or model coconut in nuts/ha.",
+    "Season 'Total' rows (48,044) are sums of the other seasons for the same district-year-crop - drop them to avoid double counting. Seasons: Kharif, Rabi, Summer, Autumn, Winter, Whole Year.",
+    "yield column is Tonnes/Hectare in the 1997-2023 file but kg/ha in the UPAG file; safest is to recompute yield = production/area.",
+    "Production missing 1.1%, zero 0.9%; area never missing. Horticulture crops (orange, papaya, grapes, pomegranate) only appear 2002-03..2014-15 and in few districts.",
+    "IDP notes some crop names map to more than one crop code; group by crop_name, not crop_code.",
+    "District names change over time (new districts carved out); use district_code (LGD-mapped) when joining years."
+  ],
+  "retrieved": "2026-10-21"
+}

@@ -1,0 +1,212 @@
+{
+  "what": "Next-season district average yield (per hectare) for 20 crops, with a 10th-90th percentile range.",
+  "model": "Gradient-boosted quantile regression (scikit-learn HistGradientBoosting) that corrects last season's district yield using the district's 5-year average, its trend, the state's last season and the crop/season.",
+  "selection": "Features and settings were chosen on validation seasons 2014-15 to 2017-18 before the test seasons were scored once.",
+  "split": "Time split: trained on seasons up to 2017-18, tested on 2018-19 onwards. Never shuffled.",
+  "metric": "Median absolute percentage error of the predicted district yield against the yield the government later recorded.",
+  "overall": {
+    "rows": 53832,
+    "model_median_error_pct": 10.7,
+    "baseline_5yr_mean_median_error_pct": 12.5,
+    "baseline_last_year_median_error_pct": 10.9,
+    "within_10pct": 0.48,
+    "within_20pct": 0.698,
+    "range_coverage_p10_p90": 0.818
+  },
+  "per_crop": {
+    "bajra": {
+      "rows": 1817,
+      "model_median_error_pct": 11.3,
+      "baseline_5yr_mean_median_error_pct": 11.7,
+      "baseline_last_year_median_error_pct": 12.5,
+      "within_10pct": 0.463,
+      "within_20pct": 0.696,
+      "range_coverage_p10_p90": 0.819
+    },
+    "banana": {
+      "rows": 697,
+      "model_median_error_pct": 4.9,
+      "baseline_5yr_mean_median_error_pct": 7.5,
+      "baseline_last_year_median_error_pct": 4.4,
+      "within_10pct": 0.679,
+      "within_20pct": 0.818,
+      "range_coverage_p10_p90": 0.792
+    },
+    "blackgram": {
+      "rows": 4282,
+      "model_median_error_pct": 12.3,
+      "baseline_5yr_mean_median_error_pct": 14.1,
+      "baseline_last_year_median_error_pct": 11.7,
+      "within_10pct": 0.443,
+      "within_20pct": 0.652,
+      "range_coverage_p10_p90": 0.826
+    },
+    "chickpea": {
+      "rows": 2642,
+      "model_median_error_pct": 11.4,
+      "baseline_5yr_mean_median_error_pct": 12.9,
+      "baseline_last_year_median_error_pct": 11.9,
+      "within_10pct": 0.46,
+      "within_20pct": 0.71,
+      "range_coverage_p10_p90": 0.854
+    },
+    "cotton": {
+      "rows": 1709,
+      "model_median_error_pct": 16.0,
+      "baseline_5yr_mean_median_error_pct": 16.9,
+      "baseline_last_year_median_error_pct": 18.2,
+      "within_10pct": 0.349,
+      "within_20pct": 0.574,
+      "range_coverage_p10_p90": 0.83
+    },
+    "groundnut": {
+      "rows": 3611,
+      "model_median_error_pct": 12.2,
+      "baseline_5yr_mean_median_error_pct": 13.2,
+      "baseline_last_year_median_error_pct": 12.0,
+      "within_10pct": 0.435,
+      "within_20pct": 0.678,
+      "range_coverage_p10_p90": 0.832
+    },
+    "jowar": {
+      "rows": 2332,
+      "model_median_error_pct": 15.7,
+      "baseline_5yr_mean_median_error_pct": 17.7,
+      "baseline_last_year_median_error_pct": 16.3,
+      "within_10pct": 0.381,
+      "within_20pct": 0.573,
+      "range_coverage_p10_p90": 0.808
+    },
+    "jute": {
+      "rows": 373,
+      "model_median_error_pct": 7.9,
+      "baseline_5yr_mean_median_error_pct": 8.5,
+      "baseline_last_year_median_error_pct": 6.9,
+      "within_10pct": 0.59,
+      "within_20pct": 0.788,
+      "range_coverage_p10_p90": 0.783
+    },
+    "lentil": {
+      "rows": 1912,
+      "model_median_error_pct": 10.0,
+      "baseline_5yr_mean_median_error_pct": 12.8,
+      "baseline_last_year_median_error_pct": 9.5,
+      "within_10pct": 0.501,
+      "within_20pct": 0.701,
+      "range_coverage_p10_p90": 0.81
+    },
+    "maize": {
+      "rows": 6391,
+      "model_median_error_pct": 11.7,
+      "baseline_5yr_mean_median_error_pct": 14.3,
+      "baseline_last_year_median_error_pct": 11.6,
+      "within_10pct": 0.448,
+      "within_20pct": 0.693,
+      "range_coverage_p10_p90": 0.806
+    },
+    "mothbeans": {
+      "rows": 118,
+      "model_median_error_pct": 14.9,
+      "baseline_5yr_mean_median_error_pct": 16.9,
+      "baseline_last_year_median_error_pct": 16.9,
+      "within_10pct": 0.364,
+      "within_20pct": 0.551,
+      "range_coverage_p10_p90": 0.805
+    },
+    "mungbean": {
+      "rows": 4222,
+      "model_median_error_pct": 14.4,
+      "baseline_5yr_mean_median_error_pct": 16.1,
+      "baseline_last_year_median_error_pct": 14.2,
+      "within_10pct": 0.383,
+      "within_20pct": 0.604,
+      "range_coverage_p10_p90": 0.819
+    },
+    "mustard": {
+      "rows": 3229,
+      "model_median_error_pct": 9.8,
+      "baseline_5yr_mean_median_error_pct": 11.9,
+      "baseline_last_year_median_error_pct": 9.7,
+      "within_10pct": 0.506,
+      "within_20pct": 0.729,
+      "range_coverage_p10_p90": 0.83
+    },
+    "onion": {
+      "rows": 1801,
+      "model_median_error_pct": 9.4,
+      "baseline_5yr_mean_median_error_pct": 13.9,
+      "baseline_last_year_median_error_pct": 9.9,
+      "within_10pct": 0.518,
+      "within_20pct": 0.691,
+      "range_coverage_p10_p90": 0.78
+    },
+    "pigeonpeas": {
+      "rows": 2895,
+      "model_median_error_pct": 14.5,
+      "baseline_5yr_mean_median_error_pct": 15.5,
+      "baseline_last_year_median_error_pct": 16.2,
+      "within_10pct": 0.399,
+      "within_20pct": 0.602,
+      "range_coverage_p10_p90": 0.816
+    },
+    "potato": {
+      "rows": 1838,
+      "model_median_error_pct": 9.1,
+      "baseline_5yr_mean_median_error_pct": 11.6,
+      "baseline_last_year_median_error_pct": 9.3,
+      "within_10pct": 0.524,
+      "within_20pct": 0.731,
+      "range_coverage_p10_p90": 0.786
+    },
+    "rice": {
+      "rows": 6934,
+      "model_median_error_pct": 8.6,
+      "baseline_5yr_mean_median_error_pct": 9.6,
+      "baseline_last_year_median_error_pct": 8.6,
+      "within_10pct": 0.554,
+      "within_20pct": 0.774,
+      "range_coverage_p10_p90": 0.814
+    },
+    "soybean": {
+      "rows": 1368,
+      "model_median_error_pct": 13.8,
+      "baseline_5yr_mean_median_error_pct": 15.1,
+      "baseline_last_year_median_error_pct": 13.4,
+      "within_10pct": 0.399,
+      "within_20pct": 0.626,
+      "range_coverage_p10_p90": 0.801
+    },
+    "sugarcane": {
+      "rows": 2385,
+      "model_median_error_pct": 6.4,
+      "baseline_5yr_mean_median_error_pct": 7.8,
+      "baseline_last_year_median_error_pct": 6.5,
+      "within_10pct": 0.633,
+      "within_20pct": 0.823,
+      "range_coverage_p10_p90": 0.823
+    },
+    "wheat": {
+      "rows": 3276,
+      "model_median_error_pct": 7.0,
+      "baseline_5yr_mean_median_error_pct": 8.8,
+      "baseline_last_year_median_error_pct": 7.2,
+      "within_10pct": 0.632,
+      "within_20pct": 0.833,
+      "range_coverage_p10_p90": 0.846
+    }
+  },
+  "data": {
+    "publisher": "Original data: Directorate of Economics & Statistics (DES), Department of Agriculture & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Government of India. Redistributed (cleaned, LGD-mapped district codes) by India Data Portal (ISB Bharti Institute of Public Policy).",
+    "licence": "Redistribution on India Data Portal: Open Data Commons Attribution License (ODC-By 1.0). Original on data.gov.in: Government Open Data License - India (GODL-India), released under NDSAP. Both permit commercial and non-commercial reuse with attribution.",
+    "attribution": "Source: Directorate of Economics & Statistics, Ministry of Agriculture & Farmers Welfare, Government of India (via India Data Portal, ODC-By; data.gov.in, GODL-India).",
+    "source_url": "https://ckan.indiadataportal.com/dataset/area-production-yield-apy",
+    "catalog_url": "https://www.data.gov.in/catalog/district-wise-season-wise-crop-production-statistics-0",
+    "seasons": "1997-98 to 2024-25",
+    "district_seasons": 210058
+  },
+  "limits": [
+    "Predicts the district average, not one field. Soil, seed, irrigation and care move a single field well above or below it.",
+    "Uses past yields only - no weather forecast - so a drought or flood year will be missed.",
+    "Cotton is lint (not kapas) and jute is fibre, converted from bales."
+  ]
+}
