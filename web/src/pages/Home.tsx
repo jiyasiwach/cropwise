@@ -1,19 +1,63 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type PointerEvent, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, CloudRain, FlaskConical, MapPin, Send, ShieldCheck, Thermometer } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Camera, CalendarDays, CloudRain, FlaskConical, IndianRupee, Landmark, MapPin, Radio, Scale, Send, ShieldCheck, Sprout, Thermometer, type LucideIcon } from 'lucide-react'
 import { api, type EvalData, type Season } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { useListener } from '../lib/speech'
 import { CropIcon, cropName, MicButton, Skeleton, TONE_BG, cx, type Tone } from '../components/ui'
-import { ArtChannels, ArtDoctor, ArtGrow, ArtPlan, ArtSchemes, ArtSell, ArtYield, HeroScene, HeroSky } from '../components/art'
+import { Photo, PhotoCredit } from '../components/Photo'
+import { Tilt } from '../components/Tilt'
+import type { PhotoKey } from '../lib/photos'
 
 function greetingKey() {
   const h = new Date().getHours()
   return h < 12 ? 'greet.morning' : h < 17 ? 'greet.afternoon' : 'greet.evening'
 }
 
-function Hero() {
+/** Glass cards floating in 3D over the hero photo, showing the field's live readings. */
+function FloatingCards({ season }: { season: Season | null }) {
+  const sow = season?.sowable[0]
+  const ph = season?.soil?.ph
+  const cards = [
+    { k: 'Soil pH', v: ph != null ? String(ph) : '—', sub: ph == null ? 'Reading…' : ph < 5.5 ? 'Acidic' : ph <= 7.5 ? 'Good for most crops' : 'Alkaline', icon: FlaskConical, z: 60, x: 0, y: 0, delay: '0s' },
+    { k: 'Rain · 30 days', v: season?.weather ? `${Math.round(season.weather.rainfall)} mm` : '—', sub: season?.weather ? `${Math.round(season.weather.temperature)}°C average` : 'Reading…', icon: CloudRain, z: 20, x: 56, y: 96, delay: '1.2s' },
+    { k: 'Sow now', v: sow ? cropName(sow.crop) : '—', sub: sow ? `${sow.days_left} days left` : 'Checking the calendar…', icon: Sprout, z: 90, x: 8, y: 192, delay: '2.4s' },
+  ]
+  return (
+    <div className="pointer-events-none absolute right-8 top-1/2 hidden h-[19rem] w-64 -translate-y-1/2 [perspective:1100px] xl:block" aria-hidden>
+      <div className="relative size-full [transform-style:preserve-3d] [transform:rotateY(-22deg)_rotateX(10deg)]">
+        {cards.map(({ k, v, sub, icon: Icon, z, x, y, delay }) => (
+          <div
+            key={k}
+            className="cw-float absolute w-56 rounded-2xl border border-white/25 bg-white/12 p-3.5 text-white shadow-[0_24px_48px_-20px_rgb(0_0_0/0.7)] backdrop-blur-md"
+            style={{ left: x, top: y, transform: `translateZ(${z}px)`, animationDelay: delay }}
+          >
+            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-white/70">
+              <span className="grid size-6 place-items-center rounded-lg bg-[#e6c46f] text-[#2a1f05]">
+                <Icon className="size-3.5" />
+              </span>
+              {k}
+            </div>
+            <div className="mt-1.5 text-2xl font-extrabold tracking-tight">{v}</div>
+            <div className="text-xs text-white/70">{sub}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Hero({ season }: { season: Season | null }) {
   const { t, lang, place } = usePrefs()
+  const photo = useRef<HTMLDivElement>(null)
+  // Parallax: the photo drifts a little against the pointer, so the hero has depth.
+  const drift = (e: PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== 'mouse' || !photo.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const r = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    photo.current.style.transform = `scale(1.08) translate(${-x * 14}px, ${-y * 10}px)`
+  }
   const navigate = useNavigate()
   const [question, setQuestion] = useState('')
   const go = useCallback((q: string) => navigate(`/ask?q=${encodeURIComponent(q)}`), [navigate])
@@ -25,26 +69,27 @@ function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden rounded-[1.9rem] border border-line/70 bg-gradient-to-b from-[#fdf0d2] via-[#f7efdd] to-[#e6efd6] dark:from-[#1d2a1f] dark:via-[#172119] dark:to-[#132016]">
-      <div className="pointer-events-none absolute -right-8 -top-8 w-36 sm:right-2 sm:top-0 sm:w-72 dark:opacity-70" aria-hidden>
-        <HeroSky />
+    <section onPointerMove={drift} className="relative isolate overflow-hidden rounded-[1.6rem] bg-[#0d2a1c] shadow-[0_30px_60px_-30px_rgb(6_20_13/0.8)]">
+      <div ref={photo} className="absolute inset-0 -z-10 scale-[1.08] transition-transform duration-500 ease-out">
+        <Photo k="hero" eager className="size-full object-[30%_70%] sm:object-center" />
       </div>
-      <div className="relative z-10 px-5 pt-6 sm:px-8 sm:pt-8">
-        <p className="flex flex-wrap items-center gap-x-2 text-sm font-semibold text-ink/70">
-          <span>{t(greetingKey() as Parameters<typeof t>[0])}</span>
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#06140d]/90 via-[#06140d]/35 to-[#06140d]/5 sm:bg-gradient-to-r sm:from-[#06140d]/85 sm:via-[#06140d]/40 sm:to-transparent" aria-hidden />
+      <div className="px-5 pb-6 pt-24 sm:px-9 sm:pb-9 sm:pt-28 lg:pt-32">
+        <p className="flex flex-wrap items-center gap-x-2 text-sm font-semibold text-white/80">
+          <span className="text-[#e6c46f]">{t(greetingKey() as Parameters<typeof t>[0])}</span>
           {place && (
             <>
               <span aria-hidden>·</span>
               <span className="inline-flex items-center gap-1">
-                <MapPin className="size-3.5 text-leaf" aria-hidden /> {place.city}
+                <MapPin className="size-3.5" aria-hidden /> {place.city}
               </span>
             </>
           )}
           <span aria-hidden>·</span>
           <span>{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
         </p>
-        <h1 className="mt-2 max-w-[18ch] text-[2rem] leading-[1.1] text-ink sm:text-[2.6rem]">{t('home.title')}</h1>
-        <form onSubmit={submit} className="mt-5 flex max-w-2xl items-center gap-2 rounded-[1.4rem] border border-line bg-surface p-2 shadow-card">
+        <h1 className="mt-2 max-w-[17ch] text-[2.1rem] leading-[1.08] text-white sm:text-[3rem]">{t('home.title')}</h1>
+        <form onSubmit={submit} className="mt-6 flex max-w-2xl items-center xl:max-w-xl gap-2 rounded-2xl bg-white/95 p-2 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.6)] backdrop-blur dark:bg-[#121b16]/90">
           <MicButton listening={listening} supported={supported} onClick={toggle} />
           <label className="sr-only" htmlFor="home-ask">
             {t('home.ask')}
@@ -56,48 +101,47 @@ function Hero() {
             placeholder={t('home.ask')}
             className="h-12 min-w-0 flex-1 border-0 bg-transparent px-2 text-[17px] text-ink outline-none placeholder:text-muted"
           />
-          <button type="submit" className="grid size-12 shrink-0 place-items-center rounded-2xl bg-leaf text-on-leaf transition hover:brightness-110" aria-label={t('common.send')}>
+          <button type="submit" className="grid size-12 shrink-0 place-items-center rounded-xl bg-leaf text-on-leaf transition hover:brightness-110" aria-label={t('common.send')}>
             <Send className="size-5" aria-hidden />
           </button>
         </form>
-        <p className="mt-2.5 text-xs text-ink/60">{t('home.note')}</p>
+        <p className="mt-3 text-xs text-white/70">{t('home.note')}</p>
       </div>
-      <div className="relative mt-3 aspect-[640/128] max-h-44 min-h-24 w-full dark:opacity-80 dark:saturate-[.8]">
-        <HeroScene />
-      </div>
+      <FloatingCards season={season} />
+      <PhotoCredit k="hero" className="absolute right-3 top-3 sm:bottom-3 sm:top-auto" />
     </section>
   )
 }
 
-function ToolCard({ to, art, title, hint, tone, featured, cta }: { to: string; art: ReactNode; title: string; hint: string; tone: Tone; featured?: boolean; cta?: string }) {
+function ToolCard({ to, photo, icon: Icon, title, hint, featured, wide, cta }: { to: string; photo: PhotoKey; icon: LucideIcon; title: string; hint: string; featured?: boolean; wide?: boolean; cta?: string }) {
   return (
+    <Tilt className={cx(featured ? 'col-span-2 sm:row-span-2' : '', wide && 'sm:col-span-2')} max={featured ? 4 : 7}>
     <Link
       to={to}
       className={cx(
-        'group flex overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface no-underline shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-leaf/40',
-        featured ? 'col-span-2 flex-col sm:flex-row' : 'flex-col',
+        'group relative isolate flex h-full flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-[#0d2a1c] no-underline shadow-[0_18px_40px_-22px_rgb(6_20_13/0.75)] ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-[0_28px_56px_-24px_rgb(6_20_13/0.85)]',
+        featured ? 'min-h-64 sm:min-h-[22rem]' : 'min-h-44 sm:min-h-48',
       )}
     >
-      <span className={cx('relative grid place-items-center overflow-hidden', TONE_BG[tone], featured ? 'h-36 sm:h-auto sm:w-[46%]' : 'h-28 sm:h-32')}>
-        <span className="pointer-events-none absolute -bottom-8 left-1/2 size-32 -translate-x-1/2 rounded-full bg-surface/40" aria-hidden />
-        <span className={cx('relative transition duration-300 group-hover:scale-[1.06]', featured ? 'w-36 sm:w-44' : 'w-28 sm:w-32')}>{art}</span>
+      <Photo k={photo} className="absolute inset-0 -z-10 size-full transition duration-500 group-hover:scale-[1.05]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#06140d]/92 via-[#06140d]/40 to-transparent" aria-hidden />
+      <span className="absolute left-3 top-3 grid size-9 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-md">
+        <Icon className="size-[18px]" aria-hidden />
       </span>
-      <span className={cx('flex flex-1 flex-col justify-between gap-2', featured ? 'p-5' : 'p-4')}>
-        <span>
-          <span className={cx('block font-bold leading-snug text-ink', featured ? 'font-display text-[1.45rem]' : 'text-[1.02rem]')}>{title}</span>
-          <span className="mt-0.5 block text-sm text-muted">{hint}</span>
-        </span>
-        {featured ? (
-          <span className="inline-flex w-fit items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-semibold text-on-leaf transition group-hover:brightness-110">
+      <span className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-[#0d2a1c] opacity-0 transition duration-300 group-hover:opacity-100 sm:opacity-80">
+        <ArrowUpRight className="size-4" aria-hidden />
+      </span>
+      <span className={cx('block [transform:translateZ(30px)]', featured ? 'p-5 sm:p-6' : 'p-4')}>
+        <span className={cx('block font-display font-extrabold tracking-tight text-white', featured ? 'text-[1.7rem] sm:text-[2rem]' : 'text-[1.05rem] leading-snug')}>{title}</span>
+        <span className={cx('mt-1 block text-white/75', featured ? 'max-w-sm text-[15px]' : 'text-sm')}>{hint}</span>
+        {featured && (
+          <span className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#e6c46f] px-4 py-2.5 text-sm font-bold text-[#2a1f05] transition group-hover:brightness-105">
             {cta} <ArrowRight className="size-4" aria-hidden />
-          </span>
-        ) : (
-          <span className="grid size-8 place-items-center self-end rounded-full bg-surface-2 text-muted transition group-hover:bg-leaf group-hover:text-on-leaf">
-            <ArrowRight className="size-4" aria-hidden />
           </span>
         )}
       </span>
     </Link>
+    </Tilt>
   )
 }
 
@@ -105,17 +149,19 @@ function Tools() {
   const { t } = usePrefs()
   return (
     <section aria-labelledby="tools-title">
-      <h2 id="tools-title" className="mb-3 px-1 text-[1.35rem] text-ink">
-        {t('home.tools')}
-      </h2>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <ToolCard to="/grow" featured art={<ArtGrow />} tone="leaf" title={t('tile.grow')} hint="We read your soil and 30 days of weather, then suggest three crops with the reasons." cta="Read my soil" />
-        <ToolCard to="/doctor" art={<ArtDoctor />} tone="clay" title={t('tile.doctor')} hint={t('hint.doctor')} />
-        <ToolCard to="/impact#calculator" art={<ArtSell />} tone="amber" title={t('tile.sell')} hint={t('hint.sell')} />
-        <ToolCard to="/results" art={<ArtPlan />} tone="sky" title={t('tile.plan')} hint={t('hint.plan')} />
-        <ToolCard to="/yield" art={<ArtYield />} tone="leaf" title={t('tile.yield')} hint={t('hint.yield')} />
-        <ToolCard to="/schemes" art={<ArtSchemes />} tone="amber" title={t('tile.schemes')} hint={t('hint.schemes')} />
-        <ToolCard to="/community" art={<ArtChannels />} tone="sky" title={t('tile.community')} hint={t('hint.community')} />
+      <div className="mb-3 flex items-end justify-between gap-3 px-1">
+        <h2 id="tools-title" className="text-[1.45rem] text-ink">
+          {t('home.tools')}
+        </h2>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <ToolCard to="/grow" featured photo="grow" icon={Sprout} title={t('tile.grow')} hint="We read your soil and 30 days of weather, then suggest three crops with the reasons." cta="Read my soil" />
+        <ToolCard to="/doctor" photo="doctor" icon={Camera} title={t('tile.doctor')} hint={t('hint.doctor')} />
+        <ToolCard to="/impact#calculator" photo="sell" icon={IndianRupee} title={t('tile.sell')} hint={t('hint.sell')} />
+        <ToolCard to="/results" photo="plan" icon={CalendarDays} title={t('tile.plan')} hint={t('hint.plan')} />
+        <ToolCard to="/yield" photo="yield" icon={Scale} title={t('tile.yield')} hint={t('hint.yield')} />
+        <ToolCard to="/schemes" wide photo="schemes" icon={Landmark} title={t('tile.schemes')} hint={t('hint.schemes')} />
+        <ToolCard to="/community" wide photo="community" icon={Radio} title={t('tile.community')} hint={t('hint.community')} />
       </div>
     </section>
   )
@@ -148,12 +194,9 @@ function Metric({ icon, tone, label, value, children }: { icon: ReactNode; tone:
   )
 }
 
-function TodayCard() {
-  const { place, t } = usePrefs()
-  const city = place?.city ?? 'Hyderabad'
+function useSeason(city: string) {
   const [season, setSeason] = useState<Season | null>(null)
   const [failed, setFailed] = useState(false)
-
   useEffect(() => {
     let live = true
     setSeason(null)
@@ -166,6 +209,11 @@ function TodayCard() {
       live = false
     }
   }, [city])
+  return { season, failed }
+}
+
+function TodayCard({ city, season, failed }: { city: string; season: Season | null; failed: boolean }) {
+  const { place, t } = usePrefs()
 
   return (
     <section className="rounded-[var(--radius-card)] border border-line bg-surface-2/60 p-4 sm:p-5">
@@ -264,11 +312,14 @@ function TrustStrip() {
 }
 
 export default function Home() {
+  const { place } = usePrefs()
+  const city = place?.city ?? 'Hyderabad'
+  const { season, failed } = useSeason(city)
   return (
     <div className="space-y-7">
-      <Hero />
+      <Hero season={season} />
       <Tools />
-      <TodayCard />
+      <TodayCard city={city} season={season} failed={failed} />
       <TrustStrip />
     </div>
   )

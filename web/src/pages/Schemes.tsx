@@ -4,7 +4,6 @@ import { BadgeIndianRupee, ChevronDown, ExternalLink, FileCheck2, Landmark, MapP
 import { api, type Scheme, type SchemeUpdates, type Schemes as SchemesData } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Card, Chip, ErrorBox, ListenButton, Note, PageTitle, Skeleton, cx } from '../components/ui'
-import { ArtSchemes } from '../components/art'
 
 type Tab = 'central' | 'state' | 'updates'
 
@@ -212,7 +211,7 @@ export default function Schemes() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtSchemes />} tone="amber" title={t('tile.schemes')} subtitle="Government schemes for farmers — what you get, who can apply and how. Each one is checked against its official page, with the date." />
+      <PageTitle photo="schemes" title={t('tile.schemes')} subtitle="Government schemes for farmers — what you get, who can apply and how. Each one is checked against its official page, with the date." />
 
       <Note tone="warn">Apply only on official .gov.in websites, at a CSC or at your bank. No government scheme asks you to pay an agent or share your OTP.</Note>
 

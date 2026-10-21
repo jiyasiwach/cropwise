@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { AlertTriangle, Apple, Banana, Bean, Cherry, Citrus, Coffee, Flower2, Grape, Info, Leaf, Loader2, Mic, MicOff, Phone, Sprout, Square, TreePalm, Volume2, Wheat, type LucideIcon } from 'lucide-react'
 import { usePrefs } from '../lib/prefs'
 import { useSpeaker } from '../lib/speech'
+import { Photo, PhotoCredit } from './Photo'
+import type { PhotoKey } from '../lib/photos'
 
 export function cx(...parts: (string | false | null | undefined)[]) {
   return parts.filter(Boolean).join(' ')
@@ -25,9 +27,9 @@ export const TONE_BG: Record<Tone, string> = {
   sky: 'bg-sky-soft',
 }
 
-/** Page header. With `art` it becomes a warm illustrated banner; without, a plain title. */
-export function PageTitle({ title, subtitle, children, art, tone = 'leaf', eyebrow }: { title: string; subtitle?: ReactNode; children?: ReactNode; art?: ReactNode; tone?: Tone; eyebrow?: ReactNode }) {
-  if (!art)
+/** Page header. With `photo` it becomes a photographic banner; without, a plain title. */
+export function PageTitle({ title, subtitle, children, photo, eyebrow }: { title: string; subtitle?: ReactNode; children?: ReactNode; photo?: PhotoKey; eyebrow?: ReactNode }) {
+  if (!photo)
     return (
       <header className="mb-5">
         {eyebrow && <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-leaf">{eyebrow}</div>}
@@ -37,17 +39,16 @@ export function PageTitle({ title, subtitle, children, art, tone = 'leaf', eyebr
       </header>
     )
   return (
-    <header className={cx('relative mb-5 overflow-hidden rounded-[1.6rem] border border-line/70 px-5 py-5 sm:px-7 sm:py-6', TONE_BG[tone])}>
-      <div className="pointer-events-none absolute -bottom-16 -right-10 size-56 rounded-full bg-surface/50 blur-2xl" aria-hidden />
-      <div className="relative flex items-center gap-4 sm:gap-6">
-        <div className="min-w-0 flex-1">
-          {eyebrow && <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-ink/60">{eyebrow}</div>}
-          <h1 className="text-[1.75rem] text-ink sm:text-[2.3rem]">{title}</h1>
-          {subtitle && <p className="mt-1.5 max-w-[56ch] text-[15px] text-ink/70 sm:text-base">{subtitle}</p>}
-          {children}
-        </div>
-        <div className="w-24 shrink-0 self-end sm:w-36 lg:w-40">{art}</div>
+    <header className="relative mb-5 flex min-h-[12rem] items-end overflow-hidden rounded-[1.4rem] bg-[#0d2a1c] shadow-card sm:min-h-[14rem]">
+      <Photo k={photo} eager className="absolute inset-0 size-full" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#06140d]/90 via-[#06140d]/55 to-[#06140d]/10 sm:bg-gradient-to-r sm:from-[#06140d]/88 sm:via-[#06140d]/55 sm:to-transparent" aria-hidden />
+      <div className="relative w-full max-w-2xl px-5 pb-5 pt-14 sm:px-7 sm:pb-7">
+        {eyebrow && <div className="mb-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[#e6c46f]">{eyebrow}</div>}
+        <h1 className="text-[1.85rem] text-white sm:text-[2.5rem]">{title}</h1>
+        {subtitle && <p className="mt-2 max-w-[56ch] text-[15px] leading-relaxed text-white/80 sm:text-base">{subtitle}</p>}
+        {children}
       </div>
+      <PhotoCredit k={photo} className="absolute bottom-2 right-2.5 hidden sm:block" />
     </header>
   )
 }
@@ -64,10 +65,11 @@ export function SectionTitle({ children, aside }: { children: ReactNode; aside?:
 type Variant = 'primary' | 'secondary' | 'ghost' | 'amber'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-leaf text-on-leaf hover:brightness-110',
+  primary:
+    'bg-leaf text-on-leaf shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_18px_-8px_rgb(13_58_37/0.65)] hover:-translate-y-px hover:brightness-110 active:translate-y-0',
   secondary: 'border border-line bg-surface text-ink hover:bg-surface-2',
   ghost: 'text-leaf hover:bg-leaf-soft',
-  amber: 'bg-amber text-[#2a1c00] hover:brightness-105',
+  amber: 'bg-amber text-[#2a1c00] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_8px_18px_-8px_rgb(120_80_10/0.55)] hover:-translate-y-px hover:brightness-105',
 }
 
 export function Button({

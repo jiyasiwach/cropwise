@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { BarChart3, ChevronRight, Code2, History, Info, Landmark, Lightbulb, MapPin, Radio, Scale } from 'lucide-react'
+import { BarChart3, Camera, ChevronRight, Code2, History, Info, Landmark, Lightbulb, MapPin, Radio, Scale } from 'lucide-react'
 import { LANGUAGES, type Lang } from '../lib/i18n'
 import { usePrefs, type Theme } from '../lib/prefs'
 import { Card, HelplineButton, PageTitle, SectionTitle, cx } from '../components/ui'
-import { ArtSettings } from '../components/art'
+import { Photo } from '../components/Photo'
+import { PHOTOS, type PhotoKey } from '../lib/photos'
 
 function Row({ to, icon, label, hint, external }: { to: string; icon: React.ReactNode; label: string; hint?: string; external?: boolean }) {
   const body = (
@@ -32,7 +33,7 @@ export default function Settings() {
   const { lang, setLang, theme, setTheme, place, setPlace, t } = usePrefs()
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtSettings />} tone="sky" title="More" />
+      <PageTitle photo="settings" title="More" />
 
       <Card>
         <Row to="/yield" icon={<Scale className="size-5" />} label="Yield forecast" hint="Expected quintal per acre for your district" />
@@ -111,6 +112,33 @@ export default function Settings() {
         <div className="mt-4">
           <HelplineButton />
         </div>
+      </Card>
+
+      <Card>
+        <SectionTitle>
+          <span className="inline-flex items-center gap-2">
+            <Camera className="size-5 text-leaf" aria-hidden /> Photo credits
+          </span>
+        </SectionTitle>
+        <p className="mb-3 text-sm text-muted">Photographs from Wikimedia Commons, used under the licence shown for each.</p>
+        <ul className="divide-y divide-line text-sm">
+          {Object.entries(PHOTOS).map(([k, ph]) => (
+            <li key={k} className="flex items-center gap-3 py-2.5">
+              <Photo k={k as PhotoKey} className="size-12 shrink-0 rounded-lg" />
+              <span className="min-w-0 flex-1">
+                <a href={ph.page} target="_blank" rel="noopener noreferrer" className="block truncate font-semibold text-ink">
+                  {ph.title.replace(/\.jpe?g$/i, '')}
+                </a>
+                <span className="block text-xs text-muted">
+                  {ph.author} ·{' '}
+                  <a href={ph.license_url} target="_blank" rel="noopener noreferrer">
+                    {ph.license}
+                  </a>
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </Card>
     </div>
   )

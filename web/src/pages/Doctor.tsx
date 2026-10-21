@@ -5,7 +5,6 @@ import { api, ApiError, type Condition, type DoctorResult } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Stepper } from '../components/charts'
 import { Button, Card, Chip, CROPS, cropName, ErrorBox, HelplineButton, ListenButton, Note, PageTitle, SectionTitle, SourceChip, cx, inputCls } from '../components/ui'
-import { ArtDoctor } from '../components/art'
 
 
 /** Shrink in the browser: ≤1024 px JPEG keeps uploads small on 2G and far under the 4.5 MB limit. */
@@ -122,7 +121,7 @@ export default function Doctor() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtDoctor />} tone="clay" title="Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
+      <PageTitle photo="doctor" title="Crop Doctor" subtitle="Photograph one sick leaf. You get the likely problem, how sure it is, and what to do — only from cited sources. When it is not sure, it says so." />
 
       <Card>
         <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => choose(e.target.files?.[0])} />

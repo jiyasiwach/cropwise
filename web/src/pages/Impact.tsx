@@ -4,7 +4,6 @@ import { api, ApiError, type MandiGain } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { CompareBars } from '../components/charts'
 import { Button, Card, Chip, CROPS, cropName, ErrorBox, HonestyBadge, Note, PageTitle, rupee, SectionTitle, inputCls } from '../components/ui'
-import { ArtIdea } from '../components/art'
 
 const A = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <a href={href} target="_blank" rel="noopener noreferrer">
@@ -144,7 +143,7 @@ export default function Impact() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtIdea />} tone="amber"
+      <PageTitle photo="impact"
         title="The problem CropWise works on"
         subtitle="Four decisions a small farmer makes every season, usually without data. Every figure below links to its public source; where we could not find one we could check, we say so."
       />

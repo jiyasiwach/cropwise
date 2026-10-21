@@ -4,7 +4,6 @@ import { BarChart3, CalendarRange, Database, MapPin, Scale, Target } from 'lucid
 import { api, type YieldForecast, type YieldOptions } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Button, Card, Chip, CropIcon, ErrorBox, ListenButton, Loading, Note, PageTitle, SectionTitle, inputCls } from '../components/ui'
-import { ArtYield } from '../components/art'
 
 const SEASON_LABEL: Record<string, string> = {
   Kharif: 'Kharif (monsoon, Jun–Oct)',
@@ -141,7 +140,7 @@ export default function Yield() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtYield />} tone="leaf"
+      <PageTitle photo="yield"
         title={t('tile.yield')}
         subtitle="How much your crop is likely to give next season, per acre and for your whole field — learned from 25+ years of Government of India district crop records."
       />

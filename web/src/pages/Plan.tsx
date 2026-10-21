@@ -5,7 +5,6 @@ import { api, ApiError, type BestMarket, type Mandi, type Plan, type Profit, typ
 import { usePrefs } from '../lib/prefs'
 import { CompareBars, MoneyBar, SeasonTimeline, Sparkline } from '../components/charts'
 import { Button, ButtonLink, Card, Chip, CropIcon, cropName, cx, ErrorBox, HelplineButton, HonestyBadge, ListenButton, Loading, Note, PageTitle, rupee, SectionTitle, SourceChip, inputCls } from '../components/ui'
-import { ArtPlan } from '../components/art'
 
 const ShopsMap = lazy(() => import('../components/ShopsMap'))
 
@@ -342,7 +341,7 @@ export default function PlanPage() {
       <Link to="/results" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted no-underline hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> All crops
       </Link>
-      <PageTitle art={<ArtPlan />} tone="sky" eyebrow="Season plan" title={`${cropName(crop)} plan`} subtitle="When to sow, what to buy, where to sell and what you could earn — for your land.">
+      <PageTitle photo="plan" eyebrow="Season plan" title={`${cropName(crop)} plan`} subtitle="When to sow, what to buy, where to sell and what you could earn — for your land.">
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-surface/80 py-1 pl-1 pr-3 text-sm font-semibold text-ink">
             <CropIcon crop={crop} size="sm" /> {cropName(crop)}

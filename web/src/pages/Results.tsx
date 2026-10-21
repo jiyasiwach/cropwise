@@ -4,7 +4,6 @@ import type { PredictIn, PredictOut, Place } from '../lib/api'
 import { load, usePrefs } from '../lib/prefs'
 import { ConfidenceRing } from '../components/charts'
 import { ButtonLink, Chip, CropIcon, cropName, cx, ListenButton, Note, PageTitle } from '../components/ui'
-import { ArtGrow } from '../components/art'
 
 interface Saved {
   result: PredictOut
@@ -20,7 +19,7 @@ export default function Results() {
   if (!saved) {
     return (
       <div className="space-y-5">
-        <PageTitle art={<ArtGrow />} tone="amber" title={t('results.title')} subtitle="Tell us where your farm is first — it takes about a minute." />
+        <PageTitle photo="results" title={t('results.title')} subtitle="Tell us where your farm is first — it takes about a minute." />
         <ButtonLink to="/grow">{t('tile.grow')} →</ButtonLink>
       </div>
     )
@@ -30,7 +29,7 @@ export default function Results() {
   const lab = result.model_source === 'lab'
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtGrow />} tone="amber"
+      <PageTitle photo="results"
         title={t('results.title')}
         subtitle={
           <>

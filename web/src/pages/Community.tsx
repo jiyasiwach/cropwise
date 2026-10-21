@@ -4,7 +4,6 @@ import { AtSign, BadgeCheck, ExternalLink, MapPin, MessageCircle, Phone, PlayCir
 import { api, type Channel, type Channels } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Card, Chip, ErrorBox, HelplineButton, Note, PageTitle, SectionTitle, Skeleton, cx } from '../components/ui'
-import { ArtChannels } from '../components/art'
 
 // Platform tints are soft washes of each service's colour, so a farmer can tell them apart at a glance.
 const PLATFORM: Record<string, { label: string; icon: typeof Send; tint: string; group: 'chat' | 'call' | 'follow' }> = {
@@ -103,7 +102,7 @@ export default function Community() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtChannels />} tone="sky"
+      <PageTitle photo="community"
         title={t('tile.community')}
         subtitle="Official government agriculture channels for alerts, scheme news and advice. Every one is published by the government body itself — CropWise does not run any groups."
       />

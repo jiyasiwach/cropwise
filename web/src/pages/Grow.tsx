@@ -4,7 +4,6 @@ import { Check, CloudSun, FlaskConical, LandPlot, MapPin, Sprout } from 'lucide-
 import { api, ApiError, type PredictIn, type Soil, type Weather } from '../lib/api'
 import { save, usePrefs } from '../lib/prefs'
 import { Button, ErrorBox, Note, PageTitle, SourceChip, TONE_BG, cx, inputCls, type Tone } from '../components/ui'
-import { ArtGrow } from '../components/art'
 
 // No `step`: detected values (27.31 °C) must never fail the browser's own form check.
 type Field = { key: keyof PredictIn; label: string; unit: string; min: number; max: number; step: number }
@@ -162,7 +161,7 @@ export default function Grow() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtGrow />} tone="leaf" title={t('grow.title')} subtitle="We read the soil and the last 30 days of weather for your area, then suggest three crops with the reasons behind each." />
+      <PageTitle photo="grow" title={t('grow.title')} subtitle="We read the soil and the last 30 days of weather for your area, then suggest three crops with the reasons behind each." />
 
       <Step n={1} done={!!place} icon={<MapPin className="size-5 text-clay" aria-hidden />} tone="clay" title="Your farm's town" hint="We look up the soil map and 30 days of weather there.">
         <form onSubmit={detect} className="flex flex-col gap-3 sm:flex-row sm:items-end">

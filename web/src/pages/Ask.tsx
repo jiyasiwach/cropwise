@@ -6,7 +6,6 @@ import { usePrefs } from '../lib/prefs'
 import { useListener } from '../lib/speech'
 import { Chip, HelplineButton, ListenButton, MicButton, PageTitle, TONE_BG, cx, type Tone } from '../components/ui'
 import { LogoMark } from '../components/Logo'
-import { ArtAsk } from '../components/art'
 
 interface Message {
   id: string
@@ -108,7 +107,7 @@ export default function Ask() {
 
   return (
     <div className="flex min-h-[calc(100dvh-12rem)] flex-col">
-      <PageTitle art={<ArtAsk />} tone="amber" title="KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
+      <PageTitle photo="ask" title="KrishiMitra" subtitle="Answers only from its sources and tells you which. Ask in your language, by voice or text." />
 
       <div className="flex-1 space-y-4" aria-live="polite">
         {messages.length === 0 && (

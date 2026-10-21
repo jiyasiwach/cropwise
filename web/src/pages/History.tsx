@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, type HistoryItem } from '../lib/api'
 import { ButtonLink, Card, Chip, CropIcon, cropName, ErrorBox, Loading, PageTitle } from '../components/ui'
-import { ArtHistory } from '../components/art'
 
 export default function History() {
   const [items, setItems] = useState<HistoryItem[] | null>(null)
@@ -15,7 +14,7 @@ export default function History() {
 
   return (
     <div className="space-y-5">
-      <PageTitle art={<ArtHistory />} tone="sky" title="History" subtitle="Your past recommendations on this phone. No account: a random id in a cookie keeps them separate from everyone else's." />
+      <PageTitle photo="history" title="History" subtitle="Your past recommendations on this phone. No account: a random id in a cookie keeps them separate from everyone else's." />
       {error && <ErrorBox message={error} />}
       {!items && !error && <Loading />}
       {items?.length === 0 && (
