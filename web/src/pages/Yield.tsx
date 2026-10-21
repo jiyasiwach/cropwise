@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { BarChart3, Info, MapPin, Scale } from 'lucide-react'
+import { BarChart3, CalendarRange, Database, MapPin, Scale, Target } from 'lucide-react'
 import { api, type YieldForecast, type YieldOptions } from '../lib/api'
 import { usePrefs } from '../lib/prefs'
 import { Button, Card, Chip, CropIcon, ErrorBox, ListenButton, Loading, Note, PageTitle, SectionTitle } from '../components/ui'
@@ -67,17 +67,18 @@ function HistoryBars({ result }: { result: YieldForecast }) {
       <div className="mt-1 flex gap-2">
         {rows.map((r) => (
           <span key={r.label} className="flex-1 text-center text-[10px] text-muted">
-            {r.forecast ? 'Next' : r.label}
+            {r.label.slice(2)}{r.forecast ? '*' : ''}
           </span>
         ))}
       </div>
-      <figcaption className="mt-2 text-xs text-muted">Quintal per acre, district average. Dashed bar = forecast.</figcaption>
+      <figcaption className="mt-2 text-xs text-muted">Quintal per acre, district average. * Dashed bar = this forecast.</figcaption>
     </figure>
   )
 }
 
 export default function Yield() {
-  const { place, acres, setAcres } = usePrefs()
+  const { place, acres, setAcres, t } = usePrefs()
+  const resultRef = useRef<HTMLDivElement>(null)
   const [state, setState] = useState<string>(place?.state ?? '')
   const [district, setDistrict] = useState<string>(place?.district ?? '')
   const [opts, setOpts] = useState<YieldOptions | null>(null)
@@ -122,6 +123,7 @@ export default function Yield() {
     setError(null)
     try {
       setResult(await api.yieldForecast(crop, opts.state, opts.district, season, acres || undefined))
+      requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
     } catch (err) {
       setResult(null)
       setError(err instanceof Error ? err.message : 'Could not make a forecast just now.')
@@ -139,7 +141,7 @@ export default function Yield() {
   return (
     <div className="space-y-5">
       <PageTitle
-        title="Yield forecast"
+        title={t('tile.yield')}
         subtitle="How much your crop is likely to give next season, per acre and for your whole field — learned from 25+ years of Government of India district crop records."
       />
 
@@ -226,8 +228,26 @@ export default function Yield() {
       {!opts && !error && <Loading />}
       {error && <ErrorBox message={error} />}
 
+      {!r && opts && !error && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { icon: Database, k: '25+ years', v: 'of Government of India district crop records' },
+            { icon: Target, k: 'Low · likely · high', v: 'a range, not a single guess — right 8 times in 10' },
+            { icon: CalendarRange, k: 'Your district', v: 'its own recent seasons and trend, not a national average' },
+          ].map(({ icon: Icon, k, v }) => (
+            <div key={k} className="flex items-start gap-3 rounded-[var(--radius-card)] border border-dashed border-line px-4 py-3.5">
+              <Icon className="mt-0.5 size-5 shrink-0 text-leaf" aria-hidden />
+              <div>
+                <div className="font-display font-bold text-ink">{k}</div>
+                <div className="text-sm text-muted">{v}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {r && (
-        <>
+        <div ref={resultRef} className="scroll-mt-20 space-y-5">
           <Card>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -255,7 +275,7 @@ export default function Yield() {
                   <div key={k} className={k === 'likely' ? 'rounded-2xl bg-leaf-soft px-3 py-3' : 'rounded-2xl bg-surface-2 px-3 py-3'}>
                     <div className="text-xs capitalize text-muted">{k === 'likely' ? 'Most likely' : k === 'low' ? 'Poor season' : 'Good season'}</div>
                     <div className="font-display text-xl font-bold tabular-nums">{num(r.field_quintal![k])} q</div>
-                    <div className="text-[11px] text-muted">for {r.acres} acres</div>
+                    <div className="text-[11px] text-muted">for {r.acres} {r.acres === 1 ? 'acre' : 'acres'}</div>
                   </div>
                 ))}
               </div>
@@ -271,12 +291,7 @@ export default function Yield() {
             <HistoryBars result={r} />
           </Card>
 
-          <Note>
-            <span className="inline-flex items-start gap-1.5">
-              <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
-              <span>{r.note}</span>
-            </span>
-          </Note>
+          <Note>{r.note}</Note>
 
           {r.accuracy && (
             <Card className="bg-surface-2">
@@ -287,7 +302,9 @@ export default function Yield() {
                     <strong>How accurate is this?</strong> Tested on {r.accuracy.rows.toLocaleString('en-IN')} district-seasons from 2018-19 onwards that the model never saw: typical
                     error <strong>{r.accuracy.model_median_error_pct}%</strong> (last season&apos;s yield as a guess: {r.accuracy.baseline_last_year_median_error_pct}%; 5-year
                     average: {r.accuracy.baseline_5yr_mean_median_error_pct}%).{' '}
-                    <Link to="/eval#yield">Full results by crop</Link>
+                    <Link to="/eval#yield" className="font-semibold text-leaf underline underline-offset-2">
+                      Full results by crop
+                    </Link>
                   </p>
                   {r.source && <p className="mt-1.5 text-xs text-muted">{r.source}</p>}
                 </div>
@@ -303,7 +320,7 @@ export default function Yield() {
               Crop insurance &amp; schemes
             </Link>
           </div>
-        </>
+        </div>
       )}
     </div>
   )
