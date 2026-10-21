@@ -6,5 +6,13 @@
       "includeFiles": "{static,templates,models,data}/**"
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "regions": [
+    "bom1"
+  ]
 }

@@ -141,7 +141,11 @@ def fit(X: pd.DataFrame, y: pd.Series) -> dict:
         m = HistGradientBoostingRegressor(loss="quantile", quantile=q, max_iter=300, learning_rate=0.05,
                                           min_samples_leaf=200, early_stopping=False,
                                           categorical_features=CATEGORICAL, random_state=7)
-        models[q] = m.fit(X[FEATURES], y)
+        m.fit(X[FEATURES], y)
+        # Only used while fitting; its pickled random generator ties the file to one numpy version
+        # (numpy 2 pickles cannot be read by the 1.26 that the server runs).
+        m._feature_subsample_rng = None
+        models[q] = m
     return models
 
 

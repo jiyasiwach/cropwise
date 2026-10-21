@@ -72,6 +72,8 @@ with TestClient(main.app) as client:
     check("yield model at least matches last season's yield as a guess",
           o["model_median_error_pct"] <= o["baseline_last_year_median_error_pct"], o)
     check("the low-high range is roughly calibrated (70-90% coverage)", 0.7 <= o["range_coverage_p10_p90"] <= 0.9, o)
+    check("the saved yield model carries no numpy random generator (it breaks across numpy versions)",
+          all(getattr(m, "_feature_subsample_rng", None) is None for m in yield_model.bundle()["models"].values()))
     check("the eval endpoint publishes the yield results", client.get("/api/v1/eval").json().get("yield") is not None)
 
     # Training and prediction share one feature function.
@@ -151,6 +153,15 @@ with TestClient(main.app) as client:
     finally:
         schemes.httpx.AsyncClient = original
     check("when the feed is down the last copy is shown with a note", out["items"][0]["title"] == "Old copy" and out["error"], out)
+
+    schemes._feed_cache.update(at=0.0, items=None)
+    schemes.httpx.AsyncClient = lambda **kw: Down()
+    try:
+        cold = asyncio.run(schemes.updates(5))
+    finally:
+        schemes.httpx.AsyncClient = original
+    check("on a cold start with the feed down, the dated saved copy is shown",
+          cold["items"] and "as of" in (cold["error"] or ""), cold.get("error"))
 
 print(f"\n{len(fails)} failed" if fails else "\nall passed")
 sys.exit(1 if fails else 0)

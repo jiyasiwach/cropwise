@@ -66,6 +66,12 @@ def channels(state: str | None = None) -> dict:
     }
 
 
+def _snapshot() -> dict:
+    """The feed's last copy saved with the code (scripts/refresh_updates.py), for when it cannot be reached."""
+    path = DATA / "updates_snapshot.json"
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
 def _feed_config() -> dict:
     path = DATA / "feed.json"
     return json.loads(path.read_text()) if path.exists() else {}
@@ -142,5 +148,11 @@ async def updates(limit: int = 12) -> dict:
     except (httpx.HTTPError, ET.ParseError, ValueError) as exc:  # JSONDecodeError is a ValueError
         items = _feed_cache["items"] or []
         error = f"The official feed did not answer ({exc.__class__.__name__}); showing the last copy we have."
+        if not items:
+            snap = _snapshot()
+            items = snap.get("items", [])
+            if items:
+                error = (f"The official feed did not answer just now; showing its announcements as of "
+                         f"{snap.get('fetched_on')}. Open the official site for anything newer.")
     return {"items": items[:limit], "source": cfg.get("source"), "error": error,
             "cached_at": _feed_cache["at"] or None, "feed_url": cfg["url"]}
